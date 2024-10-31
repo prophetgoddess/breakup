@@ -5,6 +5,12 @@ VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ball", "src\Ball.csproj", "{A79C2D92-FF68-4F4D-9CBA-84DD7E27D24E}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "lib", "lib", "{C91B5B7C-E259-47B7-AC28-40B288ADFBB6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MoonTools.ECS", "lib\MoonTools.ECS\MoonTools.ECS.csproj", "{B6AC2687-3203-43D7-B680-64107EACCF94}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MoonWorks", "lib\MoonWorks\MoonWorks.csproj", "{4551D3B9-2B83-47EE-A01F-626724D30582}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,5 +24,17 @@ Global
 		{A79C2D92-FF68-4F4D-9CBA-84DD7E27D24E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A79C2D92-FF68-4F4D-9CBA-84DD7E27D24E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A79C2D92-FF68-4F4D-9CBA-84DD7E27D24E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B6AC2687-3203-43D7-B680-64107EACCF94}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B6AC2687-3203-43D7-B680-64107EACCF94}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B6AC2687-3203-43D7-B680-64107EACCF94}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B6AC2687-3203-43D7-B680-64107EACCF94}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4551D3B9-2B83-47EE-A01F-626724D30582}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4551D3B9-2B83-47EE-A01F-626724D30582}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4551D3B9-2B83-47EE-A01F-626724D30582}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4551D3B9-2B83-47EE-A01F-626724D30582}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{B6AC2687-3203-43D7-B680-64107EACCF94} = {C91B5B7C-E259-47B7-AC28-40B288ADFBB6}
+		{4551D3B9-2B83-47EE-A01F-626724D30582} = {C91B5B7C-E259-47B7-AC28-40B288ADFBB6}
 	EndGlobalSection
 EndGlobal

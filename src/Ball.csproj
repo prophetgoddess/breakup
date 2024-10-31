@@ -4,7 +4,22 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="../lib/MoonWorks/MoonWorks.csproj">
+        <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+    </ProjectReference>
+    <ProjectReference Include="../lib/MoonTools.ECS/MoonTools.ECS.csproj">
+        <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+    </ProjectReference>
+   </ItemGroup>
+
+   <ItemGroup>
+    <Content Include="..\Content\**\*.*">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <Import Project="./CopyMoonlibs.targets" />
 </Project>
