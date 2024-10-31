@@ -4,6 +4,7 @@ using System.IO;
 using MoonTools.ECS;
 using MoonWorks;
 using MoonWorks.Graphics;
+using System.Numerics;
 
 namespace Ball;
 
@@ -11,6 +12,7 @@ class Program : Game
 {
     World World = new World();
     Renderer Renderer;
+    System.Random Random = new System.Random();
 
     public Program(
         WindowCreateInfo windowCreateInfo,
@@ -27,6 +29,17 @@ class Program : Game
     )
     {
         Renderer = new Renderer(World, MainWindow, GraphicsDevice);
+
+        for(int i = 0; i < 100; i++)
+        {
+            var sprite = World.CreateEntity();
+            World.Set(sprite, new Sprite());
+            World.Set(sprite, new Position(new Vector2(
+                                              (float)Random.Next(1280),
+                                              (float)Random.Next(720)
+                                           )));
+            World.Set(sprite, new Orientation((float)Random.NextDouble() * System.MathF.PI * 2.0f));
+        }
     }
 
     protected override void Update(TimeSpan delta)

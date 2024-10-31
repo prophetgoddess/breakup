@@ -5,6 +5,8 @@ using Buffer = MoonWorks.Graphics.Buffer;
 using MoonTools.ECS;
 using System.Runtime.InteropServices;
 
+namespace Ball;
+
 public class Renderer : MoonTools.ECS.Renderer
 {
     Window Window;
@@ -18,7 +20,8 @@ public class Renderer : MoonTools.ECS.Renderer
     Buffer SpriteVertexBuffer;
     Buffer SpriteIndexBuffer;
     Texture Ravioli;
-    System.Random Random = new System.Random();
+
+    MoonTools.ECS.Filter SpriteFilter;
 
     const int MAX_SPRITE_COUNT = 8192;
 
@@ -71,6 +74,8 @@ public class Renderer : MoonTools.ECS.Renderer
     {
         GraphicsDevice = graphicsDevice;
         Window = window;
+
+        SpriteFilter = FilterBuilder.Include<Sprite>().Include<Position>().Build();
 
         var resourceUploader = new ResourceUploader(GraphicsDevice);
         Ravioli = resourceUploader.CreateTexture2DFromCompressed(
@@ -213,12 +218,17 @@ public class Renderer : MoonTools.ECS.Renderer
 
         // Build sprite compute transfer
         var data = TransferBuffer.Map<ComputeSpriteData>(true);
-        for (var i = 0; i < MAX_SPRITE_COUNT; i += 1)
+        var i = 0;
+        foreach (var entity in SpriteFilter.Entities)
         {
-            data[i].Position = new Vector3(Random.Next(1280), Random.Next(720), 0);
-            data[i].Rotation = (float)(Random.NextDouble() * System.Math.PI * 2);
+            var position = Get<Position>(entity).value;
+            var rotation = Has<Orientation>(entity) ? Get<Orientation>(entity).value : 0.0f;
+
+            data[i].Position = new Vector3(position.X, position.Y, 0);
+            data[i].Rotation = (float)(rotation);
             data[i].Size = new Vector2(32, 32);
             data[i].Color = new Vector4(1f, 1f, 1f, 1f);
+            i++;
         }
         TransferBuffer.Unmap();
 
