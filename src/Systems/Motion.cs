@@ -35,7 +35,8 @@ public class Motion : MoonTools.ECS.System
 
     }
 
-    public (Vector2 dest, bool xCollision, bool yCollision) Sweep(Entity e, Vector2 position, Vector2 velocity, BoundingBox boundingBox)
+    public (Vector2 dest, bool xCollision, bool yCollision)
+    Sweep(Entity e, Vector2 position, Vector2 velocity, BoundingBox boundingBox)
     {
         bool xCollision = false;
         bool yCollision = false;

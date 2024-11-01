@@ -12,63 +12,51 @@ public class Renderer : MoonTools.ECS.Renderer
     Window Window;
     GraphicsDevice GraphicsDevice;
 
-    ComputePipeline ComputePipeline;
     GraphicsPipeline RenderPipeline;
-    Sampler Sampler;
-    TransferBuffer TransferBuffer;
-    Buffer SpriteComputeBuffer;
-    Buffer SpriteVertexBuffer;
-    Buffer SpriteIndexBuffer;
-    Texture Ravioli;
+    Buffer VertexBuffer;
+    Buffer IndexBuffer;
 
     MoonTools.ECS.Filter SpriteFilter;
 
-    const int MAX_SPRITE_COUNT = 8192;
-
-    [StructLayout(LayoutKind.Explicit, Size = 48)]
-    struct ComputeSpriteData
+    public struct TransformVertexUniform
     {
-        [FieldOffset(0)]
-        public Vector3 Position;
+        public Matrix4x4 ViewProjection;
 
-        [FieldOffset(12)]
-        public float Rotation;
-
-        [FieldOffset(16)]
-        public Vector2 Size;
-
-        [FieldOffset(32)]
-        public Vector4 Color;
+        public TransformVertexUniform(Matrix4x4 viewProjection)
+        {
+            ViewProjection = viewProjection;
+        }
     }
 
-
-    [StructLayout(LayoutKind.Explicit, Size = 48)]
-    struct PositionTextureColorVertex : IVertexType
+    [StructLayout(LayoutKind.Sequential)]
+    public struct PositionColorVertex : IVertexType
     {
-        [FieldOffset(0)]
-        public Vector4 Position;
+        public Vector3 Position;
+        public Color Color;
 
-        [FieldOffset(16)]
-        public Vector2 TexCoord;
-
-        [FieldOffset(32)]
-        public Vector4 Color;
+        public PositionColorVertex(Vector3 position, Color color)
+        {
+            Position = position;
+            Color = color;
+        }
 
         public static VertexElementFormat[] Formats { get; } =
         [
-            VertexElementFormat.Float4,
-            VertexElementFormat.Float2,
-            VertexElementFormat.Float4
+            VertexElementFormat.Float3,
+        VertexElementFormat.Ubyte4Norm
         ];
 
         public static uint[] Offsets { get; } =
         [
             0,
-            16,
-            32
+        12
         ];
-    }
 
+        public override string ToString()
+        {
+            return Position + " | " + Color;
+        }
+    }
 
     public Renderer(World world, Window window, GraphicsDevice graphicsDevice) : base(world)
     {
@@ -77,18 +65,9 @@ public class Renderer : MoonTools.ECS.Renderer
 
         SpriteFilter = FilterBuilder.Include<Sprite>().Include<Position>().Build();
 
-        var resourceUploader = new ResourceUploader(GraphicsDevice);
-        Ravioli = resourceUploader.CreateTexture2DFromCompressed(
-            Path.Join(System.AppContext.BaseDirectory, "Textures", "ravioli.png"),
-            TextureFormat.R8G8B8A8Unorm,
-            TextureUsageFlags.Sampler
-        );
-        resourceUploader.Upload();
-        resourceUploader.Dispose();
-
         Shader vertShader = Shader.Create(
             GraphicsDevice,
-            Path.Join(System.AppContext.BaseDirectory, "Shaders", "TexturedQuadColorWithMatrix.vert.msl"),
+            Path.Join(System.AppContext.BaseDirectory, "Shaders", "PositionColorWithMatrix.vert.msl"),
             "main0",
             new ShaderCreateInfo
             {
@@ -100,13 +79,12 @@ public class Renderer : MoonTools.ECS.Renderer
 
         Shader fragShader = Shader.Create(
             GraphicsDevice,
-            Path.Join(System.AppContext.BaseDirectory, "Shaders", "TexturedQuadColor.frag.msl"),
+            Path.Join(System.AppContext.BaseDirectory, "Shaders", "SolidColor.frag.msl"),
             "main0",
             new ShaderCreateInfo
             {
                 Stage = ShaderStage.Fragment,
                 Format = ShaderFormat.MSL,
-                NumSamplers = 1
             }
         );
 
@@ -130,74 +108,23 @@ public class Renderer : MoonTools.ECS.Renderer
             VertexShader = vertShader,
             FragmentShader = fragShader
         };
-        renderPipelineCreateInfo.VertexInputState = VertexInputState.CreateSingleBinding<PositionTextureColorVertex>();
+        renderPipelineCreateInfo.VertexInputState = VertexInputState.CreateSingleBinding<PositionColorVertex>();
 
         RenderPipeline = GraphicsPipeline.Create(GraphicsDevice, renderPipelineCreateInfo);
 
-        ComputePipeline = ComputePipeline.Create(
-            GraphicsDevice,
-            Path.Join(System.AppContext.BaseDirectory, "Shaders", "SpriteBatch.comp.msl"),
-            "main0",
-            new ComputePipelineCreateInfo
-            {
-                Format = ShaderFormat.MSL,
-                NumReadonlyStorageBuffers = 1,
-                NumReadWriteStorageBuffers = 1,
-                ThreadCountX = 64,
-                ThreadCountY = 1,
-                ThreadCountZ = 1
-            }
-        );
-        Sampler = Sampler.Create(GraphicsDevice, SamplerCreateInfo.PointClamp);
+        var resourceUploader = new ResourceUploader(GraphicsDevice);
 
-        TransferBuffer = TransferBuffer.Create<ComputeSpriteData>(
-            GraphicsDevice,
-            TransferBufferUsage.Upload,
-            MAX_SPRITE_COUNT
+        VertexBuffer = resourceUploader.CreateBuffer(
+            [
+                new PositionColorVertex(new Vector3(-1, -1, 0), Color.Red),
+                new PositionColorVertex(new Vector3( 1, -1, 0), Color.Lime),
+                new PositionColorVertex(new Vector3( 0,  1, 0), Color.Blue),
+            ],
+            BufferUsageFlags.Vertex
         );
 
-        SpriteComputeBuffer = Buffer.Create<ComputeSpriteData>(
-            GraphicsDevice,
-            BufferUsageFlags.ComputeStorageRead,
-            MAX_SPRITE_COUNT
-        );
-
-        SpriteVertexBuffer = Buffer.Create<PositionTextureColorVertex>(
-            GraphicsDevice,
-            BufferUsageFlags.ComputeStorageWrite | BufferUsageFlags.Vertex,
-            MAX_SPRITE_COUNT * 4
-        );
-
-        SpriteIndexBuffer = Buffer.Create<uint>(
-            GraphicsDevice,
-            BufferUsageFlags.Index,
-            MAX_SPRITE_COUNT * 6
-        );
-
-        TransferBuffer spriteIndexTransferBuffer = TransferBuffer.Create<uint>(
-            GraphicsDevice,
-            TransferBufferUsage.Upload,
-            MAX_SPRITE_COUNT * 6
-        );
-
-        var indexSpan = spriteIndexTransferBuffer.Map<uint>(false);
-
-        for (int i = 0, j = 0; i < MAX_SPRITE_COUNT * 6; i += 6, j += 4)
-        {
-            indexSpan[i] = (uint)j;
-            indexSpan[i + 1] = (uint)j + 1;
-            indexSpan[i + 2] = (uint)j + 2;
-            indexSpan[i + 3] = (uint)j + 3;
-            indexSpan[i + 4] = (uint)j + 2;
-            indexSpan[i + 5] = (uint)j + 1;
-        }
-        spriteIndexTransferBuffer.Unmap();
-
-        var cmdbuf = GraphicsDevice.AcquireCommandBuffer();
-        var copyPass = cmdbuf.BeginCopyPass();
-        copyPass.UploadToBuffer(spriteIndexTransferBuffer, SpriteIndexBuffer, false);
-        cmdbuf.EndCopyPass(copyPass);
-        GraphicsDevice.Submit(cmdbuf);
+        resourceUploader.Upload();
+        resourceUploader.Dispose();
 
     }
 
@@ -216,50 +143,28 @@ public class Renderer : MoonTools.ECS.Renderer
             -1f
         );
 
-        // Build sprite compute transfer
-        var data = TransferBuffer.Map<ComputeSpriteData>(true);
-        var i = 0;
-        foreach (var entity in SpriteFilter.Entities)
-        {
-            var position = Get<Position>(entity).value;
-            var rotation = Has<Orientation>(entity) ? Get<Orientation>(entity).value : 0.0f;
-
-            data[i].Position = new Vector3(position.X, position.Y, 0);
-            data[i].Rotation = (float)(rotation);
-            data[i].Size = new Vector2(16, 16);
-            data[i].Color = new Vector4(1f, 1f, 1f, 1f);
-            i++;
-        }
-        TransferBuffer.Unmap();
-
-        // Upload compute data to buffer
-        var copyPass = cmdbuf.BeginCopyPass();
-        copyPass.UploadToBuffer(TransferBuffer, SpriteComputeBuffer, true);
-        cmdbuf.EndCopyPass(copyPass);
-
-        // Set up compute pass to build sprite vertex buffer
-        var computePass = cmdbuf.BeginComputePass(
-            new StorageBufferReadWriteBinding(SpriteVertexBuffer, true)
-        );
-
-        computePass.BindComputePipeline(ComputePipeline);
-        computePass.BindStorageBuffer(SpriteComputeBuffer);
-        computePass.Dispatch(MAX_SPRITE_COUNT / 64, 1, 1);
-
-        cmdbuf.EndComputePass(computePass);
+        //cmdbuf.PushVertexUniformData(cameraMatrix);
 
         // Render sprites using vertex buffer
         var renderPass = cmdbuf.BeginRenderPass(
-            new ColorTargetInfo(renderTexture, Color.CornflowerBlue)
+            new ColorTargetInfo(renderTexture, Color.Black)
         );
 
-        cmdbuf.PushVertexUniformData(cameraMatrix);
+        foreach (var entity in SpriteFilter.Entities)
+        {
 
-        renderPass.BindGraphicsPipeline(RenderPipeline);
-        renderPass.BindVertexBuffer(SpriteVertexBuffer);
-        renderPass.BindIndexBuffer(SpriteIndexBuffer, IndexElementSize.ThirtyTwo);
-        renderPass.BindFragmentSampler(new TextureSamplerBinding(Ravioli, Sampler));
-        renderPass.DrawIndexedPrimitives(MAX_SPRITE_COUNT * 6, 1, 0, 0, 0);
+            var position = Get<Position>(entity).value;
+            var rotation = Has<Orientation>(entity) ? Get<Orientation>(entity).value : 0.0f;
+
+            Matrix4x4 model = Matrix4x4.CreateScale(Vector3.One * 10) * Matrix4x4.CreateTranslation(new Vector3(position, 0)) * cameraMatrix;
+            var uniforms = new TransformVertexUniform(model);
+
+            renderPass.BindGraphicsPipeline(RenderPipeline);
+            renderPass.BindVertexBuffer(VertexBuffer);
+            cmdbuf.PushVertexUniformData(uniforms);
+            renderPass.DrawPrimitives(3, 1, 0, 0);
+
+        }
 
         cmdbuf.EndRenderPass(renderPass);
 
