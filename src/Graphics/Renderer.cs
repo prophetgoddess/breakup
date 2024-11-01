@@ -118,7 +118,7 @@ public class Renderer : MoonTools.ECS.Renderer
                     new ColorTargetDescription
                     {
                         Format = Window.SwapchainFormat,
-                        BlendState = ColorTargetBlendState.Opaque
+                        BlendState = ColorTargetBlendState.NonPremultipliedAlphaBlend
                     }
                 ]
             },
@@ -226,7 +226,7 @@ public class Renderer : MoonTools.ECS.Renderer
 
             data[i].Position = new Vector3(position.X, position.Y, 0);
             data[i].Rotation = (float)(rotation);
-            data[i].Size = new Vector2(32, 32);
+            data[i].Size = new Vector2(16, 16);
             data[i].Color = new Vector4(1f, 1f, 1f, 1f);
             i++;
         }

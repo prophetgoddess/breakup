@@ -1,7 +1,4 @@
-﻿
-using System;
-using System.IO;
-using MoonTools.ECS;
+﻿using MoonTools.ECS;
 using MoonWorks;
 using MoonWorks.Graphics;
 using System.Numerics;
@@ -12,6 +9,7 @@ class Program : Game
 {
     World World = new World();
     Renderer Renderer;
+    Motion Motion;
     System.Random Random = new System.Random();
 
     public Program(
@@ -30,7 +28,9 @@ class Program : Game
     {
         Renderer = new Renderer(World, MainWindow, GraphicsDevice);
 
-        for(int i = 0; i < 100; i++)
+        Motion = new Motion(World);
+
+        for (int i = 0; i < 100; i++)
         {
             var sprite = World.CreateEntity();
             World.Set(sprite, new Sprite());
@@ -38,12 +38,19 @@ class Program : Game
                                               (float)Random.Next(1280),
                                               (float)Random.Next(720)
                                            )));
-            World.Set(sprite, new Orientation((float)Random.NextDouble() * System.MathF.PI * 2.0f));
+            //World.Set(sprite, new Orientation((float)Random.NextDouble() * System.MathF.PI * 2.0f));
+            World.Set(sprite, new Velocity(new Vector2(
+                (float)Random.NextDouble() * 100.0f * (Random.NextDouble() < 0.5f ? -1.0f : 1.0f),
+                (float)Random.NextDouble() * 100.0f * (Random.NextDouble() < 0.5f ? -1.0f : 1.0f)
+            )));
+            World.Set(sprite, new BoundingBox(0, 0, 16, 16));
+            World.Set(sprite, new SolidCollision());
         }
     }
 
     protected override void Update(TimeSpan delta)
     {
+        Motion.Update(delta);
     }
 
     protected override void Draw(double alpha)
@@ -65,7 +72,7 @@ class Program : Game
 #endif
 
         var windowCreateInfo = new WindowCreateInfo(
-            "VNTutorial",
+            "Ball",
             1280,
             720,
             ScreenMode.Windowed
