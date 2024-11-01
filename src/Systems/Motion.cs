@@ -15,101 +15,59 @@ public class Motion : MoonTools.ECS.System
 
     public bool Overlaps(Vector2 posA, BoundingBox boxA, Vector2 posB, BoundingBox boxB)
     {
-        Vector4 a = new Vector4(
-            boxA.X + posA.X,
-            boxA.Y + posA.Y,
-            boxA.X + posA.X + boxA.Width,
-            boxA.Y + posA.Y + boxA.Height
-        );
+        var aMinX = boxA.X + posA.X;
+        var aMinY = boxA.Y + posA.Y;
+        var aMaxX = boxA.X + posA.X + boxA.Width;
+        var aMaxY = boxA.Y + posA.Y + boxA.Height;
 
-        Vector4 b = new Vector4(
-            boxB.X + posB.X,
-            boxB.Y + posB.Y,
-            boxB.X + posB.X + boxB.Width,
-            boxB.Y + posB.Y + boxB.Height
-        );
+        var bMinX = boxB.X + posB.X;
+        var bMinY = boxB.Y + posB.Y;
+        var bMaxX = boxB.X + posB.X + boxB.Width;
+        var bMaxY = boxB.Y + posB.Y + boxB.Height;
 
-        return
-            a.X <= b.Z &&
-            a.Z >= b.X &&
-            a.Y <= b.W &&
-            a.W >= b.Z;
+        bool overlaps = aMinX <= bMaxX &&
+                        aMaxX >= bMinX &&
+                        aMinY <= bMaxY &&
+                        aMaxY >= bMinY;
+
+        return overlaps;
+
+
     }
 
-    public Vector2 Sweep(Vector2 position, Vector2 velocity, BoundingBox boundingBox)
+    public (Vector2 dest, bool xCollision, bool yCollision) Sweep(Entity e, Vector2 position, Vector2 velocity, BoundingBox boundingBox)
     {
-        var destX = position.X;
-        var destY = position.Y;
+        bool xCollision = false;
+        bool yCollision = false;
 
-        var incrementX = velocity.X * 0.1f;
-        var incrementY = velocity.Y * 0.1f;
+        var destX = position.X + velocity.X;
+        var destY = position.Y + velocity.Y;
 
-        var xCollision = false;
-
-        while (incrementX != 0.0f && !xCollision)
+        foreach (var other in ColliderFilter.Entities)
         {
-            foreach (var other in ColliderFilter.Entities)
+            var otherPos = Get<Position>(other).value;
+            var otherBox = Get<BoundingBox>(other);
+            if (e != other && Overlaps(new Vector2(destX, position.Y), boundingBox, otherPos, otherBox))
             {
-                var otherPosition = Get<Position>(other).value;
-                var otherBox = Get<BoundingBox>(other);
-
-                if (Overlaps(new Vector2(destX, position.Y), boundingBox, otherPosition, otherBox))
-                {
-                    xCollision = true;
-                    break;
-                }
-            }
-
-            if (xCollision)
-                break;
-
-            if (incrementX > 0.0f && destX + incrementX > position.X + velocity.X)
-            {
+                xCollision = true;
+                destX = position.X;
                 break;
             }
-
-            else if (incrementX < 0.0f && destX + incrementX < position.X + velocity.X)
-            {
-                break;
-            }
-
-            destX += incrementX;
         }
 
-        var yCollision = false;
-
-        while (incrementY != 0.0f && !yCollision)
+        foreach (var other in ColliderFilter.Entities)
         {
-            foreach (var other in ColliderFilter.Entities)
+            var otherPos = Get<Position>(other).value;
+            var otherBox = Get<BoundingBox>(other);
+            if (e != other && Overlaps(new Vector2(position.X, destY), boundingBox, otherPos, otherBox))
             {
-                var otherPosition = Get<Position>(other).value;
-                var otherBox = Get<BoundingBox>(other);
-
-                if (Overlaps(new Vector2(position.X, destY), boundingBox, otherPosition, otherBox))
-                {
-                    yCollision = true;
-                    break;
-                }
-            }
-
-            if (yCollision)
-                break;
-
-            if (incrementY > 0.0f && destY + incrementY > position.Y + velocity.Y)
-            {
+                yCollision = true;
+                destY = position.Y;
                 break;
             }
-
-            else if (incrementY < 0.0f && destY + incrementY < position.Y + velocity.Y)
-            {
-                break;
-            }
-
-            destY += incrementY;
         }
 
-
-        return new Vector2(destX, destY);
+        return (new Vector2(destX, destY), xCollision, yCollision);
     }
 
     public override void Update(TimeSpan delta)
@@ -119,12 +77,25 @@ public class Motion : MoonTools.ECS.System
         foreach (var entity in MotionFilter.Entities)
         {
             var position = Get<Position>(entity).value;
-            var velocity = Get<Velocity>(entity).value * dt;
+            var velocity = Get<Velocity>(entity).value;
             var dest = position + velocity;
 
             if (Has<BoundingBox>(entity) && Has<SolidCollision>(entity))
             {
-                dest = Sweep(position, velocity, Get<BoundingBox>(entity));
+                (dest, var xCollision, var yCollision) = Sweep(entity, position, velocity * dt, Get<BoundingBox>(entity));
+
+                var newVelocity = velocity;
+
+                if (xCollision)
+                {
+                    newVelocity.X = -velocity.X;
+                }
+                if (yCollision)
+                {
+                    newVelocity.Y = -velocity.Y;
+                }
+
+                Set(entity, new Velocity(newVelocity));
             }
 
             Set(entity, new Position(dest));

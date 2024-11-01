@@ -30,7 +30,7 @@ class Program : Game
 
         Motion = new Motion(World);
 
-        for (int i = 0; i < 100; i++)
+        for (int i = 0; i < 150; i++)
         {
             var sprite = World.CreateEntity();
             World.Set(sprite, new Sprite());
@@ -40,12 +40,32 @@ class Program : Game
                                            )));
             //World.Set(sprite, new Orientation((float)Random.NextDouble() * System.MathF.PI * 2.0f));
             World.Set(sprite, new Velocity(new Vector2(
-                (float)Random.NextDouble() * 100.0f * (Random.NextDouble() < 0.5f ? -1.0f : 1.0f),
-                (float)Random.NextDouble() * 100.0f * (Random.NextDouble() < 0.5f ? -1.0f : 1.0f)
+                (float)Random.NextDouble() * 1000.0f * (Random.NextDouble() < 0.5f ? -1.0f : 1.0f),
+                (float)Random.NextDouble() * 1000.0f * (Random.NextDouble() < 0.5f ? -1.0f : 1.0f)
             )));
             World.Set(sprite, new BoundingBox(0, 0, 16, 16));
             World.Set(sprite, new SolidCollision());
         }
+
+        var leftBound = World.CreateEntity();
+        World.Set(leftBound, new Position(new Vector2(-8, 0)));
+        World.Set(leftBound, new BoundingBox(0, 0, 16, 720));
+        World.Set(leftBound, new SolidCollision());
+
+        var rightBound = World.CreateEntity();
+        World.Set(rightBound, new Position(new Vector2(1280 + 8, 0)));
+        World.Set(rightBound, new BoundingBox(0, 0, 16, 720));
+        World.Set(rightBound, new SolidCollision());
+
+        var topBound = World.CreateEntity();
+        World.Set(topBound, new Position(new Vector2(0, -8)));
+        World.Set(topBound, new BoundingBox(0, 0, 1280, 16));
+        World.Set(topBound, new SolidCollision());
+
+        var bottomBound = World.CreateEntity();
+        World.Set(bottomBound, new Position(new Vector2(0, 720 + 8)));
+        World.Set(bottomBound, new BoundingBox(0, 0, 1280, 16));
+        World.Set(bottomBound, new SolidCollision());
     }
 
     protected override void Update(TimeSpan delta)
