@@ -4,6 +4,7 @@ using System.Numerics;
 using Buffer = MoonWorks.Graphics.Buffer;
 using MoonTools.ECS;
 using System.Runtime.InteropServices;
+using System.Net.Mime;
 
 namespace Ball;
 
@@ -13,50 +14,8 @@ public class Renderer : MoonTools.ECS.Renderer
     GraphicsDevice GraphicsDevice;
 
     GraphicsPipeline RenderPipeline;
-    Buffer VertexBuffer;
-    Buffer IndexBuffer;
 
     MoonTools.ECS.Filter SpriteFilter;
-
-    public struct TransformVertexUniform
-    {
-        public Matrix4x4 ViewProjection;
-
-        public TransformVertexUniform(Matrix4x4 viewProjection)
-        {
-            ViewProjection = viewProjection;
-        }
-    }
-
-    [StructLayout(LayoutKind.Sequential)]
-    public struct PositionColorVertex : IVertexType
-    {
-        public Vector3 Position;
-        public Color Color;
-
-        public PositionColorVertex(Vector3 position, Color color)
-        {
-            Position = position;
-            Color = color;
-        }
-
-        public static VertexElementFormat[] Formats { get; } =
-        [
-            VertexElementFormat.Float3,
-        VertexElementFormat.Ubyte4Norm
-        ];
-
-        public static uint[] Offsets { get; } =
-        [
-            0,
-        12
-        ];
-
-        public override string ToString()
-        {
-            return Position + " | " + Color;
-        }
-    }
 
     public Renderer(World world, Window window, GraphicsDevice graphicsDevice) : base(world)
     {
@@ -114,14 +73,7 @@ public class Renderer : MoonTools.ECS.Renderer
 
         var resourceUploader = new ResourceUploader(GraphicsDevice);
 
-        VertexBuffer = resourceUploader.CreateBuffer(
-            [
-                new PositionColorVertex(new Vector3(-1, -1, 0), Color.Red),
-                new PositionColorVertex(new Vector3( 1, -1, 0), Color.Lime),
-                new PositionColorVertex(new Vector3( 0,  1, 0), Color.Blue),
-            ],
-            BufferUsageFlags.Vertex
-        );
+        Content.Models.LoadModels(resourceUploader);
 
         resourceUploader.Upload();
         resourceUploader.Dispose();
@@ -155,12 +107,13 @@ public class Renderer : MoonTools.ECS.Renderer
 
             var position = Get<Position>(entity).value;
             var rotation = Has<Orientation>(entity) ? Get<Orientation>(entity).value : 0.0f;
+            var scale = Has<Scale>(entity) ? Get<Scale>(entity).value : 1.0f;
 
-            Matrix4x4 model = Matrix4x4.CreateScale(Vector3.One * 10) * Matrix4x4.CreateTranslation(new Vector3(position, 0)) * cameraMatrix;
+            Matrix4x4 model = Matrix4x4.CreateFromAxisAngle(Vector3.UnitZ, rotation) * Matrix4x4.CreateScale(Vector3.One * scale) * Matrix4x4.CreateTranslation(new Vector3(position, 0)) * cameraMatrix;
             var uniforms = new TransformVertexUniform(model);
 
             renderPass.BindGraphicsPipeline(RenderPipeline);
-            renderPass.BindVertexBuffer(VertexBuffer);
+            renderPass.BindVertexBuffer(Content.Models.Triangle.VertexBuffer);
             cmdbuf.PushVertexUniformData(uniforms);
             renderPass.DrawPrimitives(3, 1, 0, 0);
 

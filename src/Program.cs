@@ -35,13 +35,13 @@ class Program : Game
             var sprite = World.CreateEntity();
             World.Set(sprite, new Sprite());
             World.Set(sprite, new Position(new Vector2(
-                                              (float)Random.Next(1280),
-                                              (float)Random.Next(720)
+                                              Random.Next(1280),
+                                              Random.Next(720)
                                            )));
             //World.Set(sprite, new Orientation((float)Random.NextDouble() * System.MathF.PI * 2.0f));
             World.Set(sprite, new Velocity(new Vector2(
-                (float)Random.NextDouble() * 1000.0f * (Random.NextDouble() < 0.5f ? -1.0f : 1.0f),
-                (float)Random.NextDouble() * 1000.0f * (Random.NextDouble() < 0.5f ? -1.0f : 1.0f)
+                (float)Random.NextDouble() * 100.0f * (Random.NextDouble() < 0.5f ? -1.0f : 1.0f),
+                (float)Random.NextDouble() * 100.0f * (Random.NextDouble() < 0.5f ? -1.0f : 1.0f)
             )));
             World.Set(sprite, new BoundingBox(0, 0, 16, 16));
             World.Set(sprite, new SolidCollision());
