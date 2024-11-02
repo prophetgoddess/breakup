@@ -71,12 +71,7 @@ public class Renderer : MoonTools.ECS.Renderer
 
         RenderPipeline = GraphicsPipeline.Create(GraphicsDevice, renderPipelineCreateInfo);
 
-        var resourceUploader = new ResourceUploader(GraphicsDevice);
-
-        Content.Models.LoadModels(resourceUploader);
-
-        resourceUploader.Upload();
-        resourceUploader.Dispose();
+        Content.LoadAll(GraphicsDevice);
 
     }
 
@@ -104,18 +99,18 @@ public class Renderer : MoonTools.ECS.Renderer
 
         foreach (var entity in SpriteFilter.Entities)
         {
-
             var position = Get<Position>(entity).value;
             var rotation = Has<Orientation>(entity) ? Get<Orientation>(entity).value : 0.0f;
-            var scale = Has<Scale>(entity) ? Get<Scale>(entity).value : 1.0f;
+            var scale = Has<Scale>(entity) ? Get<Scale>(entity).value : 5;
 
             Matrix4x4 model = Matrix4x4.CreateFromAxisAngle(Vector3.UnitZ, rotation) * Matrix4x4.CreateScale(Vector3.One * scale) * Matrix4x4.CreateTranslation(new Vector3(position, 0)) * cameraMatrix;
             var uniforms = new TransformVertexUniform(model);
 
             renderPass.BindGraphicsPipeline(RenderPipeline);
-            renderPass.BindVertexBuffer(Content.Models.Triangle.VertexBuffer);
+            renderPass.BindVertexBuffer(Content.Models.TestShape.VertexBuffer);
+            renderPass.BindIndexBuffer(Content.Models.TestShape.IndexBuffer, IndexElementSize.ThirtyTwo);
             cmdbuf.PushVertexUniformData(uniforms);
-            renderPass.DrawPrimitives(3, 1, 0, 0);
+            renderPass.DrawIndexedPrimitives(Content.Models.TestShape.TriangleCount * 3, 1, 0, 0, 0);
 
         }
 

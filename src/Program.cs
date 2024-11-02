@@ -30,7 +30,7 @@ class Program : Game
 
         Motion = new Motion(World);
 
-        for (int i = 0; i < 150; i++)
+        for (int i = 0; i < 100; i++)
         {
             var sprite = World.CreateEntity();
             World.Set(sprite, new Sprite());
@@ -39,10 +39,10 @@ class Program : Game
                                               Random.Next(720)
                                            )));
             //World.Set(sprite, new Orientation((float)Random.NextDouble() * System.MathF.PI * 2.0f));
-            World.Set(sprite, new Velocity(new Vector2(
-                (float)Random.NextDouble() * 100.0f * (Random.NextDouble() < 0.5f ? -1.0f : 1.0f),
-                (float)Random.NextDouble() * 100.0f * (Random.NextDouble() < 0.5f ? -1.0f : 1.0f)
-            )));
+            // World.Set(sprite, new Velocity(new Vector2(
+            //     (float)Random.NextDouble() * 100.0f * (Random.NextDouble() < 0.5f ? -1.0f : 1.0f),
+            //     (float)Random.NextDouble() * 100.0f * (Random.NextDouble() < 0.5f ? -1.0f : 1.0f)
+            // )));
             World.Set(sprite, new BoundingBox(0, 0, 16, 16));
             World.Set(sprite, new SolidCollision());
         }

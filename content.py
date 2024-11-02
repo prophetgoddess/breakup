@@ -271,19 +271,37 @@ public static class Content
         with open(model, "r") as m:
             f.write(
                 f"""public static class {Path(model).stem}\n{{
+                    public static uint VertexCount {{ get; private set; }}
+                    public static uint TriangleCount {{ get; private set; }}
                     public static Buffer VertexBuffer {{ get; private set; }}
+                    public static Buffer IndexBuffer {{ get; private set; }}
                     public static void Load(ResourceUploader resourceUploader)
                     {{
                     VertexBuffer = resourceUploader.CreateBuffer(
                     [\n"""
             )
+            vertex_count = 0
             for line in m:
                 if line.startswith("v "):
+                    vertex_count += 1
                     vertex = line.split(" ")
                     f.write(
                         f"new PositionColorVertex(new Vector3({vertex[1].strip()}f, {vertex[2].strip()}f, {vertex[3].strip()}f), Color.Red),"
                     )
-            f.write("""], BufferUsageFlags.Vertex);""")
+            f.write("], BufferUsageFlags.Vertex);\n")
+            f.write("IndexBuffer = resourceUploader.CreateBuffer(\n[\n")
+            m.seek(0)
+            tri_count = 0
+            for line in m:
+                if line.startswith("f "):
+                    tri_count += 1
+                    index = line.split(" ")
+                    f.write(
+                        f"{int(index[1].strip()) - 1}, {int(index[2].strip()) - 1}, {int(index[3].strip()) - 1},\n"
+                    )
+            f.write("], BufferUsageFlags.Index);\n")
+            f.write(f"TriangleCount = {tri_count};\n")
+            f.write(f"VertexCount = {vertex_count};\n")
             f.write("}\n}")
 
     f.write(
