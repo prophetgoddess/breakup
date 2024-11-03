@@ -78,12 +78,12 @@ public class Motion : MoonTools.ECS.System
         foreach (var entity in MotionFilter.Entities)
         {
             var position = Get<Position>(entity).value;
-            var velocity = Get<Velocity>(entity).value;
+            var velocity = Get<Velocity>(entity).value * dt;
             var dest = position + velocity;
 
             if (Has<BoundingBox>(entity) && Has<SolidCollision>(entity))
             {
-                (dest, var xCollision, var yCollision) = Sweep(entity, position, velocity * dt, Get<BoundingBox>(entity));
+                (dest, var xCollision, var yCollision) = Sweep(entity, position, velocity, Get<BoundingBox>(entity));
 
                 var newVelocity = velocity;
 

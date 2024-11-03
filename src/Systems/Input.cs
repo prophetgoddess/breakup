@@ -1,0 +1,74 @@
+using MoonTools.ECS;
+using MoonWorks.Input;
+
+namespace Ball;
+
+public struct InputState
+{
+    public ButtonState Left { get; set; }
+    public ButtonState Right { get; set; }
+    public ButtonState Up { get; set; }
+    public ButtonState Down { get; set; }
+    public ButtonState Swing { get; set; }
+}
+
+public class ControlSet
+{
+    public VirtualButton Left { get; set; } = new EmptyButton();
+    public VirtualButton Right { get; set; } = new EmptyButton();
+    public VirtualButton Up { get; set; } = new EmptyButton();
+    public VirtualButton Down { get; set; } = new EmptyButton();
+    public VirtualButton Swing { get; set; } = new EmptyButton();
+}
+
+public class Input : MoonTools.ECS.System
+{
+    Inputs Inputs { get; }
+
+    Filter PlayerFilter { get; }
+
+    ControlSet Keyboard = new ControlSet();
+    ControlSet Gamepad = new ControlSet();
+
+    public Input(World world, Inputs inputs) : base(world)
+    {
+        Inputs = inputs;
+        PlayerFilter = FilterBuilder.Include<Player>().Build();
+
+        Keyboard.Up = Inputs.Keyboard.Button(KeyCode.W);
+        Keyboard.Down = Inputs.Keyboard.Button(KeyCode.S);
+        Keyboard.Left = Inputs.Keyboard.Button(KeyCode.A);
+        Keyboard.Right = Inputs.Keyboard.Button(KeyCode.D);
+        Keyboard.Swing = Inputs.Keyboard.Button(KeyCode.Space);
+
+        Gamepad.Up = Inputs.GetGamepad(0).LeftYDown;
+        Gamepad.Down = Inputs.GetGamepad(0).LeftYUp;
+        Gamepad.Left = Inputs.GetGamepad(0).LeftXLeft;
+        Gamepad.Right = Inputs.GetGamepad(0).LeftXRight;
+        Gamepad.Swing = Inputs.GetGamepad(0).X;
+    }
+
+    public override void Update(TimeSpan delta)
+    {
+        foreach (var playerEntity in PlayerFilter.Entities)
+        {
+            var index = Get<Player>(playerEntity);
+
+            InputState inputState = InputState(Keyboard, Gamepad);
+
+            Set(playerEntity, inputState);
+        }
+    }
+
+    private static InputState InputState(ControlSet controlSet, ControlSet altControlSet)
+    {
+        return new InputState
+        {
+            Left = controlSet.Left.State | altControlSet.Left.State,
+            Right = controlSet.Right.State | altControlSet.Right.State,
+            Up = controlSet.Up.State | altControlSet.Up.State,
+            Down = controlSet.Down.State | altControlSet.Down.State,
+            Swing = controlSet.Swing.State | altControlSet.Swing.State
+        };
+    }
+}

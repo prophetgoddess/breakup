@@ -15,14 +15,14 @@ public class Renderer : MoonTools.ECS.Renderer
 
     GraphicsPipeline RenderPipeline;
 
-    MoonTools.ECS.Filter SpriteFilter;
+    MoonTools.ECS.Filter ModelFilter;
 
     public Renderer(World world, Window window, GraphicsDevice graphicsDevice) : base(world)
     {
         GraphicsDevice = graphicsDevice;
         Window = window;
 
-        SpriteFilter = FilterBuilder.Include<Sprite>().Include<Position>().Build();
+        ModelFilter = FilterBuilder.Include<Model>().Include<Position>().Build();
 
         Shader vertShader = Shader.Create(
             GraphicsDevice,
@@ -92,25 +92,25 @@ public class Renderer : MoonTools.ECS.Renderer
 
         //cmdbuf.PushVertexUniformData(cameraMatrix);
 
-        // Render sprites using vertex buffer
         var renderPass = cmdbuf.BeginRenderPass(
-            new ColorTargetInfo(renderTexture, Color.Black)
+            new ColorTargetInfo(renderTexture, Color.GhostWhite)
         );
 
-        foreach (var entity in SpriteFilter.Entities)
+        foreach (var entity in ModelFilter.Entities)
         {
             var position = Get<Position>(entity).value;
             var rotation = Has<Orientation>(entity) ? Get<Orientation>(entity).value : 0.0f;
-            var scale = Has<Scale>(entity) ? Get<Scale>(entity).value : 5;
+            var mesh = Content.Models.IDToModel[Get<Model>(entity).ID];
+            var scale = Has<Scale>(entity) ? Get<Scale>(entity).value : 1;
 
             Matrix4x4 model = Matrix4x4.CreateFromAxisAngle(Vector3.UnitZ, rotation) * Matrix4x4.CreateScale(Vector3.One * scale) * Matrix4x4.CreateTranslation(new Vector3(position, 0)) * cameraMatrix;
             var uniforms = new TransformVertexUniform(model);
 
             renderPass.BindGraphicsPipeline(RenderPipeline);
-            renderPass.BindVertexBuffer(Content.Models.TestShape.VertexBuffer);
-            renderPass.BindIndexBuffer(Content.Models.TestShape.IndexBuffer, IndexElementSize.ThirtyTwo);
+            renderPass.BindVertexBuffer(mesh.VertexBuffer);
+            renderPass.BindIndexBuffer(mesh.IndexBuffer, IndexElementSize.ThirtyTwo);
             cmdbuf.PushVertexUniformData(uniforms);
-            renderPass.DrawIndexedPrimitives(Content.Models.TestShape.TriangleCount * 3, 1, 0, 0, 0);
+            renderPass.DrawIndexedPrimitives(mesh.TriangleCount * 3, 1, 0, 0, 0);
 
         }
 

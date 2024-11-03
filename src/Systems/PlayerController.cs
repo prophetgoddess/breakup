@@ -1,0 +1,44 @@
+using System.Numerics;
+using MoonTools.ECS;
+using MoonWorks.Input;
+
+namespace Ball;
+
+public class PlayerController : MoonTools.ECS.System
+{
+
+    public PlayerController(World world) : base(world)
+    {
+    }
+
+    public override void Update(TimeSpan delta)
+    {
+        var player = GetSingletonEntity<Player>();
+
+        var inputState = Get<InputState>(player);
+
+        var movementDelta = Vector2.Zero;
+
+        if (inputState.Up.IsDown)
+        {
+            movementDelta += -Vector2.UnitY;
+        }
+        if (inputState.Down.IsDown)
+        {
+            movementDelta -= -Vector2.UnitY;
+        }
+        if (inputState.Left.IsDown)
+        {
+            movementDelta += -Vector2.UnitX;
+        }
+        if (inputState.Right.IsDown)
+        {
+            movementDelta += Vector2.UnitX;
+        }
+
+        if (movementDelta != Vector2.Zero)
+            movementDelta = Vector2.Normalize(movementDelta);
+
+        Set(player, new Velocity(movementDelta * 500.0f));
+    }
+}

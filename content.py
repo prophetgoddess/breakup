@@ -264,19 +264,32 @@ public static class Content
     f.write(
         """public static class Models
         {
+        public abstract class Model
+        {
+            public int ID;
+            public uint VertexCount { get; internal set; }
+            public uint TriangleCount { get; internal set; }
+            public Buffer VertexBuffer { get; internal set; }
+            public Buffer IndexBuffer { get; internal set; }
+        }
+
+        public static Model[] IDToModel;
 """
     )
+
+    modelCount = 0
+
+    for model in Path(models_in).glob("*.obj"):
+        f.write(f"public static Model {Path(model).stem};\n")
+        modelCount += 1
 
     for model in Path(models_in).glob("*.obj"):
         with open(model, "r") as m:
             f.write(
-                f"""public static class {Path(model).stem}\n{{
-                    public static uint VertexCount {{ get; private set; }}
-                    public static uint TriangleCount {{ get; private set; }}
-                    public static Buffer VertexBuffer {{ get; private set; }}
-                    public static Buffer IndexBuffer {{ get; private set; }}
-                    public static void Load(ResourceUploader resourceUploader)
+                f"""public class {Path(model).stem}Model : Model\n{{
+                    public {Path(model).stem}Model(int id, ResourceUploader resourceUploader)
                     {{
+                    ID = id;
                     VertexBuffer = resourceUploader.CreateBuffer(
                     [\n"""
             )
@@ -286,7 +299,7 @@ public static class Content
                     vertex_count += 1
                     vertex = line.split(" ")
                     f.write(
-                        f"new PositionColorVertex(new Vector3({vertex[1].strip()}f, {vertex[2].strip()}f, {vertex[3].strip()}f), Color.Red),"
+                        f"new PositionColorVertex(new Vector3({vertex[1].strip()}f, {vertex[2].strip()}f, {vertex[3].strip()}f), Color.DarkGray),"
                     )
             f.write("], BufferUsageFlags.Vertex);\n")
             f.write("IndexBuffer = resourceUploader.CreateBuffer(\n[\n")
@@ -305,12 +318,18 @@ public static class Content
             f.write("}\n}")
 
     f.write(
-        """public static void LoadModels(ResourceUploader resourceUploader)
-    {"""
+        f"""public static void LoadModels(ResourceUploader resourceUploader)
+    {{
+        IDToModel = new Model[{modelCount}];
+    """
     )
 
+    index = 0
     for model in Path(models_in).glob("*.obj"):
-        f.write(f"{Path(model).stem}.Load(resourceUploader);\n")
+        f.write(
+            f"IDToModel[{index}] = {Path(model).stem} = new {Path(model).stem}Model({index}, resourceUploader);\n"
+        )
+        index += 1
 
     f.write("}\n")
 
