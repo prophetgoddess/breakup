@@ -9,9 +9,7 @@ class Program : Game
 {
     World World = new World();
     Renderer Renderer;
-    Motion Motion;
-    Input Input;
-    PlayerController PlayerController;
+    MoonTools.ECS.System[] Systems;
     System.Random Random = new System.Random();
 
     public Program(
@@ -28,11 +26,15 @@ class Program : Game
         debugMode
     )
     {
-        Renderer = new Renderer(World, MainWindow, GraphicsDevice);
+        Systems =
+        [
+            new Input(World, Inputs),
+            new Time(World),
+            new PlayerController(World),
+            new Motion(World)
+        ];
 
-        Input = new Input(World, Inputs);
-        PlayerController = new PlayerController(World);
-        Motion = new Motion(World);
+        Renderer = new Renderer(World, MainWindow, GraphicsDevice);
 
         // for (int i = 0; i < 50; i++)
         // {
@@ -51,17 +53,21 @@ class Program : Game
         //     World.Set(sprite, new SolidCollision());
         // }
 
-        var sprite = World.CreateEntity();
-        World.Set(sprite, new Model(Content.Models.Donut.ID));
-        World.Set(sprite, new Scale(16.0f));
-        World.Set(sprite, new Position(new Vector2(
+        var ball = World.CreateEntity();
+        World.Set(ball, new Model(Content.Models.Donut.ID));
+        World.Set(ball, new Scale(16.0f));
+        World.Set(ball, new Position(new Vector2(
                                           1280 * 0.5f,
                                           720 * 0.5f
                                        )));
         //World.Set(sprite, new Orientation((float)Random.NextDouble() * System.MathF.PI * 2.0f));
-        World.Set(sprite, new Velocity(Vector2.Zero));
-        World.Set(sprite, new BoundingBox(0, 0, 32, 32));
-        World.Set(sprite, new SolidCollision());
+        //World.Set(ball, new Velocity(new Vector2((float)Random.NextDouble() * 100, (float)Random.NextDouble() * 100)));
+        World.Set(ball, new Velocity(Vector2.Zero));
+        World.Set(ball, new BoundingBox(0, 0, 32, 32));
+        World.Set(ball, new SolidCollision());
+        World.Set(ball, new Bounce());
+        World.Set(ball, new CanBeHit());
+        World.Set(ball, new HasGravity());
 
         var player = World.CreateEntity();
         World.Set(player, new Model(Content.Models.Triangle.ID));
@@ -69,10 +75,11 @@ class Program : Game
                                           1280 * 0.5f,
                                           720 * 0.75f
                                        )));
-        //World.Set(sprite, new Orientation((float)Random.NextDouble() * System.MathF.PI * 2.0f));
+        World.Set(player, new Orientation(0f));
         World.Set(player, new Velocity(Vector2.Zero));
         World.Set(player, new BoundingBox(0, 0, 32, 32));
         World.Set(player, new SolidCollision());
+        World.Set(player, new HitBall());
         World.Set(player, new Scale(3.0f));
         World.Set(player, new Player());
 
@@ -99,9 +106,10 @@ class Program : Game
 
     protected override void Update(TimeSpan delta)
     {
-        Input.Update(delta);
-        PlayerController.Update(delta);
-        Motion.Update(delta);
+        foreach (var system in Systems)
+        {
+            system.Update(delta);
+        }
     }
 
     protected override void Draw(double alpha)

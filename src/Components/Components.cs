@@ -10,4 +10,8 @@ public readonly record struct Model(int ID);
 public readonly record struct BoundingBox(float X, float Y, float Width, float Height);
 public readonly record struct Circle(float Radius);
 public readonly record struct SolidCollision();
+public readonly record struct HitBall();
 public readonly record struct Player();
+public readonly record struct Bounce();
+public readonly record struct CanBeHit();
+public readonly record struct HasGravity();

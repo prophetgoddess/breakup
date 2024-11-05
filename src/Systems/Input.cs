@@ -35,10 +35,10 @@ public class Input : MoonTools.ECS.System
         Inputs = inputs;
         PlayerFilter = FilterBuilder.Include<Player>().Build();
 
-        Keyboard.Up = Inputs.Keyboard.Button(KeyCode.W);
-        Keyboard.Down = Inputs.Keyboard.Button(KeyCode.S);
-        Keyboard.Left = Inputs.Keyboard.Button(KeyCode.A);
-        Keyboard.Right = Inputs.Keyboard.Button(KeyCode.D);
+        Keyboard.Up = Inputs.Keyboard.Button(KeyCode.Up);
+        Keyboard.Down = Inputs.Keyboard.Button(KeyCode.Down);
+        Keyboard.Left = Inputs.Keyboard.Button(KeyCode.Left);
+        Keyboard.Right = Inputs.Keyboard.Button(KeyCode.Right);
         Keyboard.Swing = Inputs.Keyboard.Button(KeyCode.Space);
 
         Gamepad.Up = Inputs.GetGamepad(0).LeftYDown;

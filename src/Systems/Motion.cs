@@ -35,7 +35,7 @@ public class Motion : MoonTools.ECS.System
 
     }
 
-    public (Vector2 dest, bool xCollision, bool yCollision)
+    public (Vector2 dest, bool xCollision, bool yCollision, Entity HitX, Entity HitY)
     Sweep(Entity e, Vector2 position, Vector2 velocity, BoundingBox boundingBox)
     {
         bool xCollision = false;
@@ -44,6 +44,9 @@ public class Motion : MoonTools.ECS.System
         var destX = position.X + velocity.X;
         var destY = position.Y + velocity.Y;
 
+        Entity hitX = default;
+        Entity hitY = default;
+
         foreach (var other in ColliderFilter.Entities)
         {
             var otherPos = Get<Position>(other).value;
@@ -51,6 +54,7 @@ public class Motion : MoonTools.ECS.System
             if (e != other && Overlaps(new Vector2(destX, position.Y), boundingBox, otherPos, otherBox))
             {
                 xCollision = true;
+                hitX = other;
                 destX = position.X;
                 break;
             }
@@ -63,12 +67,13 @@ public class Motion : MoonTools.ECS.System
             if (e != other && Overlaps(new Vector2(position.X, destY), boundingBox, otherPos, otherBox))
             {
                 yCollision = true;
+                hitY = other;
                 destY = position.Y;
                 break;
             }
         }
 
-        return (new Vector2(destX, destY), xCollision, yCollision);
+        return (new Vector2(destX, destY), xCollision, yCollision, hitX, hitY);
     }
 
     public override void Update(TimeSpan delta)
@@ -78,28 +83,73 @@ public class Motion : MoonTools.ECS.System
         foreach (var entity in MotionFilter.Entities)
         {
             var position = Get<Position>(entity).value;
-            var velocity = Get<Velocity>(entity).value * dt;
+            var velocity = Get<Velocity>(entity).value;
             var dest = position + velocity;
+
+            if (Has<HasGravity>(entity))
+            {
+                velocity.Y += 100f;
+            }
 
             if (Has<BoundingBox>(entity) && Has<SolidCollision>(entity))
             {
-                (dest, var xCollision, var yCollision) = Sweep(entity, position, velocity, Get<BoundingBox>(entity));
+                (dest, var xCollision, var yCollision, var hitX, var hitY) = Sweep(entity, position, velocity * dt, Get<BoundingBox>(entity));
 
-                var newVelocity = velocity;
-
-                if (xCollision)
+                if (Has<HitBall>(entity))
                 {
-                    newVelocity.X = -velocity.X;
-                }
-                if (yCollision)
-                {
-                    newVelocity.Y = -velocity.Y;
+                    if (xCollision && Has<CanBeHit>(hitX))
+                    {
+                        var xVelocity = Get<Velocity>(hitX).value;
+                        var otherPos = Get<Position>(hitX).value;
+                        xVelocity.X += (otherPos.X - position.X) * 20.0f;
+                        Set(hitX, new Velocity(xVelocity));
+                    }
+
+                    if (yCollision && Has<CanBeHit>(hitY))
+                    {
+                        var yVelocity = Get<Velocity>(hitY).value;
+                        var otherPos = Get<Position>(hitY).value;
+                        yVelocity.Y += (otherPos.Y - position.Y) * 20.0f;
+                        Set(hitY, new Velocity(yVelocity));
+                    }
+
                 }
 
-                Set(entity, new Velocity(newVelocity));
+                if (Has<Bounce>(entity))
+                {
+                    var newVelocity = Vector2.Zero;
+                    var bounceX = false;
+                    var bounceY = false;
+
+                    if (xCollision)
+                    {
+                        bounceX = true;
+                        newVelocity.X = -velocity.X;
+                    }
+
+                    if (yCollision)
+                    {
+                        bounceY = true;
+                        newVelocity.Y = -velocity.Y;
+                    }
+
+                    if (bounceX && !bounceY)
+                        Set(entity, new Velocity(new Vector2(newVelocity.X, velocity.Y) * 0.9f));
+
+                    if (bounceY && !bounceX)
+                        Set(entity, new Velocity(new Vector2(velocity.X, newVelocity.Y) * 0.9f));
+
+                    if (bounceY && bounceX)
+                        Set(entity, new Velocity(new Vector2(newVelocity.X, newVelocity.Y) * 0.9f));
+
+                }
+
+
             }
 
             Set(entity, new Position(dest));
+
         }
+
     }
 }
