@@ -104,18 +104,15 @@ public class Motion : MoonTools.ECS.System
                     var xCollision = collision.Direction == CollisionDirection.X;
                     var yCollision = collision.Direction == CollisionDirection.Y;
 
-                    if (Has<HitBall>(entity) && HasOutRelation<Spinning>(entity) && Has<CanBeHit>(other))
+                    if (Has<HitBall>(other) && Has<CanBeHit>(entity))
                     {
-
-                        var otherVelocity = Get<Velocity>(other).value;
                         var otherPos = Get<Position>(other).value;
                         var dir = Vector2.Normalize(otherPos - dest);
-                        otherVelocity += dir * 100.0f;
-                        Set(other, new Velocity(otherVelocity));
-
+                        velocity = dir * -velocity.Length();
+                        Set(entity, new Velocity(velocity));
                     }
 
-                    if (Has<Bounce>(entity) && collision.Solid)
+                    else if (Has<Bounce>(entity) && collision.Solid)
                     {
                         if (Has<DestroyOnContactWithBall>(other))
                         {
@@ -139,21 +136,18 @@ public class Motion : MoonTools.ECS.System
                         }
 
                         if (bounceX && !bounceY)
-                            Set(entity, new Velocity(new Vector2(newVelocity.X, velocity.Y) * 0.9f));
+                            Set(entity, new Velocity(new Vector2(newVelocity.X, velocity.Y)));
 
                         if (bounceY && !bounceX)
-                            Set(entity, new Velocity(new Vector2(velocity.X, newVelocity.Y) * 0.9f));
+                            Set(entity, new Velocity(new Vector2(velocity.X, newVelocity.Y)));
 
                         if (bounceY && bounceX)
-                            Set(entity, new Velocity(new Vector2(newVelocity.X, newVelocity.Y) * 0.9f));
+                            Set(entity, new Velocity(new Vector2(newVelocity.X, newVelocity.Y)));
 
                     }
 
                     Unrelate<Colliding>(entity, other);
                 }
-
-
-
 
             }
 

@@ -79,18 +79,17 @@ class Program : Game
                                        )));
         //World.Set(sprite, new Orientation((float)Random.NextDouble() * System.MathF.PI * 2.0f));
         //World.Set(ball, new Velocity(new Vector2((float)Random.NextDouble() * 100, (float)Random.NextDouble() * 100)));
-        World.Set(ball, new Velocity(Vector2.Zero));
+        World.Set(ball, new Velocity(Vector2.UnitY * 300.0f));
         World.Set(ball, new BoundingBox(0, 0, 32, 32));
         World.Set(ball, new SolidCollision());
         World.Set(ball, new Bounce());
         World.Set(ball, new CanBeHit());
-        World.Set(ball, new HasGravity());
 
         var player = World.CreateEntity();
         World.Set(player, new Model(Content.Models.Triangle.ID));
         World.Set(player, new Position(new Vector2(
                                           1280 * 0.5f,
-                                          720 * 0.75f
+                                          720 * 0.9f
                                        )));
         World.Set(player, new Orientation(0f));
         World.Set(player, new Velocity(Vector2.Zero));
@@ -120,7 +119,7 @@ class Program : Game
         World.Set(bottomBound, new BoundingBox(0, 0, 1280, 16));
         World.Set(bottomBound, new SolidCollision());
 
-        World.Relate(player, ball, new IgnoreSolidCollision());
+        //World.Relate(player, ball, new IgnoreSolidCollision());
     }
 
     protected override void Update(TimeSpan delta)
