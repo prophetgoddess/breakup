@@ -53,6 +53,23 @@ class Program : Game
         //     World.Set(sprite, new SolidCollision());
         // }
 
+        for (var x = 0; x < 10; x++)
+        {
+            for (var y = 0; y < 3; y++)
+            {
+                var block = World.CreateEntity();
+                World.Set(block, new Model(Content.Models.Square.ID));
+                World.Set(block, new Scale(2.0f));
+                World.Set(block, new Position(new Vector2(
+                                                  200 + x * 100,
+                                                30 + y * 100
+                                               )));
+                World.Set(block, new BoundingBox(0, 0, 32, 32));
+                World.Set(block, new DestroyOnContactWithBall());
+                World.Set(block, new SolidCollision());
+            }
+        }
+
         var ball = World.CreateEntity();
         World.Set(ball, new Model(Content.Models.Donut.ID));
         World.Set(ball, new Scale(16.0f));
@@ -102,6 +119,8 @@ class Program : Game
         World.Set(bottomBound, new Position(new Vector2(0, 720 + 8)));
         World.Set(bottomBound, new BoundingBox(0, 0, 1280, 16));
         World.Set(bottomBound, new SolidCollision());
+
+        World.Relate(player, ball, new IgnoreSolidCollision());
     }
 
     protected override void Update(TimeSpan delta)

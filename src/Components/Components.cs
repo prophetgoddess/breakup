@@ -15,3 +15,5 @@ public readonly record struct Player();
 public readonly record struct Bounce();
 public readonly record struct CanBeHit();
 public readonly record struct HasGravity();
+
+public readonly record struct DestroyOnContactWithBall();
