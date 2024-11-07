@@ -89,7 +89,7 @@ public class Motion : MoonTools.ECS.System
             var velocity = Get<Velocity>(entity).value;
             if (Has<HasGravity>(entity))
             {
-                velocity.Y += 10f;
+                velocity.Y += 8f;
                 Set(entity, new Velocity(velocity));
             }
 

@@ -28,7 +28,7 @@ public class Renderer : MoonTools.ECS.Renderer
             Format = Window.SwapchainFormat,
             Usage = TextureUsageFlags.ColorTarget | TextureUsageFlags.Sampler,
             Height = Window.Height,
-            Width = (uint)(Window.Height * 4.0f / 3.0f),
+            Width = (uint)(Window.Height * Dimensions.AspectRatio),
             SampleCount = SampleCount.One,
             LayerCountOrDepth = 1,
             NumLevels = 1

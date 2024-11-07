@@ -138,8 +138,8 @@ class Program : Game
 
         var windowCreateInfo = new WindowCreateInfo(
             "Ball",
-            1280,
-            720,
+            1600,
+            900,
             ScreenMode.Windowed
         );
 
