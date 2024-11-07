@@ -7,7 +7,6 @@ public class Motion : MoonTools.ECS.System
     public Filter MotionFilter;
     public Filter ColliderFilter;
 
-
     public Motion(World world) : base(world)
     {
         MotionFilter = FilterBuilder.Include<Velocity>().Include<Position>().Build();
@@ -84,15 +83,15 @@ public class Motion : MoonTools.ECS.System
 
         foreach (var entity in MotionFilter.Entities)
         {
-
             var position = Get<Position>(entity).value;
             var velocity = Get<Velocity>(entity).value;
-            var dest = position + velocity;
-
             if (Has<HasGravity>(entity))
             {
-                velocity.Y += 100f;
+                velocity.Y += 10f;
+                Set(entity, new Velocity(velocity));
             }
+
+            var dest = position + velocity;
 
             if (Has<BoundingBox>(entity) && Has<SolidCollision>(entity))
             {
@@ -104,11 +103,23 @@ public class Motion : MoonTools.ECS.System
                     var xCollision = collision.Direction == CollisionDirection.X;
                     var yCollision = collision.Direction == CollisionDirection.Y;
 
+                    if (Has<Bounce>(entity) && Has<ResetBallOnHit>(other))
+                    {
+                        dest = new Vector2(
+                                  1280 * 0.5f,
+                                  720 * 0.5f
+                               );
+                        World.Set(entity, new Velocity(Vector2.Zero));
+                        Unrelate<Colliding>(entity, other);
+                        continue;
+                    }
+
                     if (Has<HitBall>(other) && Has<CanBeHit>(entity))
                     {
                         var otherPos = Get<Position>(other).value;
                         var dir = Vector2.Normalize(otherPos - dest);
-                        velocity = dir * -velocity.Length();
+                        velocity = dir * -velocity.Length() * 0.9f;
+                        velocity.Y -= 200.0f;
                         Set(entity, new Velocity(velocity));
                     }
 
@@ -136,13 +147,13 @@ public class Motion : MoonTools.ECS.System
                         }
 
                         if (bounceX && !bounceY)
-                            Set(entity, new Velocity(new Vector2(newVelocity.X, velocity.Y)));
+                            Set(entity, new Velocity(new Vector2(newVelocity.X, velocity.Y) * 0.9f));
 
                         if (bounceY && !bounceX)
-                            Set(entity, new Velocity(new Vector2(velocity.X, newVelocity.Y)));
+                            Set(entity, new Velocity(new Vector2(velocity.X, newVelocity.Y) * 0.9f));
 
                         if (bounceY && bounceX)
-                            Set(entity, new Velocity(new Vector2(newVelocity.X, newVelocity.Y)));
+                            Set(entity, new Velocity(new Vector2(newVelocity.X, newVelocity.Y) * 0.9f));
 
                     }
 

@@ -36,23 +36,6 @@ class Program : Game
 
         Renderer = new Renderer(World, MainWindow, GraphicsDevice);
 
-        // for (int i = 0; i < 50; i++)
-        // {
-        //     var sprite = World.CreateEntity();
-        //     World.Set(sprite, new Sprite());
-        //     World.Set(sprite, new Position(new Vector2(
-        //                                       Random.Next(1280),
-        //                                       Random.Next(720)
-        //                                    )));
-        //     //World.Set(sprite, new Orientation((float)Random.NextDouble() * System.MathF.PI * 2.0f));
-        //     World.Set(sprite, new Velocity(new Vector2(
-        //         (float)Random.NextDouble() * 100.0f * (Random.NextDouble() < 0.5f ? -1.0f : 1.0f),
-        //         (float)Random.NextDouble() * 100.0f * (Random.NextDouble() < 0.5f ? -1.0f : 1.0f)
-        //     )));
-        //     World.Set(sprite, new BoundingBox(0, 0, 32, 32));
-        //     World.Set(sprite, new SolidCollision());
-        // }
-
         for (var x = 0; x < 10; x++)
         {
             for (var y = 0; y < 3; y++)
@@ -77,13 +60,12 @@ class Program : Game
                                           1280 * 0.5f,
                                           720 * 0.5f
                                        )));
-        //World.Set(sprite, new Orientation((float)Random.NextDouble() * System.MathF.PI * 2.0f));
-        //World.Set(ball, new Velocity(new Vector2((float)Random.NextDouble() * 100, (float)Random.NextDouble() * 100)));
-        World.Set(ball, new Velocity(Vector2.UnitY * 300.0f));
+        World.Set(ball, new Velocity(Vector2.Zero));
         World.Set(ball, new BoundingBox(0, 0, 32, 32));
         World.Set(ball, new SolidCollision());
         World.Set(ball, new Bounce());
         World.Set(ball, new CanBeHit());
+        World.Set(ball, new HasGravity());
 
         var player = World.CreateEntity();
         World.Set(player, new Model(Content.Models.Triangle.ID));
@@ -98,26 +80,32 @@ class Program : Game
         World.Set(player, new HitBall());
         World.Set(player, new Scale(3.0f));
         World.Set(player, new Player());
+        World.Set(player, new IgnoreWorldOffset());
 
         var leftBound = World.CreateEntity();
         World.Set(leftBound, new Position(new Vector2(-8, 0)));
-        World.Set(leftBound, new BoundingBox(0, 0, 16, 720));
+        World.Set(leftBound, new BoundingBox(0, 0, 16, 2000));
         World.Set(leftBound, new SolidCollision());
+        World.Set(leftBound, new IgnoreWorldOffset());
+
 
         var rightBound = World.CreateEntity();
         World.Set(rightBound, new Position(new Vector2(1280 + 8, 0)));
-        World.Set(rightBound, new BoundingBox(0, 0, 16, 720));
+        World.Set(rightBound, new BoundingBox(0, 0, 16, 2000));
         World.Set(rightBound, new SolidCollision());
+        World.Set(rightBound, new IgnoreWorldOffset());
 
-        var topBound = World.CreateEntity();
-        World.Set(topBound, new Position(new Vector2(0, -8)));
-        World.Set(topBound, new BoundingBox(0, 0, 1280, 16));
-        World.Set(topBound, new SolidCollision());
+
+        // var topBound = World.CreateEntity();
+        // World.Set(topBound, new Position(new Vector2(0, -8)));
+        // World.Set(topBound, new BoundingBox(0, 0, 1280, 16));
+        // World.Set(topBound, new SolidCollision());
 
         var bottomBound = World.CreateEntity();
         World.Set(bottomBound, new Position(new Vector2(0, 720 + 8)));
         World.Set(bottomBound, new BoundingBox(0, 0, 1280, 16));
         World.Set(bottomBound, new SolidCollision());
+        World.Set(bottomBound, new ResetBallOnHit());
 
         //World.Relate(player, ball, new IgnoreSolidCollision());
     }
