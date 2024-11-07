@@ -36,8 +36,8 @@ public class BlockGenerator : MoonTools.ECS.System
         {
             SpawnBlock(
                 new Vector2(
-                    50 + (float)Random.NextDouble() * (Dimensions.WindowWidth - 50),
-                    100 + (float)Random.NextDouble() * (Dimensions.WindowHeight - 300)
+                    50 + (float)Random.NextDouble() * Dimensions.GameWidth,
+                    100 + (float)Random.NextDouble() * (Dimensions.GameHeight - 300)
                 )
             );
         }
@@ -53,7 +53,7 @@ public class BlockGenerator : MoonTools.ECS.System
         foreach (var block in BlockFilter.Entities)
         {
             var position = Get<Position>(block).value;
-            if (position.Y > (-cam.Y + Dimensions.WindowHeight))
+            if (position.Y > (-cam.Y + Dimensions.GameHeight))
             {
                 Destroy(block);
             }
@@ -63,8 +63,8 @@ public class BlockGenerator : MoonTools.ECS.System
         {
             SpawnBlock(
                 new Vector2(
-                    100 + (float)Random.NextDouble() * (Dimensions.WindowWidth - 100),
-                    -(float)Random.NextDouble() * Dimensions.WindowHeight - cam.Y
+                    (float)Random.NextDouble() * Dimensions.GameWidth,
+                    (-(float)Random.NextDouble() * Dimensions.GameHeight) - cam.Y
                 )
             );
         }

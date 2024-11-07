@@ -20,3 +20,7 @@ public readonly record struct DestroyOnContactWithBall();
 public readonly record struct CameraPosition(float Y);
 public readonly record struct FollowsCamera(float Y);
 public readonly record struct CameraFollows();
+public readonly record struct UI();
+public readonly record struct DestroyOnRestartGame();
+public readonly record struct Life();
+public readonly record struct FirstLife();

@@ -16,19 +16,33 @@ public class Renderer : MoonTools.ECS.Renderer
     GraphicsPipeline RenderPipeline;
 
     MoonTools.ECS.Filter ModelFilter;
+    MoonTools.ECS.Filter UIFilter;
 
-    Texture RenderTexture;
+    Texture GameTexture;
+    Texture UITexture;
 
-    void CreateRenderTexture()
+    void CreateRenderTextures()
     {
 
-        RenderTexture = Texture.Create(GraphicsDevice, new TextureCreateInfo
+        GameTexture = Texture.Create(GraphicsDevice, new TextureCreateInfo
         {
             Type = TextureType.TwoDimensional,
             Format = Window.SwapchainFormat,
             Usage = TextureUsageFlags.ColorTarget | TextureUsageFlags.Sampler,
             Height = Window.Height,
-            Width = (uint)(Window.Height * Dimensions.AspectRatio),
+            Width = (uint)(Window.Height * Dimensions.GameAspectRatio),
+            SampleCount = SampleCount.One,
+            LayerCountOrDepth = 1,
+            NumLevels = 1
+        });
+
+        UITexture = Texture.Create(GraphicsDevice, new TextureCreateInfo
+        {
+            Type = TextureType.TwoDimensional,
+            Format = Window.SwapchainFormat,
+            Usage = TextureUsageFlags.ColorTarget | TextureUsageFlags.Sampler,
+            Height = Window.Height,
+            Width = (uint)(Window.Height * Dimensions.WindowAspectRatio),
             SampleCount = SampleCount.One,
             LayerCountOrDepth = 1,
             NumLevels = 1
@@ -41,9 +55,10 @@ public class Renderer : MoonTools.ECS.Renderer
         GraphicsDevice = graphicsDevice;
         Window = window;
 
-        CreateRenderTexture();
+        CreateRenderTextures();
 
-        ModelFilter = FilterBuilder.Include<Model>().Include<Position>().Build();
+        ModelFilter = FilterBuilder.Include<Model>().Include<Position>().Exclude<UI>().Build();
+        UIFilter = FilterBuilder.Include<Model>().Include<Position>().Include<UI>().Build();
 
         Shader vertShader = Shader.Create(
             GraphicsDevice,
@@ -98,10 +113,10 @@ public class Renderer : MoonTools.ECS.Renderer
 
     public void Draw(CommandBuffer cmdbuf, Texture renderTexture)
     {
-        if (Window.Height != RenderTexture.Height)
+        if (Window.Height != GameTexture.Height || Window.Height != UITexture.Height)
         {
             renderTexture.Dispose();
-            CreateRenderTexture();
+            CreateRenderTextures();
         }
 
         if (renderTexture == null)
@@ -112,8 +127,8 @@ public class Renderer : MoonTools.ECS.Renderer
         Matrix4x4 cameraMatrix =
         Matrix4x4.CreateOrthographicOffCenter(
             0,
-            Dimensions.WindowWidth,
-            Dimensions.WindowHeight - cameraPos,
+            Dimensions.GameWidth,
+            Dimensions.GameHeight - cameraPos,
             -cameraPos,
             0,
             -1f
@@ -121,8 +136,8 @@ public class Renderer : MoonTools.ECS.Renderer
 
         //cmdbuf.PushVertexUniformData(cameraMatrix);
 
-        var renderPass = cmdbuf.BeginRenderPass(
-            new ColorTargetInfo(RenderTexture, Color.GhostWhite)
+        var gamePass = cmdbuf.BeginRenderPass(
+            new ColorTargetInfo(GameTexture, Color.GhostWhite)
         );
 
         foreach (var entity in ModelFilter.Entities)
@@ -135,28 +150,79 @@ public class Renderer : MoonTools.ECS.Renderer
             Matrix4x4 model = Matrix4x4.CreateFromAxisAngle(Vector3.UnitZ, rotation) * Matrix4x4.CreateScale(Vector3.One * scale) * Matrix4x4.CreateTranslation(new Vector3(position, 0)) * cameraMatrix;
             var uniforms = new TransformVertexUniform(model);
 
-            renderPass.BindGraphicsPipeline(RenderPipeline);
-            renderPass.BindVertexBuffer(mesh.VertexBuffer);
-            renderPass.BindIndexBuffer(mesh.IndexBuffer, IndexElementSize.ThirtyTwo);
+            gamePass.BindGraphicsPipeline(RenderPipeline);
+            gamePass.BindVertexBuffer(mesh.VertexBuffer);
+            gamePass.BindIndexBuffer(mesh.IndexBuffer, IndexElementSize.ThirtyTwo);
             cmdbuf.PushVertexUniformData(uniforms);
-            renderPass.DrawIndexedPrimitives(mesh.TriangleCount * 3, 1, 0, 0, 0);
+            gamePass.DrawIndexedPrimitives(mesh.TriangleCount * 3, 1, 0, 0, 0);
 
         }
 
-        cmdbuf.EndRenderPass(renderPass);
+        cmdbuf.EndRenderPass(gamePass);
 
         cmdbuf.Blit(new BlitInfo
         {
-            Source = new BlitRegion(RenderTexture),
+            Source = new BlitRegion(GameTexture),
             Destination = new BlitRegion
             {
-                Texture = renderTexture,
-                X = (uint)((renderTexture.Width - RenderTexture.Width) * 0.5f),
-                W = RenderTexture.Width,
-                H = RenderTexture.Height
+                Texture = UITexture,
+                X = (uint)((UITexture.Width - GameTexture.Width) * 0.5f),
+                W = GameTexture.Width,
+                H = GameTexture.Height
             },
             LoadOp = LoadOp.Clear,
             ClearColor = Color.Black,
+            FlipMode = FlipMode.None,
+            Filter = MoonWorks.Graphics.Filter.Nearest,
+            Cycle = true
+        });
+
+        var uiPass = cmdbuf.BeginRenderPass(
+            new ColorTargetInfo(UITexture, LoadOp.Load)
+        );
+
+        Matrix4x4 uiCameraMatrix =
+        Matrix4x4.CreateOrthographicOffCenter(
+            0,
+            Dimensions.WindowWidth,
+            Dimensions.WindowHeight,
+            0,
+            0,
+            -1f
+        );
+
+        foreach (var entity in UIFilter.Entities)
+        {
+            var position = Get<Position>(entity).value;
+            var rotation = Has<Orientation>(entity) ? Get<Orientation>(entity).value : 0.0f;
+            var mesh = Content.Models.IDToModel[Get<Model>(entity).ID];
+            var scale = Has<Scale>(entity) ? Get<Scale>(entity).value : 1;
+
+            Matrix4x4 model = Matrix4x4.CreateFromAxisAngle(Vector3.UnitZ, rotation) * Matrix4x4.CreateScale(Vector3.One * scale) * Matrix4x4.CreateTranslation(new Vector3(position, 0)) * uiCameraMatrix;
+            var uniforms = new TransformVertexUniform(model);
+
+            uiPass.BindGraphicsPipeline(RenderPipeline);
+            uiPass.BindVertexBuffer(mesh.VertexBuffer);
+            uiPass.BindIndexBuffer(mesh.IndexBuffer, IndexElementSize.ThirtyTwo);
+            cmdbuf.PushVertexUniformData(uniforms);
+            uiPass.DrawIndexedPrimitives(mesh.TriangleCount * 3, 1, 0, 0, 0);
+
+        }
+
+        cmdbuf.EndRenderPass(uiPass);
+
+        cmdbuf.Blit(new BlitInfo
+        {
+            Source = new BlitRegion(UITexture),
+            Destination = new BlitRegion
+            {
+                Texture = renderTexture,
+                X = (uint)((renderTexture.Width - UITexture.Width) * 0.5f),
+                W = UITexture.Width,
+                H = UITexture.Height
+            },
+            LoadOp = LoadOp.Clear,
+            ClearColor = Color.Transparent,
             FlipMode = FlipMode.None,
             Filter = MoonWorks.Graphics.Filter.Nearest,
             Cycle = true

@@ -109,11 +109,21 @@ public class Motion : MoonTools.ECS.System
                     {
                         var offset = GetSingleton<CameraPosition>().Y;
                         dest = new Vector2(
-                                  Dimensions.WindowWidth * 0.5f,
-                                  (Dimensions.WindowHeight * 0.5f) - offset
+                                  Dimensions.GameWidth * 0.5f,
+                                  (Dimensions.GameHeight * 0.5f) - offset
                                );
                         World.Set(entity, new Velocity(Vector2.Zero));
                         Unrelate<Colliding>(entity, other);
+
+                        var life = GetSingletonEntity<FirstLife>();
+
+                        while (HasOutRelation<NextLife>(life))
+                        {
+                            life = OutRelationSingleton<NextLife>(life);
+                        }
+
+                        Destroy(life);
+
                         continue;
                     }
 
@@ -122,7 +132,7 @@ public class Motion : MoonTools.ECS.System
                         var otherPos = Get<Position>(other).value;
                         var dir = Vector2.Normalize(otherPos - dest);
                         velocity = dir * -velocity.Length() * 0.9f;
-                        velocity.Y -= 200.0f;
+                        velocity.Y -= 300.0f;
                         Set(entity, new Velocity(velocity));
                     }
 

@@ -46,18 +46,17 @@ public class Input : MoonTools.ECS.System
         Gamepad.Left = Inputs.GetGamepad(0).LeftXLeft;
         Gamepad.Right = Inputs.GetGamepad(0).LeftXRight;
         Gamepad.Swing = Inputs.GetGamepad(0).X;
+
+        var inputEntity = CreateEntity();
+        Set(inputEntity, InputState(Keyboard, Gamepad));
     }
 
     public override void Update(TimeSpan delta)
     {
-        foreach (var playerEntity in PlayerFilter.Entities)
-        {
-            var index = Get<Player>(playerEntity);
 
-            InputState inputState = InputState(Keyboard, Gamepad);
+        InputState inputState = InputState(Keyboard, Gamepad);
+        Set(GetSingletonEntity<InputState>(), inputState);
 
-            Set(playerEntity, inputState);
-        }
     }
 
     private static InputState InputState(ControlSet controlSet, ControlSet altControlSet)
