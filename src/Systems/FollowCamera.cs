@@ -19,8 +19,6 @@ public class FollowCamera : MoonTools.ECS.System
         var ball = GetSingletonEntity<CameraFollows>();
         var ballPosition = Get<Position>(ball).value;
 
-
-        Console.WriteLine($"y: {ballPosition.Y} offset: {offset}");
         if (ballPosition.Y < -offset)
         {
             offset = -ballPosition.Y;

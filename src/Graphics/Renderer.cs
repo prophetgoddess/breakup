@@ -85,8 +85,8 @@ public class Renderer : MoonTools.ECS.Renderer
         Matrix4x4 cameraMatrix =
         Matrix4x4.CreateOrthographicOffCenter(
             0,
-            1280,
-            720 - cameraPos,
+            Dimensions.WindowWidth,
+            Dimensions.WindowHeight - cameraPos,
             -cameraPos,
             0,
             -1f

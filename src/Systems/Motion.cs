@@ -1,6 +1,7 @@
 using System.Numerics;
 using Ball;
 using MoonTools.ECS;
+using MoonWorks;
 
 public class Motion : MoonTools.ECS.System
 {
@@ -106,9 +107,10 @@ public class Motion : MoonTools.ECS.System
 
                     if (Has<Bounce>(entity) && Has<ResetBallOnHit>(other))
                     {
+                        var offset = GetSingleton<CameraPosition>().Y;
                         dest = new Vector2(
-                                  1280 * 0.5f,
-                                  720 * 0.5f
+                                  Dimensions.WindowWidth * 0.5f,
+                                  (Dimensions.WindowHeight * 0.5f) - offset
                                );
                         World.Set(entity, new Velocity(Vector2.Zero));
                         Unrelate<Colliding>(entity, other);

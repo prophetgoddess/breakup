@@ -37,7 +37,7 @@ class Program : Game
 
         Renderer = new Renderer(World, MainWindow, GraphicsDevice);
 
-        for (var x = 0; x < 10; x++)
+        for (var x = 0; x < 5; x++)
         {
             for (var y = 0; y < 3; y++)
             {
@@ -45,8 +45,8 @@ class Program : Game
                 World.Set(block, new Model(Content.Models.Square.ID));
                 World.Set(block, new Scale(2.0f));
                 World.Set(block, new Position(new Vector2(
-                                                  200 + x * 100,
-                                                30 + y * 100
+                                                  100 + x * 100,
+                                                 100 + y * 100
                                                )));
                 World.Set(block, new BoundingBox(0, 0, 32, 32));
                 World.Set(block, new DestroyOnContactWithBall());
@@ -58,8 +58,8 @@ class Program : Game
         World.Set(ball, new Model(Content.Models.Donut.ID));
         World.Set(ball, new Scale(16.0f));
         World.Set(ball, new Position(new Vector2(
-                                          1280 * 0.5f,
-                                          720 * 0.5f
+                                          Dimensions.WindowWidth * 0.5f,
+                                          Dimensions.WindowHeight * 0.5f
                                        )));
         World.Set(ball, new Velocity(Vector2.Zero));
         World.Set(ball, new BoundingBox(0, 0, 32, 32));
@@ -72,8 +72,8 @@ class Program : Game
         var player = World.CreateEntity();
         World.Set(player, new Model(Content.Models.Triangle.ID));
         World.Set(player, new Position(new Vector2(
-                                          1280 * 0.5f,
-                                          720 * 0.9f
+                                          Dimensions.WindowWidth * 0.5f,
+                                          Dimensions.WindowHeight * 0.9f
                                        )));
         World.Set(player, new Orientation(0f));
         World.Set(player, new Velocity(Vector2.Zero));
@@ -82,7 +82,7 @@ class Program : Game
         World.Set(player, new HitBall());
         World.Set(player, new Scale(3.0f));
         World.Set(player, new Player());
-        World.Set(player, new FollowsCamera(720 * 0.9f));
+        World.Set(player, new FollowsCamera(Dimensions.WindowHeight * 0.9f));
 
         var leftBound = World.CreateEntity();
         World.Set(leftBound, new Position(new Vector2(-8, 0)));
@@ -91,23 +91,17 @@ class Program : Game
         World.Set(leftBound, new FollowsCamera(0));
 
         var rightBound = World.CreateEntity();
-        World.Set(rightBound, new Position(new Vector2(1280 + 8, 0)));
+        World.Set(rightBound, new Position(new Vector2(Dimensions.WindowWidth + 8, 0)));
         World.Set(rightBound, new BoundingBox(0, 0, 16, 2000));
         World.Set(rightBound, new SolidCollision());
         World.Set(rightBound, new FollowsCamera(0));
 
-
-        // var topBound = World.CreateEntity();
-        // World.Set(topBound, new Position(new Vector2(0, -8)));
-        // World.Set(topBound, new BoundingBox(0, 0, 1280, 16));
-        // World.Set(topBound, new SolidCollision());
-
         var bottomBound = World.CreateEntity();
-        World.Set(bottomBound, new Position(new Vector2(0, 720 + 8)));
-        World.Set(bottomBound, new BoundingBox(0, 0, 1280, 16));
+        World.Set(bottomBound, new Position(new Vector2(0, Dimensions.WindowHeight + 8)));
+        World.Set(bottomBound, new BoundingBox(0, 0, Dimensions.WindowWidth, 16));
         World.Set(bottomBound, new SolidCollision());
         World.Set(bottomBound, new ResetBallOnHit());
-        World.Set(bottomBound, new FollowsCamera(720 + 8));
+        World.Set(bottomBound, new FollowsCamera(Dimensions.WindowHeight + 8));
 
 
         var cameraEntity = World.CreateEntity();
@@ -144,8 +138,8 @@ class Program : Game
 
         var windowCreateInfo = new WindowCreateInfo(
             "Ball",
-            1280,
-            720,
+            (int)(Dimensions.WindowWidth * 1.5),
+            (int)(Dimensions.WindowHeight * 1.5),
             ScreenMode.Windowed
         );
 
