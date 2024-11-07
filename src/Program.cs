@@ -10,7 +10,6 @@ class Program : Game
     World World = new World();
     Renderer Renderer;
     MoonTools.ECS.System[] Systems;
-    System.Random Random = new System.Random();
 
     public Program(
         WindowCreateInfo windowCreateInfo,
@@ -32,27 +31,11 @@ class Program : Game
             new Time(World),
             new PlayerController(World),
             new Motion(World),
-            new FollowCamera(World)
+            new FollowCamera(World),
+            new BlockGenerator(World),
         ];
 
         Renderer = new Renderer(World, MainWindow, GraphicsDevice);
-
-        for (var x = 0; x < 5; x++)
-        {
-            for (var y = 0; y < 3; y++)
-            {
-                var block = World.CreateEntity();
-                World.Set(block, new Model(Content.Models.Square.ID));
-                World.Set(block, new Scale(2.0f));
-                World.Set(block, new Position(new Vector2(
-                                                  100 + x * 100,
-                                                 100 + y * 100
-                                               )));
-                World.Set(block, new BoundingBox(0, 0, 32, 32));
-                World.Set(block, new DestroyOnContactWithBall());
-                World.Set(block, new SolidCollision());
-            }
-        }
 
         var ball = World.CreateEntity();
         World.Set(ball, new Model(Content.Models.Donut.ID));
