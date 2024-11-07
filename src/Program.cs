@@ -67,6 +67,7 @@ class Program : Game
         World.Set(ball, new Bounce());
         World.Set(ball, new CanBeHit());
         World.Set(ball, new HasGravity());
+        World.Set(ball, new CameraFollows());
 
         var player = World.CreateEntity();
         World.Set(player, new Model(Content.Models.Triangle.ID));

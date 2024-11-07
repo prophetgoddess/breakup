@@ -14,7 +14,19 @@ public class FollowCamera : MoonTools.ECS.System
 
     public override void Update(TimeSpan delta)
     {
-        var offset = GetSingleton<CameraPosition>().Y;
+        var camera = GetSingletonEntity<CameraPosition>();
+        var offset = Get<CameraPosition>(camera).Y;
+        var ball = GetSingletonEntity<CameraFollows>();
+        var ballPosition = Get<Position>(ball).value;
+
+
+        Console.WriteLine($"y: {ballPosition.Y} offset: {offset}");
+        if (ballPosition.Y < -offset)
+        {
+            offset = -ballPosition.Y;
+        }
+
+        Set(camera, new CameraPosition(offset));
 
         foreach (var entity in FollowFilter.Entities)
         {
@@ -23,5 +35,7 @@ public class FollowCamera : MoonTools.ECS.System
             position.Y = follow - offset;
             Set(entity, new Position(position));
         }
+
+
     }
 }

@@ -81,10 +81,6 @@ public class Motion : MoonTools.ECS.System
     {
         var dt = (float)delta.TotalSeconds;
 
-        var camera = GetSingletonEntity<CameraPosition>();
-        var cameraPos = Get<CameraPosition>(camera);
-        Set(camera, new CameraPosition(cameraPos.Y + dt * 10.0f));
-
         foreach (var entity in MotionFilter.Entities)
         {
 
