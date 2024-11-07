@@ -41,7 +41,9 @@ public class PlayerController : MoonTools.ECS.System
             movementDelta = Vector2.Normalize(movementDelta);
         }
 
-        Set(player, new Velocity(movementDelta * 500.0f));
+        movementDelta *= 500f;
+
+        Set(player, new Velocity(movementDelta));
 
         if (HasOutRelation<Spinning>(player))
         {

@@ -80,13 +80,14 @@ public class Renderer : MoonTools.ECS.Renderer
         if (renderTexture == null)
             return;
 
+        var cameraPos = GetSingleton<CameraPosition>().Y;
 
         Matrix4x4 cameraMatrix =
         Matrix4x4.CreateOrthographicOffCenter(
             0,
             1280,
-            720,
-            0,
+            720 - cameraPos,
+            -cameraPos,
             0,
             -1f
         );

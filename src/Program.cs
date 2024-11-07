@@ -31,7 +31,8 @@ class Program : Game
             new Input(World, Inputs),
             new Time(World),
             new PlayerController(World),
-            new Motion(World)
+            new Motion(World),
+            new FollowCamera(World)
         ];
 
         Renderer = new Renderer(World, MainWindow, GraphicsDevice);
@@ -80,20 +81,19 @@ class Program : Game
         World.Set(player, new HitBall());
         World.Set(player, new Scale(3.0f));
         World.Set(player, new Player());
-        World.Set(player, new IgnoreWorldOffset());
+        World.Set(player, new FollowsCamera(720 * 0.9f));
 
         var leftBound = World.CreateEntity();
         World.Set(leftBound, new Position(new Vector2(-8, 0)));
         World.Set(leftBound, new BoundingBox(0, 0, 16, 2000));
         World.Set(leftBound, new SolidCollision());
-        World.Set(leftBound, new IgnoreWorldOffset());
-
+        World.Set(leftBound, new FollowsCamera(0));
 
         var rightBound = World.CreateEntity();
         World.Set(rightBound, new Position(new Vector2(1280 + 8, 0)));
         World.Set(rightBound, new BoundingBox(0, 0, 16, 2000));
         World.Set(rightBound, new SolidCollision());
-        World.Set(rightBound, new IgnoreWorldOffset());
+        World.Set(rightBound, new FollowsCamera(0));
 
 
         // var topBound = World.CreateEntity();
@@ -106,6 +106,11 @@ class Program : Game
         World.Set(bottomBound, new BoundingBox(0, 0, 1280, 16));
         World.Set(bottomBound, new SolidCollision());
         World.Set(bottomBound, new ResetBallOnHit());
+        World.Set(bottomBound, new FollowsCamera(720 + 8));
+
+
+        var cameraEntity = World.CreateEntity();
+        World.Set(cameraEntity, new CameraPosition(0f));
 
         //World.Relate(player, ball, new IgnoreSolidCollision());
     }

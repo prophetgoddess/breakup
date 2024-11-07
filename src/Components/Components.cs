@@ -17,5 +17,5 @@ public readonly record struct CanBeHit();
 public readonly record struct HasGravity();
 public readonly record struct ResetBallOnHit();
 public readonly record struct DestroyOnContactWithBall();
-public readonly record struct WorldOffset(float Y);
-public readonly record struct IgnoreWorldOffset();
+public readonly record struct CameraPosition(float Y);
+public readonly record struct FollowsCamera(float Y);
