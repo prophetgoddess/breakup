@@ -17,10 +17,31 @@ public class Renderer : MoonTools.ECS.Renderer
 
     MoonTools.ECS.Filter ModelFilter;
 
+    Texture RenderTexture;
+
+    void CreateRenderTexture()
+    {
+
+        RenderTexture = Texture.Create(GraphicsDevice, new TextureCreateInfo
+        {
+            Type = TextureType.TwoDimensional,
+            Format = Window.SwapchainFormat,
+            Usage = TextureUsageFlags.ColorTarget | TextureUsageFlags.Sampler,
+            Height = Window.Height,
+            Width = (uint)(Window.Height * 4.0f / 3.0f),
+            SampleCount = SampleCount.One,
+            LayerCountOrDepth = 1,
+            NumLevels = 1
+        });
+
+    }
+
     public Renderer(World world, Window window, GraphicsDevice graphicsDevice) : base(world)
     {
         GraphicsDevice = graphicsDevice;
         Window = window;
+
+        CreateRenderTexture();
 
         ModelFilter = FilterBuilder.Include<Model>().Include<Position>().Build();
 
@@ -77,6 +98,12 @@ public class Renderer : MoonTools.ECS.Renderer
 
     public void Draw(CommandBuffer cmdbuf, Texture renderTexture)
     {
+        if (Window.Height != RenderTexture.Height)
+        {
+            renderTexture.Dispose();
+            CreateRenderTexture();
+        }
+
         if (renderTexture == null)
             return;
 
@@ -95,7 +122,7 @@ public class Renderer : MoonTools.ECS.Renderer
         //cmdbuf.PushVertexUniformData(cameraMatrix);
 
         var renderPass = cmdbuf.BeginRenderPass(
-            new ColorTargetInfo(renderTexture, Color.GhostWhite)
+            new ColorTargetInfo(RenderTexture, Color.GhostWhite)
         );
 
         foreach (var entity in ModelFilter.Entities)
@@ -117,6 +144,23 @@ public class Renderer : MoonTools.ECS.Renderer
         }
 
         cmdbuf.EndRenderPass(renderPass);
+
+        cmdbuf.Blit(new BlitInfo
+        {
+            Source = new BlitRegion(RenderTexture),
+            Destination = new BlitRegion
+            {
+                Texture = renderTexture,
+                X = (uint)((renderTexture.Width - RenderTexture.Width) * 0.5f),
+                W = RenderTexture.Width,
+                H = RenderTexture.Height
+            },
+            LoadOp = LoadOp.Clear,
+            ClearColor = Color.Black,
+            FlipMode = FlipMode.None,
+            Filter = MoonWorks.Graphics.Filter.Nearest,
+            Cycle = true
+        });
 
     }
 }
