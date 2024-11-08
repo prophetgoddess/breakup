@@ -53,6 +53,10 @@ public class GameState : MoonTools.ECS.System
         Set(player, new FollowsCamera(Dimensions.GameHeight * 0.9f));
         Set(player, new DestroyOnRestartGame());
 
+        Relate(ball, player, new HeldBy(new Vector2(0f, -32.0f)));
+        Set(ball, new Velocity(Vector2.Zero));
+        Relate(ball, player, new IgnoreSolidCollision());
+
         var leftBound = CreateEntity();
         Set(leftBound, new Position(new Vector2(-8, 0)));
         Set(leftBound, new BoundingBox(0, 0, 16, 2000));

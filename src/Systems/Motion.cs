@@ -32,8 +32,6 @@ public class Motion : MoonTools.ECS.System
                         aMaxY >= bMinY;
 
         return overlaps;
-
-
     }
 
     public Vector2 Sweep(Entity e, Vector2 position, Vector2 velocity, BoundingBox boundingBox)
@@ -81,6 +79,7 @@ public class Motion : MoonTools.ECS.System
     public override void Update(TimeSpan delta)
     {
         var dt = (float)delta.TotalSeconds;
+        var offset = GetSingleton<CameraPosition>().Y;
 
         foreach (var entity in MotionFilter.Entities)
         {
@@ -95,8 +94,19 @@ public class Motion : MoonTools.ECS.System
 
             var dest = position + velocity;
 
+            if (HasOutRelation<HeldBy>(entity))
+            {
+                var held = OutRelationSingleton<HeldBy>(entity);
+                var data = GetRelationData<HeldBy>(entity, held);
+                dest = Get<Position>(held).value + data.offset;
+                //dest.Y -= offset;
+                Set(entity, new Position(dest));
+                continue;
+            }
+
             if (Has<BoundingBox>(entity) && Has<SolidCollision>(entity))
             {
+
                 dest = Sweep(entity, position, velocity * dt, Get<BoundingBox>(entity));
 
                 foreach (var other in OutRelations<Colliding>(entity))
@@ -107,13 +117,11 @@ public class Motion : MoonTools.ECS.System
 
                     if (Has<Bounce>(entity) && Has<ResetBallOnHit>(other))
                     {
-                        var offset = GetSingleton<CameraPosition>().Y;
-                        dest = new Vector2(
-                                  Dimensions.GameWidth * 0.5f,
-                                  (Dimensions.GameHeight * 0.5f) - offset
-                               );
-                        World.Set(entity, new Velocity(Vector2.Zero));
+                        var player = GetSingletonEntity<Player>();
+                        Relate(entity, player, new HeldBy(new Vector2(0f, -32.0f)));
+                        Set(entity, new Velocity(Vector2.Zero));
                         Unrelate<Colliding>(entity, other);
+                        Relate(entity, player, new IgnoreSolidCollision());
 
                         var life = GetSingletonEntity<FirstLife>();
 

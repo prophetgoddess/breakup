@@ -27,6 +27,7 @@ public class BlockGenerator : MoonTools.ECS.System
         Set(block, new BoundingBox(0, 0, 32, 32));
         Set(block, new DestroyOnContactWithBall());
         Set(block, new SolidCollision());
+        Set(block, new DestroyOnRestartGame());
     }
 
     void Initialize()

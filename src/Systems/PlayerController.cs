@@ -32,12 +32,19 @@ public class PlayerController : MoonTools.ECS.System
             movementDelta += Vector2.UnitX;
         }
 
-        // if (inputState.Swing.IsPressed && !HasOutRelation<Spinning>(player))
-        // {
-        //     var timerEntity = CreateEntity();
-        //     Set(timerEntity, new Timer(0.25f));
-        //     Relate(player, timerEntity, new Spinning());
-        // }
+        if (inputState.Swing.IsPressed && !HasOutRelation<Spinning>(player))
+        {
+            var timerEntity = CreateEntity();
+            Set(timerEntity, new Timer(0.25f));
+            Relate(player, timerEntity, new Spinning());
+
+            if (HasInRelation<HeldBy>(player))
+            {
+                var ball = InRelationSingleton<HeldBy>(player);
+                Unrelate<HeldBy>(ball, player);
+                Unrelate<IgnoreSolidCollision>(ball, player);
+            }
+        }
 
         if (movementDelta != Vector2.Zero)
         {
