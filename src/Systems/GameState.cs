@@ -47,7 +47,7 @@ public class GameState : MoonTools.ECS.System
                                        )));
         Set(player, new Orientation(0f));
         Set(player, new Velocity(Vector2.Zero));
-        Set(player, new BoundingBox(0, 0, 32, 32));
+        Set(player, new BoundingBox(0, 0, 80, 32));
         Set(player, new SolidCollision());
         Set(player, new HitBall());
         Set(player, new Scale(4.0f));

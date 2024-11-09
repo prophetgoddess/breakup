@@ -5,6 +5,7 @@ using Buffer = MoonWorks.Graphics.Buffer;
 using MoonTools.ECS;
 using System.Runtime.InteropServices;
 using System.Net.Mime;
+using MoonWorks.Graphics.Font;
 
 namespace Ball;
 
@@ -17,6 +18,9 @@ public class Renderer : MoonTools.ECS.Renderer
 
     MoonTools.ECS.Filter ModelFilter;
     MoonTools.ECS.Filter UIFilter;
+
+    TextBatch TextBatch;
+    GraphicsPipeline TextPipeline;
 
     Texture GameTexture;
     Texture UITexture;
@@ -54,6 +58,8 @@ public class Renderer : MoonTools.ECS.Renderer
     {
         GraphicsDevice = graphicsDevice;
         Window = window;
+
+        TextBatch = new TextBatch(GraphicsDevice);
 
         CreateRenderTextures();
 
@@ -107,6 +113,28 @@ public class Renderer : MoonTools.ECS.Renderer
 
         RenderPipeline = GraphicsPipeline.Create(GraphicsDevice, renderPipelineCreateInfo);
 
+        var textPipelineCreateInfo = new GraphicsPipelineCreateInfo
+        {
+            VertexShader = GraphicsDevice.TextVertexShader,
+            FragmentShader = GraphicsDevice.TextFragmentShader,
+            VertexInputState = GraphicsDevice.TextVertexInputState,
+            PrimitiveType = PrimitiveType.TriangleList,
+            RasterizerState = RasterizerState.CCW_CullNone,
+            MultisampleState = MultisampleState.None,
+            DepthStencilState = DepthStencilState.Disable,
+            TargetInfo = new GraphicsPipelineTargetInfo
+            {
+                ColorTargetDescriptions = [
+                    new ColorTargetDescription
+                    {
+                        Format = Window.SwapchainFormat,
+                        BlendState = ColorTargetBlendState.NonPremultipliedAlphaBlend
+                    }
+                ]
+            }
+        };
+
+        TextPipeline = GraphicsPipeline.Create(GraphicsDevice, textPipelineCreateInfo);
         Content.LoadAll(GraphicsDevice);
 
     }
@@ -173,9 +201,13 @@ public class Renderer : MoonTools.ECS.Renderer
             LoadOp = LoadOp.Clear,
             ClearColor = Color.Black,
             FlipMode = FlipMode.None,
-            Filter = MoonWorks.Graphics.Filter.Nearest,
+            Filter = MoonWorks.Graphics.Filter.Linear,
             Cycle = true
         });
+
+        TextBatch.Start(Content.Fonts.Kosugi);
+        TextBatch.Add($"{(int)cameraPos}", 16, Color.White, HorizontalAlignment.Left, VerticalAlignment.Middle);
+        TextBatch.UploadBufferData(cmdbuf);
 
         var uiPass = cmdbuf.BeginRenderPass(
             new ColorTargetInfo(UITexture, LoadOp.Load)
@@ -209,6 +241,11 @@ public class Renderer : MoonTools.ECS.Renderer
 
         }
 
+        var textModel = Matrix4x4.CreateTranslation(Dimensions.GameWidth - 70, -cameraPos + 100, 0f);
+
+        uiPass.BindGraphicsPipeline(TextPipeline);
+        TextBatch.Render(cmdbuf, uiPass, textModel * cameraMatrix);
+
         cmdbuf.EndRenderPass(uiPass);
 
         cmdbuf.Blit(new BlitInfo
@@ -224,7 +261,7 @@ public class Renderer : MoonTools.ECS.Renderer
             LoadOp = LoadOp.Clear,
             ClearColor = Color.Transparent,
             FlipMode = FlipMode.None,
-            Filter = MoonWorks.Graphics.Filter.Nearest,
+            Filter = MoonWorks.Graphics.Filter.Linear,
             Cycle = true
         });
 
