@@ -33,7 +33,7 @@ class Program : Game
             new PlayerController(World),
             new Motion(World),
             new FollowCamera(World),
-            new BlockGenerator(World),
+            new Blocks(World),
         ];
 
         Renderer = new Renderer(World, MainWindow, GraphicsDevice);

@@ -41,7 +41,7 @@ public class Motion : MoonTools.ECS.System
 
         foreach (var other in ColliderFilter.Entities)
         {
-            var otherPos = Get<Position>(other).value;
+            var otherPos = Get<Position>(other).Value;
             var otherBox = Get<BoundingBox>(other);
             if (e != other && Overlaps(new Vector2(destX, position.Y), boundingBox, otherPos, otherBox))
             {
@@ -57,7 +57,7 @@ public class Motion : MoonTools.ECS.System
 
         foreach (var other in ColliderFilter.Entities)
         {
-            var otherPos = Get<Position>(other).value;
+            var otherPos = Get<Position>(other).Value;
             var otherBox = Get<BoundingBox>(other);
             if (e != other && Overlaps(new Vector2(position.X, destY), boundingBox, otherPos, otherBox))
             {
@@ -84,8 +84,8 @@ public class Motion : MoonTools.ECS.System
         foreach (var entity in MotionFilter.Entities)
         {
 
-            var position = Get<Position>(entity).value;
-            var velocity = Get<Velocity>(entity).value;
+            var position = Get<Position>(entity).Value;
+            var velocity = Get<Velocity>(entity).Value;
             if (Has<HasGravity>(entity))
             {
                 velocity.Y += 8f;
@@ -98,15 +98,13 @@ public class Motion : MoonTools.ECS.System
             {
                 var held = OutRelationSingleton<HeldBy>(entity);
                 var data = GetRelationData<HeldBy>(entity, held);
-                dest = Get<Position>(held).value + data.offset;
-                //dest.Y -= offset;
+                dest = Get<Position>(held).Value + data.offset;
                 Set(entity, new Position(dest));
                 continue;
             }
 
             if (Has<BoundingBox>(entity) && Has<SolidCollision>(entity))
             {
-
                 dest = Sweep(entity, position, velocity * dt, Get<BoundingBox>(entity));
 
                 foreach (var other in OutRelations<Colliding>(entity))
@@ -137,18 +135,19 @@ public class Motion : MoonTools.ECS.System
 
                     if (Has<HitBall>(other) && Has<CanBeHit>(entity))
                     {
-                        var otherPos = Get<Position>(other).value;
+                        var otherPos = Get<Position>(other).Value;
                         var dir = Vector2.Normalize(otherPos - dest);
                         velocity = dir * -velocity.Length() * 0.9f;
-                        velocity.Y -= 300.0f;
+                        velocity.Y -= 200.0f;
                         Set(entity, new Velocity(velocity));
                     }
 
                     else if (Has<Bounce>(entity) && collision.Solid)
                     {
-                        if (Has<DestroyOnContactWithBall>(other))
+                        if (Has<CanTakeDamageFromBall>(other) && Has<HitPoints>(other))
                         {
-                            Destroy(other);
+                            var hitPoints = Get<HitPoints>(other).Value;
+                            Set(other, new HitPoints(hitPoints - 1));
                         }
 
                         var newVelocity = Vector2.Zero;

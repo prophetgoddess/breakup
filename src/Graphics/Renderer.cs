@@ -142,10 +142,10 @@ public class Renderer : MoonTools.ECS.Renderer
 
         foreach (var entity in ModelFilter.Entities)
         {
-            var position = Get<Position>(entity).value;
-            var rotation = Has<Orientation>(entity) ? Get<Orientation>(entity).value : 0.0f;
+            var position = Get<Position>(entity).Value;
+            var rotation = Has<Orientation>(entity) ? Get<Orientation>(entity).Value : 0.0f;
             var mesh = Content.Models.IDToModel[Get<Model>(entity).ID];
-            var scale = Has<Scale>(entity) ? Get<Scale>(entity).value : 1;
+            var scale = Has<Scale>(entity) ? Get<Scale>(entity).Value : 1;
 
             Matrix4x4 model = Matrix4x4.CreateFromAxisAngle(Vector3.UnitZ, rotation) * Matrix4x4.CreateScale(Vector3.One * scale) * Matrix4x4.CreateTranslation(new Vector3(position, 0)) * cameraMatrix;
             var uniforms = new TransformVertexUniform(model);
@@ -193,10 +193,10 @@ public class Renderer : MoonTools.ECS.Renderer
 
         foreach (var entity in UIFilter.Entities)
         {
-            var position = Get<Position>(entity).value;
-            var rotation = Has<Orientation>(entity) ? Get<Orientation>(entity).value : 0.0f;
+            var position = Get<Position>(entity).Value;
+            var rotation = Has<Orientation>(entity) ? Get<Orientation>(entity).Value : 0.0f;
             var mesh = Content.Models.IDToModel[Get<Model>(entity).ID];
-            var scale = Has<Scale>(entity) ? Get<Scale>(entity).value : 1;
+            var scale = Has<Scale>(entity) ? Get<Scale>(entity).Value : 1;
 
             Matrix4x4 model = Matrix4x4.CreateFromAxisAngle(Vector3.UnitZ, rotation) * Matrix4x4.CreateScale(Vector3.One * scale) * Matrix4x4.CreateTranslation(new Vector3(position, 0)) * uiCameraMatrix;
             var uniforms = new TransformVertexUniform(model);

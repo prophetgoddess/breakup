@@ -124,34 +124,34 @@ if os.path.exists(texture_in):
 
 fontsDirty = False
 
-# if os.path.exists(fonts_in):
-#     if not os.path.isdir(fonts_out):
-#         os.mkdir(fonts_out)
+if os.path.exists(fonts_in):
+    if not os.path.isdir(fonts_out):
+        os.mkdir(fonts_out)
 
-#     for font in Path(fonts_in).glob("**/*.ttf"):
-#         digest = get_digest(font)
+    for font in Path(fonts_in).glob("**/*.ttf"):
+        digest = get_digest(font)
 
-#         if not font in hashes:
-#             fontsDirty
+        if not font in hashes:
+            fontsDirty
 
-#         if not font in hashes or hashes[font] != digest or args.force:
-#             subprocess.run(
-#                 [
-#                     "msdf-atlas-gen",
-#                     "-yorigin",
-#                     "top",
-#                     "-font",
-#                     font,
-#                     "-imageout",
-#                     f"{os.path.join(fonts_out, Path(font).stem)}.png",
-#                     "-json",
-#                     f"{os.path.join(fonts_out, Path(font).stem)}.json",
-#                     "-fontname",
-#                     os.path.basename(font),
-#                 ]
-#             )
-#             shutil.copy(font, f"{os.path.join(fonts_out, Path(font).stem)}.font")
-#             hashes[font] = digest
+        if not font in hashes or hashes[font] != digest or args.force:
+            subprocess.run(
+                [
+                    "msdf-atlas-gen",
+                    "-yorigin",
+                    "top",
+                    "-font",
+                    font,
+                    "-imageout",
+                    f"{os.path.join(fonts_out, Path(font).stem)}.png",
+                    "-json",
+                    f"{os.path.join(fonts_out, Path(font).stem)}.json",
+                    "-fontname",
+                    os.path.basename(font),
+                ]
+            )
+            shutil.copy(font, f"{os.path.join(fonts_out, Path(font).stem)}.font")
+            hashes[font] = digest
 
 
 #
@@ -249,14 +249,14 @@ public static class Content
         f.write(f"public static Font {Path(font).stem};\n")
 
     f.write(
-        """public static void LoadFonts(GraphicsDevice graphicsDevice, CommandBuffer commandBuffer, string path)
+        """public static void LoadFonts(GraphicsDevice graphicsDevice, string path)
         {
 """
     )
 
     for font in Path(fonts_out).glob("*.json"):
         f.write(
-            f'{Path(font).stem} = Font.Load(graphicsDevice, commandBuffer, Path.Join(path, "{Path(font.stem)}.font"));\n'
+            f'{Path(font).stem} = Font.Load(graphicsDevice, Path.Join(path, "{Path(font.stem)}.font"));\n'
         )
 
     f.write("\n}\n}\n\n")
@@ -340,7 +340,7 @@ public static class Content
         {
             var cmdbuf = graphicsDevice.AcquireCommandBuffer();
 
-            Fonts.LoadFonts(graphicsDevice, cmdbuf, Path.Join(System.AppContext.BaseDirectory, "Fonts"));
+            Fonts.LoadFonts(graphicsDevice, Path.Join(System.AppContext.BaseDirectory, "Fonts"));
 
             graphicsDevice.Submit(cmdbuf);
     
