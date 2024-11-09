@@ -7,13 +7,12 @@ public class Blocks : MoonTools.ECS.System
 {
 
     Filter BlockFilter;
-    bool Initialized = false;
-    int MinBlockCount = 20;
     int CellSize = 32;
     int GridWidth { get { return Dimensions.GameWidth / CellSize; } }
     int GridHeight { get { return Dimensions.GameHeight / CellSize; } }
 
     System.Random Random = new System.Random();
+    float LastGridOffset = -1.0f;
 
     public Blocks(World world) : base(world)
     {
@@ -47,41 +46,67 @@ public class Blocks : MoonTools.ECS.System
 
     void Initialize()
     {
-        Initialized = true;
-        for (int i = 0; i < MinBlockCount; i++)
+        Destroy(GetSingletonEntity<Initialize>());
+        LastGridOffset = 0.0f;
+        for (int x = 0; x < GridWidth; x++)
         {
-            SpawnBlock(
-                Random.Next(GridWidth),
-                Random.Next(GridHeight - (GridHeight / 2))
-            );
+            for (int y = -3; y < GridHeight * 0.4f; y++)
+            {
+                if (Random.NextDouble() < 0.1f)
+                {
+                    SpawnBlock(
+                        x,
+                        y
+                    );
+                }
+            }
         }
     }
 
     public override void Update(TimeSpan delta)
     {
-        var cam = GetSingleton<CameraPosition>();
-
-        if (!Initialized)
+        if (Some<Initialize>())
             Initialize();
 
-        foreach (var block in BlockFilter.Entities)
+        var cam = GetSingleton<CameraPosition>();
+
+        if (cam.Y > LastGridOffset && cam.Y > LastGridOffset + CellSize)
         {
-            if (
-                Get<Position>(block).Value.Y > (-cam.Y + Dimensions.GameHeight) ||
-                (Has<HitPoints>(block) && Get<HitPoints>(block).Value <= 0)
-                )
+            LastGridOffset = cam.Y;
+
+            int y = -(int)(MathF.Floor(cam.Y + CellSize) / CellSize) - 3;
+
+            for (int x = 0; x < GridWidth; x++)
             {
-                Destroy(block);
+                if (Random.NextDouble() < 0.1f)
+                {
+                    SpawnBlock(x, y);
+                }
             }
         }
 
-        if (BlockFilter.Count < MinBlockCount)
+        foreach (var block in BlockFilter.Entities)
         {
-            SpawnBlock(
-                Random.Next(GridWidth),
-                (int)(-cam.Y / CellSize) - Random.Next(GridHeight)
-            );
+            if (Has<HitPoints>(block))
+            {
+                var hp = Get<HitPoints>(block).Value;
+
+                if (hp <= 0)
+                {
+                    Destroy(block);
+                    continue;
+                }
+            }
+
+            var position = Get<Position>(block).Value;
+
+            if (position.Y > -cam.Y + (Dimensions.GameHeight * 0.7))
+            {
+                Destroy(block);
+                continue;
+            }
         }
+
 
     }
 }

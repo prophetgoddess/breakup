@@ -2,8 +2,8 @@ namespace Ball;
 
 public static class Dimensions
 {
-    public const int GameWidth = 1024;
-    public const int GameHeight = 768;
+    public const int GameWidth = 640;
+    public const int GameHeight = 480;
     public const float GameAspectRatio = GameWidth / (float)GameHeight;
 
     public const int WindowWidth = 1920;

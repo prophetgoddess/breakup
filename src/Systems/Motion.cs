@@ -137,7 +137,7 @@ public class Motion : MoonTools.ECS.System
                     {
                         var otherPos = Get<Position>(other).Value;
                         var dir = Vector2.Normalize(otherPos - dest);
-                        velocity = dir * -velocity.Length() * 0.9f;
+                        velocity = dir * -velocity.Length();
                         velocity.Y -= 200.0f;
                         Set(entity, new Velocity(velocity));
                     }
@@ -167,13 +167,13 @@ public class Motion : MoonTools.ECS.System
                         }
 
                         if (bounceX && !bounceY)
-                            Set(entity, new Velocity(new Vector2(newVelocity.X, velocity.Y) * 0.9f));
+                            Set(entity, new Velocity(new Vector2(newVelocity.X, velocity.Y) * 0.8f));
 
                         if (bounceY && !bounceX)
-                            Set(entity, new Velocity(new Vector2(velocity.X, newVelocity.Y) * 0.9f));
+                            Set(entity, new Velocity(new Vector2(velocity.X, newVelocity.Y * 0.8f)));
 
                         if (bounceY && bounceX)
-                            Set(entity, new Velocity(new Vector2(newVelocity.X, newVelocity.Y) * 0.9f));
+                            Set(entity, new Velocity(new Vector2(newVelocity.X, newVelocity.Y * 0.8f)));
 
                     }
 

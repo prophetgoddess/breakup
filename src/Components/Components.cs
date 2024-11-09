@@ -26,3 +26,4 @@ public readonly record struct Life();
 public readonly record struct FirstLife();
 public readonly record struct HitPoints(int Value);
 public readonly record struct CanDamagePaddle();
+public readonly record struct Initialize();

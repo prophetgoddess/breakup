@@ -21,6 +21,8 @@ public class GameState : MoonTools.ECS.System
             Destroy(entity);
         }
 
+        Set(CreateEntity(), new Initialize());
+
         var ball = CreateEntity();
         Set(ball, new Model(Content.Models.Donut.ID));
         Set(ball, new Scale(16.0f));
@@ -48,7 +50,7 @@ public class GameState : MoonTools.ECS.System
         Set(player, new BoundingBox(0, 0, 32, 32));
         Set(player, new SolidCollision());
         Set(player, new HitBall());
-        Set(player, new Scale(3.0f));
+        Set(player, new Scale(4.0f));
         Set(player, new Player());
         Set(player, new FollowsCamera(Dimensions.GameHeight * 0.9f));
         Set(player, new DestroyOnRestartGame());
