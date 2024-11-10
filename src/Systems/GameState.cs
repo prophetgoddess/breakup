@@ -123,7 +123,9 @@ public class GameState : MoonTools.ECS.System
 
     public override void Update(TimeSpan delta)
     {
-        if (LivesFilter.Count == 0)
+        var inputState = GetSingleton<InputState>();
+
+        if (LivesFilter.Count == 0 || inputState.Restart.IsPressed)
         {
             StartGame();
         }

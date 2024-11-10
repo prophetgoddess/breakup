@@ -59,7 +59,7 @@ class Program : Game
 
         var highScoreEntity = World.CreateEntity();
         World.Set(highScoreEntity, new HighScore(0));
-        World.Set(highScoreEntity, new Position(new Vector2(Dimensions.WindowWidth - 190, 160)));
+        World.Set(highScoreEntity, new Position(new Vector2(Dimensions.WindowWidth - 190, 140)));
         World.Set(highScoreEntity,
          new Text(
             Stores.FontStorage.GetID(Content.Fonts.Kosugi),
