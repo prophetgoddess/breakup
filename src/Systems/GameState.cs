@@ -1,5 +1,6 @@
 using System.Numerics;
 using MoonTools.ECS;
+using MoonWorks.Audio;
 
 namespace Ball;
 public class GameState : MoonTools.ECS.System
@@ -8,10 +9,17 @@ public class GameState : MoonTools.ECS.System
     Filter DestroyFilter;
     Filter LivesFilter;
 
-    public GameState(World world) : base(world)
+    PersistentVoice Voice;
+    AudioDevice AudioDevice;
+
+    public GameState(World world, AudioDevice audioDevice) : base(world)
     {
+        AudioDevice = audioDevice;
         DestroyFilter = FilterBuilder.Include<DestroyOnRestartGame>().Build();
         LivesFilter = FilterBuilder.Include<Life>().Build();
+        Voice = audioDevice.Obtain<PersistentVoice>(Content.SFX.Music.Format);
+        Voice.Submit(Content.SFX.Music);
+        Voice.Play();
     }
 
     void StartGame()
@@ -25,7 +33,7 @@ public class GameState : MoonTools.ECS.System
 
         var ball = CreateEntity();
         Set(ball, new Model(Content.Models.Donut.ID));
-        Set(ball, new Scale(16.0f));
+        Set(ball, new Scale(Vector2.One * 16.0f));
         Set(ball, new Position(new Vector2(
                                           Dimensions.GameWidth * 0.5f,
                                           Dimensions.GameHeight * 0.5f
@@ -50,7 +58,7 @@ public class GameState : MoonTools.ECS.System
         Set(player, new BoundingBox(-24, 0, 64, 32));
         Set(player, new SolidCollision());
         Set(player, new HitBall());
-        Set(player, new Scale(4.0f));
+        Set(player, new Scale(Vector2.One * 4.0f));
         Set(player, new Player());
         Set(player, new FollowsCamera(Dimensions.GameHeight * 0.9f));
         Set(player, new DestroyOnRestartGame());
@@ -64,6 +72,14 @@ public class GameState : MoonTools.ECS.System
         Set(leftBound, new BoundingBox(0, 0, 16, 2000));
         Set(leftBound, new SolidCollision());
         Set(leftBound, new FollowsCamera(0));
+        Set(leftBound, new DestroyOnRestartGame());
+
+
+        var leftBoundSprite = CreateEntity();
+        Set(leftBoundSprite, new Position(new Vector2(-9, 0)));
+        Set(leftBoundSprite, new Model(Content.Models.Square.ID));
+        Set(leftBoundSprite, new Scale(new Vector2(1.5f, 2000)));
+        Set(leftBoundSprite, new DestroyOnRestartGame());
 
         var rightBound = CreateEntity();
         Set(rightBound, new Position(new Vector2(Dimensions.GameWidth + 8, 0)));
@@ -71,6 +87,12 @@ public class GameState : MoonTools.ECS.System
         Set(rightBound, new SolidCollision());
         Set(rightBound, new FollowsCamera(0));
         Set(rightBound, new DestroyOnRestartGame());
+
+        var rightBoundSprite = CreateEntity();
+        Set(rightBoundSprite, new Position(new Vector2(Dimensions.GameWidth + 9, 0)));
+        Set(rightBoundSprite, new Model(Content.Models.Square.ID));
+        Set(rightBoundSprite, new Scale(new Vector2(1.5f, 2000)));
+        Set(rightBoundSprite, new DestroyOnRestartGame());
 
         var bottomBound = CreateEntity();
         Set(bottomBound, new Position(new Vector2(0, Dimensions.GameHeight + 8)));
@@ -90,7 +112,7 @@ public class GameState : MoonTools.ECS.System
             var lifeEntity = CreateEntity();
             Set(lifeEntity, new Life());
             Set(lifeEntity, new Model(Content.Models.Donut.ID));
-            Set(lifeEntity, new Scale(16.0f));
+            Set(lifeEntity, new Scale(Vector2.One * 16.0f));
             Set(lifeEntity, new UI());
             Set(lifeEntity, new Position(new Vector2(100, 50 + i * 100)));
             Set(lifeEntity, new DestroyOnRestartGame());
@@ -123,6 +145,13 @@ public class GameState : MoonTools.ECS.System
 
     public override void Update(TimeSpan delta)
     {
+        if (Voice.State == SoundState.Stopped)
+        {
+            Voice = AudioDevice.Obtain<PersistentVoice>(Content.SFX.Music.Format);
+            Voice.Submit(Content.SFX.Music);
+            Voice.Play();
+        }
+
         var inputState = GetSingleton<InputState>();
 
         if (LivesFilter.Count == 0 || inputState.Restart.IsPressed)

@@ -30,7 +30,7 @@ class Program : Game
         Systems =
         [
             new Input(World, Inputs),
-            new GameState(World),
+            new GameState(World, AudioDevice),
             new Time(World),
             new PlayerController(World),
             new Motion(World, AudioDevice),
@@ -101,7 +101,9 @@ class Program : Game
             "Ball",
             Dimensions.WindowWidth,
             Dimensions.WindowHeight,
-            ScreenMode.Windowed
+
+
+            ScreenMode.Fullscreen
         );
 
         var frameLimiterSettings = new FrameLimiterSettings(

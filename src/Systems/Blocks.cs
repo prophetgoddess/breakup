@@ -24,7 +24,7 @@ public class Blocks : MoonTools.ECS.System
     void SpawnBlock(int x, int y)
     {
         var block = CreateEntity();
-        Set(block, new Scale(1.9f));
+        Set(block, new Scale(Vector2.One * 1.9f));
         Set(block, new Position(new Vector2(CellSize * 0.5f + x * CellSize, CellSize * 0.5f + y * CellSize)));
         Set(block, new BoundingBox(0, 0, 32, 32));
         Set(block, new SolidCollision());

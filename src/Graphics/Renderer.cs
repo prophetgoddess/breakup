@@ -182,9 +182,9 @@ public class Renderer : MoonTools.ECS.Renderer
             var position = Get<Position>(entity).Value;
             var rotation = Has<Orientation>(entity) ? Get<Orientation>(entity).Value : 0.0f;
             var mesh = Content.Models.IDToModel[Get<Model>(entity).ID];
-            var scale = Has<Scale>(entity) ? Get<Scale>(entity).Value : 1;
+            var scale = Has<Scale>(entity) ? Get<Scale>(entity).Value : Vector2.One;
 
-            Matrix4x4 model = Matrix4x4.CreateFromAxisAngle(Vector3.UnitZ, rotation) * Matrix4x4.CreateScale(Vector3.One * scale) * Matrix4x4.CreateTranslation(new Vector3(position, 0)) * cameraMatrix;
+            Matrix4x4 model = Matrix4x4.CreateFromAxisAngle(Vector3.UnitZ, rotation) * Matrix4x4.CreateScale(new Vector3(scale.X, scale.Y, 0)) * Matrix4x4.CreateTranslation(new Vector3(position, 0)) * cameraMatrix;
             var uniforms = new TransformVertexUniform(model);
 
             gamePass.BindGraphicsPipeline(RenderPipeline);
@@ -208,7 +208,7 @@ public class Renderer : MoonTools.ECS.Renderer
                 H = GameTexture.Height
             },
             LoadOp = LoadOp.Clear,
-            ClearColor = Color.Black,
+            ClearColor = Color.GhostWhite,
             FlipMode = FlipMode.None,
             Filter = MoonWorks.Graphics.Filter.Linear,
             Cycle = true
@@ -234,9 +234,9 @@ public class Renderer : MoonTools.ECS.Renderer
             var position = Get<Position>(entity).Value;
             var rotation = Has<Orientation>(entity) ? Get<Orientation>(entity).Value : 0.0f;
             var mesh = Content.Models.IDToModel[Get<Model>(entity).ID];
-            var scale = Has<Scale>(entity) ? Get<Scale>(entity).Value : 1;
+            var scale = Has<Scale>(entity) ? Get<Scale>(entity).Value : Vector2.One;
 
-            Matrix4x4 model = Matrix4x4.CreateFromAxisAngle(Vector3.UnitZ, rotation) * Matrix4x4.CreateScale(Vector3.One * scale) * Matrix4x4.CreateTranslation(new Vector3(position, 0)) * uiCameraMatrix;
+            Matrix4x4 model = Matrix4x4.CreateFromAxisAngle(Vector3.UnitZ, rotation) * Matrix4x4.CreateScale(new Vector3(scale.X, scale.Y, 0f)) * Matrix4x4.CreateTranslation(new Vector3(position, 0)) * uiCameraMatrix;
             var uniforms = new TransformVertexUniform(model);
 
             uiPass.BindGraphicsPipeline(RenderPipeline);
@@ -256,7 +256,7 @@ public class Renderer : MoonTools.ECS.Renderer
             var position = Get<Position>(textEntity).Value;
 
             textBatch.Start(Stores.FontStorage.Get(text.FontID));
-            textBatch.Add(Stores.TextStorage.Get(text.TextID), text.Size, Color.White, text.HorizontalAlignment, text.VerticalAlignment);
+            textBatch.Add(Stores.TextStorage.Get(text.TextID), text.Size, Color.Gray, text.HorizontalAlignment, text.VerticalAlignment);
             textBatch.UploadBufferData(cmdbuf);
 
             var textModel = Matrix4x4.CreateTranslation(position.X, position.Y, 0f);
