@@ -2,16 +2,26 @@ using System.Numerics;
 using Ball;
 using MoonTools.ECS;
 using MoonWorks;
+using MoonWorks.Audio;
 
 public class Motion : MoonTools.ECS.System
 {
     public Filter MotionFilter;
     public Filter ColliderFilter;
+    AudioDevice AudioDevice;
 
-    public Motion(World world) : base(world)
+    public Motion(World world, AudioDevice audioDevice) : base(world)
     {
+        AudioDevice = audioDevice;
         MotionFilter = FilterBuilder.Include<Velocity>().Include<Position>().Build();
         ColliderFilter = FilterBuilder.Include<Position>().Include<SolidCollision>().Build();
+    }
+
+    void PlaySound(AudioBuffer buffer)
+    {
+        var voice = AudioDevice.Obtain<PersistentVoice>(buffer.Format);
+        voice.Submit(buffer);
+        voice.Play();
     }
 
     public bool Overlaps(Vector2 posA, BoundingBox boxA, Vector2 posB, BoundingBox boxB)
@@ -115,6 +125,8 @@ public class Motion : MoonTools.ECS.System
 
                     if (Has<Bounce>(entity) && Has<ResetBallOnHit>(other))
                     {
+                        PlaySound(Content.SFX.Fail);
+
                         var player = GetSingletonEntity<Player>();
                         Relate(entity, player, new HeldBy(new Vector2(0f, -32.0f)));
                         Set(entity, new Velocity(Vector2.Zero));
@@ -135,6 +147,7 @@ public class Motion : MoonTools.ECS.System
 
                     if (Has<HitBall>(other) && Has<CanBeHit>(entity))
                     {
+                        PlaySound(Content.SFX.Boing);
                         var otherPos = Get<Position>(other).Value;
                         var dir = Vector2.Normalize(otherPos - dest);
                         velocity = dir * -velocity.Length();
@@ -144,10 +157,14 @@ public class Motion : MoonTools.ECS.System
 
                     else if (Has<Bounce>(entity) && collision.Solid)
                     {
+                        if (!Has<CanTakeDamageFromBall>(other))
+                            PlaySound(Content.SFX.Bounce);
+
                         if (Has<CanTakeDamageFromBall>(other) && Has<HitPoints>(other))
                         {
                             var hitPoints = Get<HitPoints>(other).Value;
                             Set(other, new HitPoints(hitPoints - 1));
+                            PlaySound(Content.SFX.Pop);
                         }
 
                         var bounceX = false;

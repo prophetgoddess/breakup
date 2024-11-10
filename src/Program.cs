@@ -25,13 +25,15 @@ class Program : Game
         debugMode
     )
     {
+        Content.LoadAll(GraphicsDevice, AudioDevice);
+
         Systems =
         [
             new Input(World, Inputs),
             new GameState(World),
             new Time(World),
             new PlayerController(World),
-            new Motion(World),
+            new Motion(World, AudioDevice),
             new FollowCamera(World),
             new Blocks(World),
         ];

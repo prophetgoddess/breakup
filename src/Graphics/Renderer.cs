@@ -145,7 +145,6 @@ public class Renderer : MoonTools.ECS.Renderer
         };
 
         TextPipeline = GraphicsPipeline.Create(GraphicsDevice, textPipelineCreateInfo);
-        Content.LoadAll(GraphicsDevice);
 
     }
 
