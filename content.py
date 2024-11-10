@@ -138,8 +138,6 @@ if os.path.exists(fonts_in):
             subprocess.run(
                 [
                     "msdf-atlas-gen",
-                    "-yorigin",
-                    "top",
                     "-font",
                     font,
                     "-imageout",
@@ -366,6 +364,3 @@ resourceUploader.Dispose();
 
 subprocess.run(["dotnet", "restore", project])
 subprocess.run(["dotnet", "format", project])
-
-with open(os.path.join(input, "hashes"), "wb") as f:
-    pickle.dump(hashes, f, protocol=pickle.HIGHEST_PROTOCOL)

@@ -18,8 +18,9 @@ public class Renderer : MoonTools.ECS.Renderer
 
     MoonTools.ECS.Filter ModelFilter;
     MoonTools.ECS.Filter UIFilter;
+    MoonTools.ECS.Filter TextFilter;
 
-    TextBatch TextBatch;
+    Queue<TextBatch> TextBatchPool;
     GraphicsPipeline TextPipeline;
 
     Texture GameTexture;
@@ -54,17 +55,26 @@ public class Renderer : MoonTools.ECS.Renderer
 
     }
 
+    TextBatch GetTextBatch()
+    {
+        if (TextBatchPool.Count > 0)
+            return TextBatchPool.Dequeue();
+
+        return new TextBatch(GraphicsDevice);
+    }
+
     public Renderer(World world, Window window, GraphicsDevice graphicsDevice) : base(world)
     {
         GraphicsDevice = graphicsDevice;
         Window = window;
 
-        TextBatch = new TextBatch(GraphicsDevice);
+        TextBatchPool = new Queue<TextBatch>();
 
         CreateRenderTextures();
 
         ModelFilter = FilterBuilder.Include<Model>().Include<Position>().Exclude<UI>().Build();
         UIFilter = FilterBuilder.Include<Model>().Include<Position>().Include<UI>().Build();
+        TextFilter = FilterBuilder.Include<Text>().Include<Position>().Include<UI>().Build();
 
         Shader vertShader = Shader.Create(
             GraphicsDevice,
@@ -205,9 +215,6 @@ public class Renderer : MoonTools.ECS.Renderer
             Cycle = true
         });
 
-        TextBatch.Start(Content.Fonts.Kosugi);
-        TextBatch.Add($"{(int)cameraPos}", 16, Color.White, HorizontalAlignment.Left, VerticalAlignment.Middle);
-        TextBatch.UploadBufferData(cmdbuf);
 
         var uiPass = cmdbuf.BeginRenderPass(
             new ColorTargetInfo(UITexture, LoadOp.Load)
@@ -241,12 +248,29 @@ public class Renderer : MoonTools.ECS.Renderer
 
         }
 
-        var textModel = Matrix4x4.CreateTranslation(Dimensions.GameWidth - 70, -cameraPos + 100, 0f);
-
-        uiPass.BindGraphicsPipeline(TextPipeline);
-        TextBatch.Render(cmdbuf, uiPass, textModel * cameraMatrix);
-
         cmdbuf.EndRenderPass(uiPass);
+
+        foreach (var textEntity in TextFilter.Entities)
+        {
+            var textBatch = GetTextBatch();
+            var text = Get<Text>(textEntity);
+            var position = Get<Position>(textEntity).Value;
+
+            textBatch.Start(Stores.FontStorage.Get(text.FontID));
+            textBatch.Add(Stores.TextStorage.Get(text.TextID), text.Size, Color.White, text.HorizontalAlignment, text.VerticalAlignment);
+            textBatch.UploadBufferData(cmdbuf);
+
+            var textModel = Matrix4x4.CreateTranslation(position.X, position.Y, 0f);
+
+            var textPass = cmdbuf.BeginRenderPass(
+                new ColorTargetInfo(UITexture, LoadOp.Load)
+            );
+            uiPass.BindGraphicsPipeline(TextPipeline);
+            textBatch.Render(cmdbuf, textPass, textModel * uiCameraMatrix);
+            cmdbuf.EndRenderPass(textPass);
+
+            TextBatchPool.Enqueue(textBatch);
+        }
 
         cmdbuf.Blit(new BlitInfo
         {

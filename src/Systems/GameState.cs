@@ -47,7 +47,7 @@ public class GameState : MoonTools.ECS.System
                                        )));
         Set(player, new Orientation(0f));
         Set(player, new Velocity(Vector2.Zero));
-        Set(player, new BoundingBox(0, 0, 80, 32));
+        Set(player, new BoundingBox(-24, 0, 64, 32));
         Set(player, new SolidCollision());
         Set(player, new HitBall());
         Set(player, new Scale(4.0f));
@@ -106,13 +106,58 @@ public class GameState : MoonTools.ECS.System
             lastLife = lifeEntity;
         }
 
+        var scoreEntity = Some<Score>() ? GetSingletonEntity<Score>() : CreateEntity();
+        Set(scoreEntity, new Text(Stores.FontStorage.GetID(Content.Fonts.Kosugi), 24, Stores.TextStorage.GetID("0")));
+        Set(scoreEntity, new Score(0));
+        Set(scoreEntity, new Position(new Vector2(Dimensions.WindowWidth - 190, 60)));
+        Set(scoreEntity, new UI());
+
+    }
+
+    string GetFormattedScore(int amount, int length = 11)
+    {
+        return amount >= 0
+            ? amount.ToString($"D{length}")
+            : amount.ToString($"D{length - 1}");
     }
 
     public override void Update(TimeSpan delta)
     {
-        if (DestroyFilter.Count == 0 || LivesFilter.Count == 0)
+        if (LivesFilter.Count == 0)
         {
             StartGame();
         }
+
+        if (!Some<Score>())
+            return;
+
+        var newScore = (int)GetSingleton<CameraPosition>().Y;
+        var scoreEntity = GetSingletonEntity<Score>();
+        var score = Get<Score>(scoreEntity);
+        var highScoreEntity = GetSingletonEntity<HighScore>();
+        var highScore = Get<HighScore>(highScoreEntity).Value;
+
+        Set(scoreEntity, new Score(newScore));
+        Set(scoreEntity,
+        new Text(
+            Stores.FontStorage.GetID(Content.Fonts.Kosugi),
+            24,
+            Stores.TextStorage.GetID(GetFormattedScore(newScore)),
+            MoonWorks.Graphics.Font.HorizontalAlignment.Left,
+            MoonWorks.Graphics.Font.VerticalAlignment.Middle));
+
+        if (newScore > highScore)
+        {
+            highScore = newScore;
+            Set(highScoreEntity, new HighScore(newScore));
+        }
+
+        Set(highScoreEntity,
+         new Text(
+            Stores.FontStorage.GetID(Content.Fonts.Kosugi),
+            24,
+            Stores.TextStorage.GetID(GetFormattedScore(highScore)),
+            MoonWorks.Graphics.Font.HorizontalAlignment.Left,
+            MoonWorks.Graphics.Font.VerticalAlignment.Middle));
     }
 }
