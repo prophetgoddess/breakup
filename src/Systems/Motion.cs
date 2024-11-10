@@ -9,6 +9,8 @@ public class Motion : MoonTools.ECS.System
     public Filter MotionFilter;
     public Filter ColliderFilter;
     AudioDevice AudioDevice;
+    System.Random Random = new System.Random();
+
 
     public Motion(World world, AudioDevice audioDevice) : base(world)
     {
@@ -21,6 +23,7 @@ public class Motion : MoonTools.ECS.System
     {
         var voice = AudioDevice.Obtain<PersistentVoice>(buffer.Format);
         voice.Submit(buffer);
+        voice.SetPitch((float)Random.NextDouble() * (Random.NextDouble() < 0.5f ? -0.1f : 0.1f));
         voice.Play();
     }
 
