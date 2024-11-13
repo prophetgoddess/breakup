@@ -25,15 +25,15 @@ class Program : Game
         debugMode
     )
     {
-        Content.LoadAll(GraphicsDevice, AudioDevice);
+        Content.LoadAll(GraphicsDevice);
 
         Systems =
         [
             new Input(World, Inputs),
-            new GameState(World, AudioDevice),
+            new GameState(World),
             new Time(World),
             new PlayerController(World),
-            new Motion(World, AudioDevice),
+            new Motion(World),
             new FollowCamera(World),
             new Blocks(World),
         ];
@@ -44,18 +44,17 @@ class Program : Game
         World.Set(scoreLabel, new Position(new Vector2(Dimensions.WindowWidth - 190, 40)));
         World.Set(scoreLabel,
          new Text(
-            Stores.FontStorage.GetID(Content.Fonts.Kosugi),
-            32,
+            Stores.FontStorage.GetID(Content.Fonts.FX300Angular),
+            28,
             Stores.TextStorage.GetID("SCORE")));
         World.Set(scoreLabel, new UI());
-
 
         var highScoreLabel = World.CreateEntity();
         World.Set(highScoreLabel, new Position(new Vector2(Dimensions.WindowWidth - 190, 120)));
         World.Set(highScoreLabel,
          new Text(
-            Stores.FontStorage.GetID(Content.Fonts.Kosugi),
-            32,
+            Stores.FontStorage.GetID(Content.Fonts.FX300Angular),
+            28,
             Stores.TextStorage.GetID("BEST")));
         World.Set(highScoreLabel, new UI());
 
@@ -64,7 +63,7 @@ class Program : Game
         World.Set(highScoreEntity, new Position(new Vector2(Dimensions.WindowWidth - 190, 140)));
         World.Set(highScoreEntity,
          new Text(
-            Stores.FontStorage.GetID(Content.Fonts.Kosugi),
+            Stores.FontStorage.GetID(Content.Fonts.FX300),
             24,
             Stores.TextStorage.GetID("")));
         World.Set(highScoreEntity, new UI());
@@ -101,9 +100,7 @@ class Program : Game
             "Ball",
             Dimensions.WindowWidth,
             Dimensions.WindowHeight,
-
-
-            ScreenMode.Fullscreen
+            ScreenMode.Windowed
         );
 
         var frameLimiterSettings = new FrameLimiterSettings(

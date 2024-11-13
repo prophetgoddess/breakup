@@ -9,17 +9,10 @@ public class GameState : MoonTools.ECS.System
     Filter DestroyFilter;
     Filter LivesFilter;
 
-    PersistentVoice Voice;
-    AudioDevice AudioDevice;
-
-    public GameState(World world, AudioDevice audioDevice) : base(world)
+    public GameState(World world) : base(world)
     {
-        AudioDevice = audioDevice;
         DestroyFilter = FilterBuilder.Include<DestroyOnRestartGame>().Build();
         LivesFilter = FilterBuilder.Include<Life>().Build();
-        Voice = audioDevice.Obtain<PersistentVoice>(Content.SFX.Music.Format);
-        Voice.Submit(Content.SFX.Music);
-        Voice.Play();
     }
 
     void StartGame()
@@ -33,13 +26,13 @@ public class GameState : MoonTools.ECS.System
 
         var ball = CreateEntity();
         Set(ball, new Model(Content.Models.Donut.ID));
-        Set(ball, new Scale(Vector2.One * 16.0f));
+        Set(ball, new Scale(Vector2.One * 10.0f));
         Set(ball, new Position(new Vector2(
                                           Dimensions.GameWidth * 0.5f,
                                           Dimensions.GameHeight * 0.5f
                                        )));
         Set(ball, new Velocity(Vector2.Zero));
-        Set(ball, new BoundingBox(0, 0, 32, 32));
+        Set(ball, new BoundingBox(0, 0, 22, 22));
         Set(ball, new SolidCollision());
         Set(ball, new Bounce());
         Set(ball, new CanBeHit());
@@ -48,17 +41,17 @@ public class GameState : MoonTools.ECS.System
         Set(ball, new DestroyOnRestartGame());
 
         var player = CreateEntity();
-        Set(player, new Model(Content.Models.Triangle.ID));
+        Set(player, new Model(Content.Models.Square.ID));
         Set(player, new Position(new Vector2(
                                           Dimensions.GameWidth * 0.5f,
                                           Dimensions.GameHeight * 0.9f
                                        )));
         Set(player, new Orientation(0f));
         Set(player, new Velocity(Vector2.Zero));
-        Set(player, new BoundingBox(-24, 0, 64, 32));
+        Set(player, new BoundingBox(-24, 0, 130, 32));
         Set(player, new SolidCollision());
         Set(player, new HitBall());
-        Set(player, new Scale(Vector2.One * 4.0f));
+        Set(player, new Scale(new Vector2(7, 1)));
         Set(player, new Player());
         Set(player, new FollowsCamera(Dimensions.GameHeight * 0.9f));
         Set(player, new DestroyOnRestartGame());
@@ -129,14 +122,14 @@ public class GameState : MoonTools.ECS.System
         }
 
         var scoreEntity = Some<Score>() ? GetSingletonEntity<Score>() : CreateEntity();
-        Set(scoreEntity, new Text(Stores.FontStorage.GetID(Content.Fonts.Kosugi), 24, Stores.TextStorage.GetID("0")));
+        Set(scoreEntity, new Text(Stores.FontStorage.GetID(Content.Fonts.FX300), 24, Stores.TextStorage.GetID("0")));
         Set(scoreEntity, new Score(0));
         Set(scoreEntity, new Position(new Vector2(Dimensions.WindowWidth - 190, 60)));
         Set(scoreEntity, new UI());
 
     }
 
-    string GetFormattedScore(int amount, int length = 11)
+    string GetFormattedScore(int amount, int length = 6)
     {
         return amount >= 0
             ? amount.ToString($"D{length}")
@@ -145,12 +138,6 @@ public class GameState : MoonTools.ECS.System
 
     public override void Update(TimeSpan delta)
     {
-        if (Voice.State == SoundState.Stopped)
-        {
-            Voice = AudioDevice.Obtain<PersistentVoice>(Content.SFX.Music.Format);
-            Voice.Submit(Content.SFX.Music);
-            Voice.Play();
-        }
 
         var inputState = GetSingleton<InputState>();
 
@@ -171,7 +158,7 @@ public class GameState : MoonTools.ECS.System
         Set(scoreEntity, new Score(newScore));
         Set(scoreEntity,
         new Text(
-            Stores.FontStorage.GetID(Content.Fonts.Kosugi),
+            Stores.FontStorage.GetID(Content.Fonts.FX300),
             24,
             Stores.TextStorage.GetID(GetFormattedScore(newScore)),
             MoonWorks.Graphics.Font.HorizontalAlignment.Left,
@@ -185,7 +172,7 @@ public class GameState : MoonTools.ECS.System
 
         Set(highScoreEntity,
          new Text(
-            Stores.FontStorage.GetID(Content.Fonts.Kosugi),
+            Stores.FontStorage.GetID(Content.Fonts.FX300),
             24,
             Stores.TextStorage.GetID(GetFormattedScore(highScore)),
             MoonWorks.Graphics.Font.HorizontalAlignment.Left,

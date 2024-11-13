@@ -138,6 +138,8 @@ if os.path.exists(fonts_in):
             subprocess.run(
                 [
                     "msdf-atlas-gen",
+                    "-yorigin",
+                    "top",
                     "-font",
                     font,
                     "-imageout",

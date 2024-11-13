@@ -39,7 +39,7 @@ public class Input : MoonTools.ECS.System
         Keyboard.Left = Inputs.Keyboard.Button(KeyCode.Left);
         Keyboard.Right = Inputs.Keyboard.Button(KeyCode.Right);
         Keyboard.Swing = Inputs.Keyboard.Button(KeyCode.Space);
-        Keyboard.Restart = Inputs.Keyboard.Button(KeyCode.Escape);
+        Keyboard.Restart = Inputs.Keyboard.Button(KeyCode.R);
 
         Gamepad.Up = Inputs.GetGamepad(0).DpadUp;
         Gamepad.Down = Inputs.GetGamepad(0).DpadDown;

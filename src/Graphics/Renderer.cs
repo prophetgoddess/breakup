@@ -236,7 +236,7 @@ public class Renderer : MoonTools.ECS.Renderer
             var mesh = Content.Models.IDToModel[Get<Model>(entity).ID];
             var scale = Has<Scale>(entity) ? Get<Scale>(entity).Value : Vector2.One;
 
-            Matrix4x4 model = Matrix4x4.CreateFromAxisAngle(Vector3.UnitZ, rotation) * Matrix4x4.CreateScale(new Vector3(scale.X, scale.Y, 0f)) * Matrix4x4.CreateTranslation(new Vector3(position, 0)) * uiCameraMatrix;
+            Matrix4x4 model = Matrix4x4.CreateScale(new Vector3(scale.X, scale.Y, 0f)) * Matrix4x4.CreateFromAxisAngle(Vector3.UnitZ, rotation) * Matrix4x4.CreateTranslation(new Vector3(position, 0)) * uiCameraMatrix;
             var uniforms = new TransformVertexUniform(model);
 
             uiPass.BindGraphicsPipeline(RenderPipeline);
