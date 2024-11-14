@@ -1,6 +1,7 @@
 using System.Numerics;
 using MoonTools.ECS;
 using MoonWorks.Input;
+using MoonWorks.Math;
 
 namespace Ball;
 
@@ -31,11 +32,11 @@ public class PlayerController : MoonTools.ECS.System
             movementDelta += Vector2.UnitX;
         }
 
-        if (inputState.Swing.IsPressed && !HasOutRelation<Spinning>(player))
+        if (inputState.Swing.IsPressed && !HasOutRelation<Bouncing>(player))
         {
-            // var timerEntity = CreateEntity();
-            // Set(timerEntity, new Timer(0.25f));
-            // Relate(player, timerEntity, new Spinning());
+            var timerEntity = CreateEntity();
+            Set(timerEntity, new Timer(0.25f));
+            Relate(player, timerEntity, new Bouncing());
 
             if (HasInRelation<HeldBy>(player))
             {
@@ -55,14 +56,14 @@ public class PlayerController : MoonTools.ECS.System
 
         Set(player, new Velocity(movementDelta));
 
-        if (HasOutRelation<Spinning>(player))
+        if (HasOutRelation<Bouncing>(player))
         {
-            var timer = Get<Timer>(OutRelationSingleton<Spinning>(player));
-            Set(player, new Orientation(timer.Remaining * MathF.PI * 2));
+            var timer = Get<Timer>(OutRelationSingleton<Bouncing>(player));
+            Set(player, new Scale(new Vector2(6f, float.Lerp(0.5f, 1f, Easing.InQuad(timer.Remaining)))));
         }
         else
         {
-            Set(player, new Orientation(0f));
+            Set(player, new Scale(new Vector2(6f, 0.5f)));
         }
     }
 }

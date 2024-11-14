@@ -88,9 +88,7 @@ public class Blocks : MoonTools.ECS.System
 
         var meterEntity = GetSingletonEntity<Meter>();
         var meter = Get<Meter>(meterEntity);
-        var scale = Get<Scale>(meterEntity).Value;
-        scale.X -= (float)delta.TotalSeconds;
-
+        var value = meter.Value;
 
         foreach (var block in BlockFilter.Entities)
         {
@@ -100,8 +98,8 @@ public class Blocks : MoonTools.ECS.System
 
                 if (hp <= 0)
                 {
+                    value += 0.1f;
                     Destroy(block);
-                    scale.X += 1f;
                     continue;
                 }
             }
@@ -115,8 +113,7 @@ public class Blocks : MoonTools.ECS.System
             }
         }
 
-        scale.X = Math.Clamp(scale.X, 0f, meter.MaxScale);
-        Set(meterEntity, new Scale(scale));
+        Set(meterEntity, new Meter(value, meter.Decay, meter.Scale));
 
 
     }

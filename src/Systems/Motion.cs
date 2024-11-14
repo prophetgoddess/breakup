@@ -81,7 +81,6 @@ public class Motion : MoonTools.ECS.System
     public override void Update(TimeSpan delta)
     {
         var dt = (float)delta.TotalSeconds;
-        var offset = GetSingleton<CameraPosition>().Y;
 
         foreach (var entity in MotionFilter.Entities)
         {
@@ -137,10 +136,11 @@ public class Motion : MoonTools.ECS.System
 
                     if (Has<HitBall>(other) && Has<CanBeHit>(entity))
                     {
+                        var meterValue = GetSingleton<Meter>().Value * 200.0f;
                         var otherPos = Get<Position>(other).Value;
                         var dir = Vector2.Normalize(otherPos - dest);
                         velocity = dir * -velocity.Length();
-                        velocity.Y -= 200.0f;
+                        velocity.Y -= 200.0f + meterValue;
                         Set(entity, new Velocity(velocity));
                     }
 
@@ -166,8 +166,8 @@ public class Motion : MoonTools.ECS.System
                         var otherPos = Get<Position>(other).Value;
                         if (yCollision && !Has<CanTakeDamageFromBall>(other) && position.Y < otherPos.Y)
                         {
-                            newVelocity.Y += (float)Random.NextDouble() * -50.0f;
-                            newVelocity.X += (float)Random.NextDouble() * 25.0f * (Random.NextDouble() < 0.5f ? 1.0f : -1.0f);
+                            newVelocity.Y += (float)Random.NextDouble() * -100.0f;
+                            newVelocity.X += (float)Random.NextDouble() * 50.0f * (Random.NextDouble() < 0.5f ? 1.0f : -1.0f);
                         }
 
                         Set(entity, new Velocity(newVelocity));

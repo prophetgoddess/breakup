@@ -37,6 +37,7 @@ class Program : Game
             new Parent(World),
             new FollowCamera(World),
             new Blocks(World),
+            new Meters(World)
         ];
 
         Renderer = new Renderer(World, MainWindow, GraphicsDevice, Inputs);

@@ -65,7 +65,7 @@ public class GameState : MoonTools.ECS.System
         Set(meter, new Orientation(0f));
         Set(meter, new Velocity(Vector2.Zero));
         Set(meter, new Scale(new Vector2(0f, 0.5f)));
-        Set(meter, new Meter(6f));
+        Set(meter, new Meter(0f, 0.05f, 6f));
         Set(meter, new DestroyOnRestartGame());
         Relate(meter, player, new ChildOf(new Vector2(0f, 16f)));
 
