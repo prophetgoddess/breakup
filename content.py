@@ -299,7 +299,7 @@ public static class Content
                     vertex_count += 1
                     vertex = line.split(" ")
                     f.write(
-                        f"new PositionColorVertex(new Vector3({vertex[1].strip()}f, {vertex[2].strip()}f, {vertex[3].strip()}f), Color.DarkGray),"
+                        f"new PositionVertex(new Vector3({vertex[1].strip()}f, {vertex[2].strip()}f, {vertex[3].strip()}f)),"
                     )
             f.write("], BufferUsageFlags.Vertex);\n")
             f.write("IndexBuffer = resourceUploader.CreateBuffer(\n[\n")

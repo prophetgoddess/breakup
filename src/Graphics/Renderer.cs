@@ -19,12 +19,14 @@ public class Renderer : MoonTools.ECS.Renderer
     MoonTools.ECS.Filter ModelFilter;
     MoonTools.ECS.Filter UIFilter;
     MoonTools.ECS.Filter TextFilter;
+    MoonTools.ECS.Filter ColliderFilter;
 
     Queue<TextBatch> TextBatchPool;
     GraphicsPipeline TextPipeline;
 
     Texture GameTexture;
     Texture UITexture;
+    Texture ColliderTexture;
 
     void CreateRenderTextures()
     {
@@ -53,6 +55,33 @@ public class Renderer : MoonTools.ECS.Renderer
             NumLevels = 1
         });
 
+        var cmdbuf = GraphicsDevice.AcquireCommandBuffer();
+
+        ColliderTexture = Texture.Create(GraphicsDevice, new TextureCreateInfo
+        {
+            Type = TextureType.TwoDimensional,
+            Format = Window.SwapchainFormat,
+            Usage = TextureUsageFlags.ColorTarget | TextureUsageFlags.Sampler,
+            Height = 1,
+            Width = 1,
+            SampleCount = SampleCount.One,
+            LayerCountOrDepth = 1,
+            NumLevels = 1
+        });
+
+        cmdbuf.Blit(new BlitInfo
+        {
+            Source = new BlitRegion(ColliderTexture),
+            Destination = new BlitRegion(ColliderTexture),
+            LoadOp = LoadOp.Clear,
+            ClearColor = Color.Red,
+            FlipMode = FlipMode.None,
+            Filter = MoonWorks.Graphics.Filter.Linear,
+            Cycle = true
+        });
+
+        GraphicsDevice.Submit(cmdbuf);
+
     }
 
     TextBatch GetTextBatch()
@@ -75,10 +104,11 @@ public class Renderer : MoonTools.ECS.Renderer
         ModelFilter = FilterBuilder.Include<Model>().Include<Position>().Exclude<UI>().Build();
         UIFilter = FilterBuilder.Include<Model>().Include<Position>().Include<UI>().Build();
         TextFilter = FilterBuilder.Include<Text>().Include<Position>().Include<UI>().Build();
+        ColliderFilter = FilterBuilder.Include<Position>().Include<BoundingBox>().Build();
 
         Shader vertShader = Shader.Create(
             GraphicsDevice,
-            Path.Join(System.AppContext.BaseDirectory, "Shaders", "PositionColorWithMatrix.vert.msl"),
+            Path.Join(System.AppContext.BaseDirectory, "Shaders", "Vertex.vert.msl"),
             "main0",
             new ShaderCreateInfo
             {
@@ -90,7 +120,7 @@ public class Renderer : MoonTools.ECS.Renderer
 
         Shader fragShader = Shader.Create(
             GraphicsDevice,
-            Path.Join(System.AppContext.BaseDirectory, "Shaders", "SolidColor.frag.msl"),
+            Path.Join(System.AppContext.BaseDirectory, "Shaders", "Fragment.frag.msl"),
             "main0",
             new ShaderCreateInfo
             {
@@ -99,7 +129,7 @@ public class Renderer : MoonTools.ECS.Renderer
             }
         );
 
-        GraphicsPipelineCreateInfo renderPipelineCreateInfo = new GraphicsPipelineCreateInfo
+        var renderPipelineCreateInfo = new GraphicsPipelineCreateInfo
         {
             TargetInfo = new GraphicsPipelineTargetInfo
             {
@@ -115,11 +145,10 @@ public class Renderer : MoonTools.ECS.Renderer
             MultisampleState = MultisampleState.None,
             PrimitiveType = PrimitiveType.TriangleList,
             RasterizerState = RasterizerState.CCW_CullNone,
-            VertexInputState = VertexInputState.Empty,
+            VertexInputState = VertexInputState.CreateSingleBinding<PositionVertex>(),
             VertexShader = vertShader,
             FragmentShader = fragShader
         };
-        renderPipelineCreateInfo.VertexInputState = VertexInputState.CreateSingleBinding<PositionColorVertex>();
 
         RenderPipeline = GraphicsPipeline.Create(GraphicsDevice, renderPipelineCreateInfo);
 
@@ -185,7 +214,7 @@ public class Renderer : MoonTools.ECS.Renderer
             var scale = Has<Scale>(entity) ? Get<Scale>(entity).Value : Vector2.One;
 
             Matrix4x4 model = Matrix4x4.CreateFromAxisAngle(Vector3.UnitZ, rotation) * Matrix4x4.CreateScale(new Vector3(scale.X, scale.Y, 0)) * Matrix4x4.CreateTranslation(new Vector3(position, 0)) * cameraMatrix;
-            var uniforms = new TransformVertexUniform(model);
+            var uniforms = new TransformVertexUniform(model, Color.DarkGray);
 
             gamePass.BindGraphicsPipeline(RenderPipeline);
             gamePass.BindVertexBuffer(mesh.VertexBuffer);
@@ -237,7 +266,7 @@ public class Renderer : MoonTools.ECS.Renderer
             var scale = Has<Scale>(entity) ? Get<Scale>(entity).Value : Vector2.One;
 
             Matrix4x4 model = Matrix4x4.CreateScale(new Vector3(scale.X, scale.Y, 0f)) * Matrix4x4.CreateFromAxisAngle(Vector3.UnitZ, rotation) * Matrix4x4.CreateTranslation(new Vector3(position, 0)) * uiCameraMatrix;
-            var uniforms = new TransformVertexUniform(model);
+            var uniforms = new TransformVertexUniform(model, Color.DarkGray);
 
             uiPass.BindGraphicsPipeline(RenderPipeline);
             uiPass.BindVertexBuffer(mesh.VertexBuffer);
@@ -256,7 +285,7 @@ public class Renderer : MoonTools.ECS.Renderer
             var position = Get<Position>(textEntity).Value;
 
             textBatch.Start(Stores.FontStorage.Get(text.FontID));
-            textBatch.Add(Stores.TextStorage.Get(text.TextID), text.Size, Color.Gray, text.HorizontalAlignment, text.VerticalAlignment);
+            textBatch.Add(Stores.TextStorage.Get(text.TextID), text.Size, Color.DarkGray, text.HorizontalAlignment, text.VerticalAlignment);
             textBatch.UploadBufferData(cmdbuf);
 
             var textModel = Matrix4x4.CreateTranslation(position.X, position.Y, 0f);

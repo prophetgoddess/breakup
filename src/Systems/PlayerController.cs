@@ -42,7 +42,6 @@ public class PlayerController : MoonTools.ECS.System
                 var ball = InRelationSingleton<HeldBy>(player);
                 Unrelate<HeldBy>(ball, player);
                 Unrelate<IgnoreSolidCollision>(ball, player);
-                var velocity = Get<Velocity>(ball).Value;
                 Set(ball, new Velocity(Vector2.UnitY * -300.0f));
             }
         }
