@@ -38,7 +38,7 @@ class Program : Game
             new Blocks(World),
         ];
 
-        Renderer = new Renderer(World, MainWindow, GraphicsDevice);
+        Renderer = new Renderer(World, MainWindow, GraphicsDevice, Inputs);
 
         var scoreLabel = World.CreateEntity();
         World.Set(scoreLabel, new Position(new Vector2(Dimensions.WindowWidth - 190, 40)));

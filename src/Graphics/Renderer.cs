@@ -6,6 +6,7 @@ using MoonTools.ECS;
 using System.Runtime.InteropServices;
 using System.Net.Mime;
 using MoonWorks.Graphics.Font;
+using MoonWorks.Input;
 
 namespace Ball;
 
@@ -13,6 +14,7 @@ public class Renderer : MoonTools.ECS.Renderer
 {
     Window Window;
     GraphicsDevice GraphicsDevice;
+    Inputs Inputs;
 
     GraphicsPipeline RenderPipeline;
 
@@ -26,7 +28,9 @@ public class Renderer : MoonTools.ECS.Renderer
 
     Texture GameTexture;
     Texture UITexture;
-    Texture ColliderTexture;
+
+    public Buffer RectIndexBuffer;
+    public Buffer RectVertexBuffer;
 
     void CreateRenderTextures()
     {
@@ -55,33 +59,6 @@ public class Renderer : MoonTools.ECS.Renderer
             NumLevels = 1
         });
 
-        var cmdbuf = GraphicsDevice.AcquireCommandBuffer();
-
-        ColliderTexture = Texture.Create(GraphicsDevice, new TextureCreateInfo
-        {
-            Type = TextureType.TwoDimensional,
-            Format = Window.SwapchainFormat,
-            Usage = TextureUsageFlags.ColorTarget | TextureUsageFlags.Sampler,
-            Height = 1,
-            Width = 1,
-            SampleCount = SampleCount.One,
-            LayerCountOrDepth = 1,
-            NumLevels = 1
-        });
-
-        cmdbuf.Blit(new BlitInfo
-        {
-            Source = new BlitRegion(ColliderTexture),
-            Destination = new BlitRegion(ColliderTexture),
-            LoadOp = LoadOp.Clear,
-            ClearColor = Color.Red,
-            FlipMode = FlipMode.None,
-            Filter = MoonWorks.Graphics.Filter.Linear,
-            Cycle = true
-        });
-
-        GraphicsDevice.Submit(cmdbuf);
-
     }
 
     TextBatch GetTextBatch()
@@ -92,10 +69,11 @@ public class Renderer : MoonTools.ECS.Renderer
         return new TextBatch(GraphicsDevice);
     }
 
-    public Renderer(World world, Window window, GraphicsDevice graphicsDevice) : base(world)
+    public Renderer(World world, Window window, GraphicsDevice graphicsDevice, Inputs inputs) : base(world)
     {
         GraphicsDevice = graphicsDevice;
         Window = window;
+        Inputs = inputs;
 
         TextBatchPool = new Queue<TextBatch>();
 
@@ -175,6 +153,27 @@ public class Renderer : MoonTools.ECS.Renderer
 
         TextPipeline = GraphicsPipeline.Create(GraphicsDevice, textPipelineCreateInfo);
 
+        var resourceUploader = new ResourceUploader(GraphicsDevice);
+        RectVertexBuffer = resourceUploader.CreateBuffer(
+            [
+                new PositionVertex(new Vector3(-1,  1, 0) * 0.5f),
+                new PositionVertex(new Vector3( 1,  1, 0) * 0.5f),
+                new PositionVertex(new Vector3( 1, -1, 0) * 0.5f),
+                new PositionVertex(new Vector3(-1, -1, 0) * 0.5f),
+            ],
+            BufferUsageFlags.Vertex
+        );
+        RectIndexBuffer = resourceUploader.CreateBuffer(
+            [
+                0, 1, 2,
+                0, 2, 3,
+            ],
+            BufferUsageFlags.Index
+        );
+        resourceUploader.Upload();
+        resourceUploader.Dispose();
+
+
     }
 
     public void Draw(CommandBuffer cmdbuf, Texture renderTexture)
@@ -200,11 +199,12 @@ public class Renderer : MoonTools.ECS.Renderer
             -1f
         );
 
-        //cmdbuf.PushVertexUniformData(cameraMatrix);
-
         var gamePass = cmdbuf.BeginRenderPass(
             new ColorTargetInfo(GameTexture, Color.GhostWhite)
         );
+
+        gamePass.BindGraphicsPipeline(RenderPipeline);
+
 
         foreach (var entity in ModelFilter.Entities)
         {
@@ -216,12 +216,29 @@ public class Renderer : MoonTools.ECS.Renderer
             Matrix4x4 model = Matrix4x4.CreateFromAxisAngle(Vector3.UnitZ, rotation) * Matrix4x4.CreateScale(new Vector3(scale.X, scale.Y, 0)) * Matrix4x4.CreateTranslation(new Vector3(position, 0)) * cameraMatrix;
             var uniforms = new TransformVertexUniform(model, Color.DarkGray);
 
-            gamePass.BindGraphicsPipeline(RenderPipeline);
             gamePass.BindVertexBuffer(mesh.VertexBuffer);
             gamePass.BindIndexBuffer(mesh.IndexBuffer, IndexElementSize.ThirtyTwo);
             cmdbuf.PushVertexUniformData(uniforms);
             gamePass.DrawIndexedPrimitives(mesh.TriangleCount * 3, 1, 0, 0, 0);
 
+        }
+
+        if (Inputs.Keyboard.IsHeld(KeyCode.D1))
+        {
+
+            foreach (var entity in ColliderFilter.Entities)
+            {
+                var position = Get<Position>(entity).Value;
+                var box = Get<BoundingBox>(entity);
+
+                Matrix4x4 model = Matrix4x4.CreateScale(new Vector3(box.Width, box.Height, 0)) * Matrix4x4.CreateTranslation(new Vector3(position + new Vector2(box.X, box.Y), 0)) * cameraMatrix;
+                var uniforms = new TransformVertexUniform(model, Color.Red * 0.5f);
+
+                gamePass.BindVertexBuffer(RectVertexBuffer);
+                gamePass.BindIndexBuffer(RectIndexBuffer, IndexElementSize.ThirtyTwo);
+                cmdbuf.PushVertexUniformData(uniforms);
+                gamePass.DrawIndexedPrimitives(6, 1, 0, 0, 0);
+            }
         }
 
         cmdbuf.EndRenderPass(gamePass);

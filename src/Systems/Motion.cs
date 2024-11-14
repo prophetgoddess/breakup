@@ -18,15 +18,15 @@ public class Motion : MoonTools.ECS.System
 
     public bool Overlaps(Vector2 posA, BoundingBox boxA, Vector2 posB, BoundingBox boxB)
     {
-        var aMinX = boxA.X + posA.X;
-        var aMinY = boxA.Y + posA.Y;
-        var aMaxX = boxA.X + posA.X + boxA.Width;
-        var aMaxY = boxA.Y + posA.Y + boxA.Height;
+        var aMinX = boxA.X + posA.X - boxA.Width * 0.5f;
+        var aMinY = boxA.Y + posA.Y - boxA.Height * 0.5f;
+        var aMaxX = boxA.X + posA.X + boxA.Width * 0.5f;
+        var aMaxY = boxA.Y + posA.Y + boxA.Height * 0.5f;
 
-        var bMinX = boxB.X + posB.X;
-        var bMinY = boxB.Y + posB.Y;
-        var bMaxX = boxB.X + posB.X + boxB.Width;
-        var bMaxY = boxB.Y + posB.Y + boxB.Height;
+        var bMinX = boxB.X + posB.X - boxB.Width * 0.5f;
+        var bMinY = boxB.Y + posB.Y - boxB.Height * 0.5f;
+        var bMaxX = boxB.X + posB.X + boxB.Width * 0.5f;
+        var bMaxY = boxB.Y + posB.Y + boxB.Height * 0.5f;
 
         bool overlaps = aMinX <= bMaxX &&
                         aMaxX >= bMinX &&
@@ -34,6 +34,23 @@ public class Motion : MoonTools.ECS.System
                         aMaxY >= bMinY;
 
         return overlaps;
+
+        // var aMinX = boxA.X + posA.X;
+        // var aMinY = boxA.Y + posA.Y;
+        // var aMaxX = boxA.X + posA.X + boxA.Width;
+        // var aMaxY = boxA.Y + posA.Y + boxA.Height;
+
+        // var bMinX = boxB.X + posB.X;
+        // var bMinY = boxB.Y + posB.Y;
+        // var bMaxX = boxB.X + posB.X + boxB.Width;
+        // var bMaxY = boxB.Y + posB.Y + boxB.Height;
+
+        // bool overlaps = aMinX <= bMaxX &&
+        //                 aMaxX >= bMinX &&
+        //                 aMinY <= bMaxY &&
+        //                 aMaxY >= bMinY;
+
+        //return overlaps;
     }
 
     public Vector2 Sweep(Entity e, Vector2 position, Vector2 velocity, BoundingBox boundingBox)

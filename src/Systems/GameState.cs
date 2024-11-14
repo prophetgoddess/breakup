@@ -48,7 +48,7 @@ public class GameState : MoonTools.ECS.System
             )));
         Set(player, new Orientation(0f));
         Set(player, new Velocity(Vector2.Zero));
-        Set(player, new BoundingBox(-24, 0, 130, 8));
+        Set(player, new BoundingBox(0, 0, 100, 8));
         Set(player, new SolidCollision());
         Set(player, new HitBall());
         Set(player, new Scale(new Vector2(6, 0.5f)));
@@ -87,7 +87,7 @@ public class GameState : MoonTools.ECS.System
         Set(rightBoundSprite, new DestroyOnRestartGame());
 
         var bottomBound = CreateEntity();
-        Set(bottomBound, new Position(new Vector2(0, Dimensions.GameHeight + 8)));
+        Set(bottomBound, new Position(new Vector2(Dimensions.GameWidth * 0.5f, Dimensions.GameHeight + 8)));
         Set(bottomBound, new BoundingBox(0, 0, Dimensions.GameWidth, 16));
         Set(bottomBound, new SolidCollision());
         Set(bottomBound, new ResetBallOnHit());
