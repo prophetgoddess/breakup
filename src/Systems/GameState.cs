@@ -119,7 +119,7 @@ public class GameState : MoonTools.ECS.System
             Set(lifeEntity, new Model(Content.Models.Donut.ID));
             Set(lifeEntity, new Scale(Vector2.One * 16.0f));
             Set(lifeEntity, new UI());
-            Set(lifeEntity, new Position(new Vector2(100, 50 + i * 100)));
+            Set(lifeEntity, new Position(new Vector2(100, 50 + i * 50)));
             Set(lifeEntity, new DestroyOnRestartGame());
 
             if (i == 0)

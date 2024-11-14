@@ -140,7 +140,10 @@ public class Motion : MoonTools.ECS.System
                         var otherPos = Get<Position>(other).Value;
                         var dir = Vector2.Normalize(otherPos - dest);
                         velocity = dir * -velocity.Length();
-                        velocity.Y -= 200.0f + meterValue;
+
+                        if (HasOutRelation<Bouncing>(other))
+                            velocity.Y -= 200.0f + meterValue;
+
                         Set(entity, new Velocity(velocity));
                     }
 
