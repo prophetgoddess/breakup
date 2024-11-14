@@ -41,7 +41,7 @@ public class GameState : MoonTools.ECS.System
         Set(ball, new DestroyOnRestartGame());
 
         var player = CreateEntity();
-        Set(player, new Model(Content.Models.Square.ID));
+        Set(player, new Model(Content.Models.Paddle.ID));
         Set(player, new Position(new Vector2(
                 Dimensions.GameWidth * 0.5f,
                 Dimensions.GameHeight * 0.9f

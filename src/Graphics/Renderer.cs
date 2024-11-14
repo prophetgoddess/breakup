@@ -156,17 +156,21 @@ public class Renderer : MoonTools.ECS.Renderer
         var resourceUploader = new ResourceUploader(GraphicsDevice);
         RectVertexBuffer = resourceUploader.CreateBuffer(
             [
-                new PositionVertex(new Vector3(-1,  1, 0) * 0.5f),
-                new PositionVertex(new Vector3( 1,  1, 0) * 0.5f),
-                new PositionVertex(new Vector3( 1, -1, 0) * 0.5f),
+                new PositionVertex(new Vector3(-1, 1, 0) * 0.5f),
+                new PositionVertex(new Vector3(1, 1, 0) * 0.5f),
+                new PositionVertex(new Vector3(1, -1, 0) * 0.5f),
                 new PositionVertex(new Vector3(-1, -1, 0) * 0.5f),
             ],
             BufferUsageFlags.Vertex
         );
         RectIndexBuffer = resourceUploader.CreateBuffer(
             [
-                0, 1, 2,
-                0, 2, 3,
+                0,
+                1,
+                2,
+                0,
+                2,
+                3,
             ],
             BufferUsageFlags.Index
         );
@@ -225,7 +229,6 @@ public class Renderer : MoonTools.ECS.Renderer
 
         if (Inputs.Keyboard.IsHeld(KeyCode.D1))
         {
-
             foreach (var entity in ColliderFilter.Entities)
             {
                 var position = Get<Position>(entity).Value;
@@ -234,8 +237,8 @@ public class Renderer : MoonTools.ECS.Renderer
                 Matrix4x4 model = Matrix4x4.CreateScale(new Vector3(box.Width, box.Height, 0)) * Matrix4x4.CreateTranslation(new Vector3(position + new Vector2(box.X, box.Y), 0)) * cameraMatrix;
                 var uniforms = new TransformVertexUniform(model, Color.Red * 0.5f);
 
-                gamePass.BindVertexBuffer(RectVertexBuffer);
-                gamePass.BindIndexBuffer(RectIndexBuffer, IndexElementSize.ThirtyTwo);
+                gamePass.BindVertexBuffer(Content.Models.Paddle.VertexBuffer);
+                gamePass.BindIndexBuffer(Content.Models.Paddle.IndexBuffer, IndexElementSize.ThirtyTwo);
                 cmdbuf.PushVertexUniformData(uniforms);
                 gamePass.DrawIndexedPrimitives(6, 1, 0, 0, 0);
             }
