@@ -34,23 +34,6 @@ public class Motion : MoonTools.ECS.System
                         aMaxY >= bMinY;
 
         return overlaps;
-
-        // var aMinX = boxA.X + posA.X;
-        // var aMinY = boxA.Y + posA.Y;
-        // var aMaxX = boxA.X + posA.X + boxA.Width;
-        // var aMaxY = boxA.Y + posA.Y + boxA.Height;
-
-        // var bMinX = boxB.X + posB.X;
-        // var bMinY = boxB.Y + posB.Y;
-        // var bMaxX = boxB.X + posB.X + boxB.Width;
-        // var bMaxY = boxB.Y + posB.Y + boxB.Height;
-
-        // bool overlaps = aMinX <= bMaxX &&
-        //                 aMaxX >= bMinX &&
-        //                 aMinY <= bMaxY &&
-        //                 aMaxY >= bMinY;
-
-        //return overlaps;
     }
 
     public Vector2 Sweep(Entity e, Vector2 position, Vector2 velocity, BoundingBox boundingBox)
@@ -169,27 +152,25 @@ public class Motion : MoonTools.ECS.System
                             Set(other, new HitPoints(hitPoints - 1));
                         }
 
-                        var bounceX = false;
-                        var bounceY = false;
+                        var newVelocity = velocity;
 
-                        if (xCollision)
+                        if (xCollision && !yCollision)
+                            newVelocity = new Vector2(-velocity.X, velocity.Y) * 0.8f;
+
+                        else if (yCollision && !xCollision)
+                            newVelocity = new Vector2(velocity.X, -velocity.Y) * 0.8f;
+
+                        else if (yCollision && xCollision)
+                            newVelocity = new Vector2(-velocity.X, -velocity.Y) * 0.8f;
+
+                        var otherPos = Get<Position>(other).Value;
+                        if (yCollision && !Has<CanTakeDamageFromBall>(other) && position.Y < otherPos.Y)
                         {
-                            bounceX = true;
+                            newVelocity.Y += (float)Random.NextDouble() * -50.0f;
+                            newVelocity.X += (float)Random.NextDouble() * 25.0f * (Random.NextDouble() < 0.5f ? 1.0f : -1.0f);
                         }
 
-                        if (yCollision)
-                        {
-                            bounceY = true;
-                        }
-
-                        if (bounceX && !bounceY)
-                            Set(entity, new Velocity(new Vector2(-velocity.X, velocity.Y) * 0.8f));
-
-                        if (bounceY && !bounceX)
-                            Set(entity, new Velocity(new Vector2(velocity.X, -velocity.Y) * 0.8f));
-
-                        if (bounceY && bounceX)
-                            Set(entity, new Velocity(new Vector2(-velocity.X, -velocity.Y) * 0.8f));
+                        Set(entity, new Velocity(newVelocity));
 
                     }
 
