@@ -56,6 +56,19 @@ public class GameState : MoonTools.ECS.System
         Set(player, new FollowsCamera(Dimensions.GameHeight * 0.9f));
         Set(player, new DestroyOnRestartGame());
 
+        var meter = CreateEntity();
+        Set(meter, new Model(Content.Models.Paddle.ID));
+        Set(meter, new Position(new Vector2(
+                Dimensions.GameWidth * 0.5f,
+                Dimensions.GameHeight * 0.9f
+            )));
+        Set(meter, new Orientation(0f));
+        Set(meter, new Velocity(Vector2.Zero));
+        Set(meter, new Scale(new Vector2(0f, 0.5f)));
+        Set(meter, new Meter(6f));
+        Set(meter, new DestroyOnRestartGame());
+        Relate(meter, player, new ChildOf(new Vector2(0f, 16f)));
+
         Relate(ball, player, new HeldBy(new Vector2(0f, -32.0f)));
         Set(ball, new Velocity(Vector2.Zero));
         Relate(ball, player, new IgnoreSolidCollision());

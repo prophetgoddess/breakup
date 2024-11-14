@@ -1,5 +1,6 @@
 using System.Numerics;
 using MoonTools.ECS;
+using MoonWorks.Math;
 
 namespace Ball;
 
@@ -85,6 +86,12 @@ public class Blocks : MoonTools.ECS.System
             }
         }
 
+        var meterEntity = GetSingletonEntity<Meter>();
+        var meter = Get<Meter>(meterEntity);
+        var scale = Get<Scale>(meterEntity).Value;
+        scale.X -= (float)delta.TotalSeconds;
+
+
         foreach (var block in BlockFilter.Entities)
         {
             if (Has<HitPoints>(block))
@@ -94,6 +101,7 @@ public class Blocks : MoonTools.ECS.System
                 if (hp <= 0)
                 {
                     Destroy(block);
+                    scale.X += 1f;
                     continue;
                 }
             }
@@ -106,6 +114,9 @@ public class Blocks : MoonTools.ECS.System
                 continue;
             }
         }
+
+        scale.X = Math.Clamp(scale.X, 0f, meter.MaxScale);
+        Set(meterEntity, new Scale(scale));
 
 
     }

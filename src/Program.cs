@@ -34,6 +34,7 @@ class Program : Game
             new Time(World),
             new PlayerController(World),
             new Motion(World),
+            new Parent(World),
             new FollowCamera(World),
             new Blocks(World),
         ];

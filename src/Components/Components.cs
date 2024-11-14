@@ -29,3 +29,4 @@ public readonly record struct CanDamagePaddle();
 public readonly record struct Initialize();
 public readonly record struct Score(int Current);
 public readonly record struct HighScore(int Value);
+public readonly record struct Meter(float MaxScale);
