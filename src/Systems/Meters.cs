@@ -23,7 +23,7 @@ public class Meters : MoonTools.ECS.System
             value = Math.Clamp(value, 0, 1f);
             var scale = Get<Scale>(entity).Value;
 
-            Set(entity, new Scale(new Vector2(float.Lerp(0f, meter.Scale, meter.Value), scale.Y)));
+            Set(entity, new Scale(Vector2.One * float.Lerp(0f, meter.Scale, meter.Value)));
             Set(entity, new Meter(value, meter.Decay, meter.Scale));
         }
     }

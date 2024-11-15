@@ -41,23 +41,23 @@ public class GameState : MoonTools.ECS.System
         Set(ball, new DestroyOnRestartGame());
 
         var player = CreateEntity();
-        Set(player, new Model(Content.Models.Paddle.ID));
+        Set(player, new Model(Content.Models.EmptyTriangle.ID));
         Set(player, new Position(new Vector2(
                 Dimensions.GameWidth * 0.5f,
                 Dimensions.GameHeight * 0.9f
             )));
         Set(player, new Orientation(0f));
         Set(player, new Velocity(Vector2.Zero));
-        Set(player, new BoundingBox(0, 0, 100, 8));
+        Set(player, new BoundingBox(0, 8, 55, 50));
         Set(player, new SolidCollision());
         Set(player, new HitBall());
-        Set(player, new Scale(new Vector2(6, 0.5f)));
+        Set(player, new Scale(new Vector2(4, 4)));
         Set(player, new Player());
         Set(player, new FollowsCamera(Dimensions.GameHeight * 0.9f));
         Set(player, new DestroyOnRestartGame());
 
         var meter = CreateEntity();
-        Set(meter, new Model(Content.Models.Paddle.ID));
+        Set(meter, new Model(Content.Models.Triangle.ID));
         Set(meter, new Position(new Vector2(
                 Dimensions.GameWidth * 0.5f,
                 Dimensions.GameHeight * 0.9f
@@ -65,9 +65,9 @@ public class GameState : MoonTools.ECS.System
         Set(meter, new Orientation(0f));
         Set(meter, new Velocity(Vector2.Zero));
         Set(meter, new Scale(new Vector2(0f, 0.5f)));
-        Set(meter, new Meter(0f, 0.05f, 6f));
+        Set(meter, new Meter(0f, 0.02f, 4f));
         Set(meter, new DestroyOnRestartGame());
-        Relate(meter, player, new ChildOf(new Vector2(0f, 16f)));
+        Relate(meter, player, new ChildOf(new Vector2(0f, 0f)));
 
         Relate(ball, player, new HeldBy(new Vector2(0f, -32.0f)));
         Set(ball, new Velocity(Vector2.Zero));

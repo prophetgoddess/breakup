@@ -209,7 +209,6 @@ public class Renderer : MoonTools.ECS.Renderer
 
         gamePass.BindGraphicsPipeline(RenderPipeline);
 
-
         foreach (var entity in ModelFilter.Entities)
         {
             var position = Get<Position>(entity).Value;
@@ -237,8 +236,8 @@ public class Renderer : MoonTools.ECS.Renderer
                 Matrix4x4 model = Matrix4x4.CreateScale(new Vector3(box.Width, box.Height, 0)) * Matrix4x4.CreateTranslation(new Vector3(position + new Vector2(box.X, box.Y), 0)) * cameraMatrix;
                 var uniforms = new TransformVertexUniform(model, Color.Red * 0.5f);
 
-                gamePass.BindVertexBuffer(Content.Models.Paddle.VertexBuffer);
-                gamePass.BindIndexBuffer(Content.Models.Paddle.IndexBuffer, IndexElementSize.ThirtyTwo);
+                gamePass.BindVertexBuffer(RectVertexBuffer);
+                gamePass.BindIndexBuffer(RectIndexBuffer, IndexElementSize.ThirtyTwo);
                 cmdbuf.PushVertexUniformData(uniforms);
                 gamePass.DrawIndexedPrimitives(6, 1, 0, 0, 0);
             }

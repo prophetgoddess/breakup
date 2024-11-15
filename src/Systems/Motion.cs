@@ -8,7 +8,6 @@ public class Motion : MoonTools.ECS.System
 {
     public Filter MotionFilter;
     public Filter ColliderFilter;
-    System.Random Random = new System.Random();
 
     public Motion(World world) : base(world)
     {
@@ -107,79 +106,6 @@ public class Motion : MoonTools.ECS.System
             if (Has<BoundingBox>(entity) && Has<SolidCollision>(entity))
             {
                 dest = Sweep(entity, position, velocity * dt, Get<BoundingBox>(entity));
-
-                foreach (var other in OutRelations<Colliding>(entity))
-                {
-                    var collision = GetRelationData<Colliding>(entity, other);
-                    var xCollision = collision.Direction == CollisionDirection.X;
-                    var yCollision = collision.Direction == CollisionDirection.Y;
-
-                    if (Has<Bounce>(entity) && Has<ResetBallOnHit>(other))
-                    {
-                        var player = GetSingletonEntity<Player>();
-                        Relate(entity, player, new HeldBy(new Vector2(0f, -32.0f)));
-                        Set(entity, new Velocity(Vector2.Zero));
-                        Unrelate<Colliding>(entity, other);
-                        Relate(entity, player, new IgnoreSolidCollision());
-
-                        var life = GetSingletonEntity<FirstLife>();
-
-                        while (HasOutRelation<NextLife>(life))
-                        {
-                            life = OutRelationSingleton<NextLife>(life);
-                        }
-
-                        Destroy(life);
-
-                        continue;
-                    }
-
-                    if (Has<HitBall>(other) && Has<CanBeHit>(entity))
-                    {
-                        var meterValue = GetSingleton<Meter>().Value * 200.0f;
-                        var otherPos = Get<Position>(other).Value;
-                        var dir = Vector2.Normalize(otherPos - dest);
-                        velocity = dir * -velocity.Length();
-
-                        if (HasOutRelation<Bouncing>(other))
-                            velocity.Y -= 200.0f + meterValue;
-
-                        Set(entity, new Velocity(velocity));
-                    }
-
-                    else if (Has<Bounce>(entity) && collision.Solid)
-                    {
-                        if (Has<CanTakeDamageFromBall>(other) && Has<HitPoints>(other))
-                        {
-                            var hitPoints = Get<HitPoints>(other).Value;
-                            Set(other, new HitPoints(hitPoints - 1));
-                        }
-
-                        var newVelocity = velocity;
-
-                        if (xCollision && !yCollision)
-                            newVelocity = new Vector2(-velocity.X, velocity.Y) * 0.8f;
-
-                        else if (yCollision && !xCollision)
-                            newVelocity = new Vector2(velocity.X, -velocity.Y) * 0.8f;
-
-                        else if (yCollision && xCollision)
-                            newVelocity = new Vector2(-velocity.X, -velocity.Y) * 0.8f;
-
-                        var otherPos = Get<Position>(other).Value;
-                        if (yCollision && !Has<CanTakeDamageFromBall>(other) && position.Y < otherPos.Y)
-                        {
-                            newVelocity.Y += (float)Random.NextDouble() * -100.0f;
-                            newVelocity.X += (float)Random.NextDouble() * 50.0f * (Random.NextDouble() < 0.5f ? 1.0f : -1.0f);
-                        }
-
-                        Set(entity, new Velocity(newVelocity));
-
-                    }
-
-                    Unrelate<Colliding>(entity, other);
-                }
-
             }
 
             Set(entity, new Position(dest));
@@ -187,4 +113,5 @@ public class Motion : MoonTools.ECS.System
         }
 
     }
+
 }
