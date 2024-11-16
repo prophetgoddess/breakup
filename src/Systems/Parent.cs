@@ -17,10 +17,10 @@ public class Parent : MoonTools.ECS.System
         {
             if (HasOutRelation<ChildOf>(entity))
             {
-                var held = OutRelationSingleton<ChildOf>(entity);
-                var data = GetRelationData<ChildOf>(entity, held);
-                Set(entity, new Position(Get<Position>(held).Value + data.offset));
-                Set(entity, new Orientation(Get<Orientation>(held).Value));
+                var parent = OutRelationSingleton<ChildOf>(entity);
+                var data = GetRelationData<ChildOf>(entity, parent);
+                Set(entity, new Position(Get<Position>(parent).Value + data.offset));
+                Set(entity, new Orientation(Get<Orientation>(parent).Value));
                 continue;
             }
         }

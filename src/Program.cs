@@ -35,8 +35,8 @@ class Program : Game
             new PlayerController(World),
             new Motion(World),
             new Collision(World),
-            new Parent(World),
             new FollowCamera(World),
+            new Parent(World),
             new Blocks(World),
             new Meters(World)
         ];

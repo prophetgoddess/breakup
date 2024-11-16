@@ -1,4 +1,5 @@
 using MoonTools.ECS;
+using MoonWorks;
 using MoonWorks.Input;
 
 namespace Ball;
@@ -11,6 +12,8 @@ public struct InputState
     public ButtonState Down { get; set; }
     public ButtonState Swing { get; set; }
     public ButtonState Restart { get; set; }
+    public ButtonState Dash { get; set; }
+    public ButtonState Slow { get; set; }
 }
 
 public class ControlSet
@@ -21,6 +24,8 @@ public class ControlSet
     public VirtualButton Down { get; set; } = new EmptyButton();
     public VirtualButton Swing { get; set; } = new EmptyButton();
     public VirtualButton Restart { get; set; } = new EmptyButton();
+    public VirtualButton Dash { get; set; }
+    public VirtualButton Slow { get; set; }
 }
 
 public class Input : MoonTools.ECS.System
@@ -40,6 +45,8 @@ public class Input : MoonTools.ECS.System
         Keyboard.Right = Inputs.Keyboard.Button(KeyCode.Right);
         Keyboard.Swing = Inputs.Keyboard.Button(KeyCode.Space);
         Keyboard.Restart = Inputs.Keyboard.Button(KeyCode.R);
+        Keyboard.Dash = Inputs.Keyboard.Button(KeyCode.LeftControl);
+        Keyboard.Slow = Inputs.Keyboard.Button(KeyCode.LeftShift);
 
         Gamepad.Up = Inputs.GetGamepad(0).DpadUp;
         Gamepad.Down = Inputs.GetGamepad(0).DpadDown;
@@ -47,6 +54,8 @@ public class Input : MoonTools.ECS.System
         Gamepad.Right = Inputs.GetGamepad(0).DpadRight;
         Gamepad.Swing = Inputs.GetGamepad(0).A;
         Gamepad.Restart = Inputs.GetGamepad(0).Guide;
+        Gamepad.Dash = Inputs.GetGamepad(0).RightShoulder;
+        Gamepad.Slow = Inputs.GetGamepad(0).LeftShoulder;
 
         var inputEntity = CreateEntity();
         Set(inputEntity, InputState(Keyboard, Gamepad));
@@ -69,7 +78,9 @@ public class Input : MoonTools.ECS.System
             Up = controlSet.Up.State | altControlSet.Up.State,
             Down = controlSet.Down.State | altControlSet.Down.State,
             Swing = controlSet.Swing.State | altControlSet.Swing.State,
-            Restart = controlSet.Restart.State | altControlSet.Restart.State
+            Restart = controlSet.Restart.State | altControlSet.Restart.State,
+            Dash = controlSet.Dash.State | altControlSet.Dash.State,
+            Slow = controlSet.Slow.State | altControlSet.Slow.State
         };
     }
 }

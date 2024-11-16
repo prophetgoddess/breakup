@@ -61,7 +61,7 @@ public class Collision : MoonTools.ECS.System
                 newVelocity = new Vector2(-velocity.X, -velocity.Y) * 0.8f;
 
             var otherPos = Get<Position>(other).Value;
-            if (yCollision && !Has<CanTakeDamageFromBall>(other) && position.Y < otherPos.Y)
+            if (yCollision && !Has<CanTakeDamageFromBall>(other) && position.Y < otherPos.Y && MathF.Abs(velocity.Length()) < float.Epsilon)
             {
                 newVelocity.Y += (float)Random.NextDouble() * -100.0f;
                 newVelocity.X += (float)Random.NextDouble() * 50.0f * (Random.NextDouble() < 0.5f ? 1.0f : -1.0f);
