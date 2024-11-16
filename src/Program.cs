@@ -33,6 +33,7 @@ class Program : Game
             new GameState(World),
             new Time(World),
             new PlayerController(World),
+            new PlayerAttractor(World),
             new Motion(World),
             new Collision(World),
             new FollowCamera(World),

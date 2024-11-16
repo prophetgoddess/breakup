@@ -36,7 +36,7 @@ public class GameState : MoonTools.ECS.System
         Set(ball, new SolidCollision());
         Set(ball, new Bounce());
         Set(ball, new CanBeHit());
-        Set(ball, new HasGravity());
+        Set(ball, new HasGravity(1f));
         Set(ball, new CameraFollows());
         Set(ball, new DestroyOnRestartGame());
 

@@ -88,7 +88,7 @@ public class Motion : MoonTools.ECS.System
             var velocity = Get<Velocity>(entity).Value;
             if (Has<HasGravity>(entity))
             {
-                velocity.Y += 5f;
+                velocity.Y += 5f * Get<HasGravity>(entity).Scale;
                 Set(entity, new Velocity(velocity));
             }
 

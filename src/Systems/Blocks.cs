@@ -14,9 +14,12 @@ public class Blocks : MoonTools.ECS.System
 
     System.Random Random = new System.Random();
     float LastGridOffset = -1.0f;
+    GemSpawner GemSpawner;
 
     public Blocks(World world) : base(world)
     {
+        GemSpawner = new GemSpawner(world);
+
         BlockFilter = FilterBuilder
         .Include<CanDamagePaddle>()
         .Build();
@@ -86,9 +89,6 @@ public class Blocks : MoonTools.ECS.System
             }
         }
 
-        var meterEntity = GetSingletonEntity<Meter>();
-        var meter = Get<Meter>(meterEntity);
-        var value = meter.Value;
 
         foreach (var block in BlockFilter.Entities)
         {
@@ -98,7 +98,8 @@ public class Blocks : MoonTools.ECS.System
 
                 if (hp <= 0)
                 {
-                    value += 0.1f;
+
+                    GemSpawner.SpawnGems(Get<Position>(block).Value);
                     Destroy(block);
                     continue;
                 }
@@ -112,8 +113,6 @@ public class Blocks : MoonTools.ECS.System
                 continue;
             }
         }
-
-        Set(meterEntity, new Meter(value, meter.Decay, meter.Scale));
 
 
     }

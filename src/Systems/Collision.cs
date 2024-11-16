@@ -8,8 +8,6 @@ public class Collision : MoonTools.ECS.System
 {
     Filter CollidingFilter;
 
-    System.Random Random = new System.Random();
-
     public Collision(World world) : base(world)
     {
         CollidingFilter = FilterBuilder.Include<SolidCollision>().Include<Position>().Include<BoundingBox>().Build();
@@ -31,8 +29,29 @@ public class Collision : MoonTools.ECS.System
 
                 HandleHitBall(entity, other);
 
+                HandleGems(entity, other);
+
                 Unrelate<Colliding>(entity, other);
             }
+        }
+    }
+
+    void HandleGems(Entity entity, Entity other)
+    {
+        bool fill = Has<FillMeter>(entity);
+        bool player = Has<Player>(other);
+
+        System.Console.WriteLine($"{fill}, {player}");
+
+        if (fill && player)
+        {
+            var meterEntity = GetSingletonEntity<Meter>();
+            var meter = Get<Meter>(meterEntity);
+            var value = meter.Value;
+            value += Get<FillMeter>(entity).Amount;
+
+            Set(meterEntity, new Meter(value, meter.Decay, meter.Scale));
+            Destroy(entity);
         }
     }
 
@@ -61,10 +80,10 @@ public class Collision : MoonTools.ECS.System
                 newVelocity = new Vector2(-velocity.X, -velocity.Y) * 0.8f;
 
             var otherPos = Get<Position>(other).Value;
-            if (yCollision && !Has<CanTakeDamageFromBall>(other) && position.Y < otherPos.Y && MathF.Abs(velocity.Length()) < float.Epsilon)
+            if (yCollision && !Has<CanTakeDamageFromBall>(other) && position.Y < otherPos.Y && velocity.Length() < 0.1f)
             {
-                newVelocity.Y += (float)Random.NextDouble() * -100.0f;
-                newVelocity.X += (float)Random.NextDouble() * 50.0f * (Random.NextDouble() < 0.5f ? 1.0f : -1.0f);
+                newVelocity.Y += Rando.Range(-100f, 0f);
+                newVelocity.X += Rando.Range(-50f, 50f);
             }
 
             Set(entity, new Velocity(newVelocity));
