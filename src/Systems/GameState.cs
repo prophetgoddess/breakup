@@ -3,6 +3,8 @@ using System.Numerics;
 using MoonTools.ECS;
 using MoonWorks.Audio;
 using Filter = MoonTools.ECS.Filter;
+using System.Reflection.Metadata;
+using Microsoft.VisualBasic;
 
 namespace Ball;
 public class GameState : MoonTools.ECS.System
@@ -139,14 +141,14 @@ public class GameState : MoonTools.ECS.System
         }
 
         var scoreEntity = Some<Score>() ? GetSingletonEntity<Score>() : CreateEntity();
-        Set(scoreEntity, new Text(Stores.FontStorage.GetID(Content.Fonts.FX300), FontSizes.BodySize, Stores.TextStorage.GetID("0")));
+        Set(scoreEntity, new Text(Fonts.BodyFont, Fonts.BodySize, Stores.TextStorage.GetID("0")));
         Set(scoreEntity, new Highlight());
         Set(scoreEntity, new Score(0));
         Set(scoreEntity, new Position(new Vector2(UILayoutConstants.InfoX, UILayoutConstants.ScoreY)));
         Set(scoreEntity, new UI());
 
         var gemsEntity = Some<Gems>() ? GetSingletonEntity<Gems>() : CreateEntity();
-        Set(gemsEntity, new Text(Stores.FontStorage.GetID(Content.Fonts.FX300), FontSizes.BodySize, Stores.TextStorage.GetID("0")));
+        Set(gemsEntity, new Text(Fonts.BodyFont, Fonts.BodySize, Stores.TextStorage.GetID("0")));
         Set(gemsEntity, new Highlight());
         Set(gemsEntity, new Gems(0, 0));
         Set(gemsEntity, new Position(new Vector2(UILayoutConstants.InfoX, UILayoutConstants.GemsY)));
@@ -179,8 +181,8 @@ public class GameState : MoonTools.ECS.System
 
         Set(gemsEntity,
         new Text(
-            Stores.FontStorage.GetID(Content.Fonts.FX300),
-            FontSizes.BodySize,
+            Fonts.BodyFont,
+            Fonts.BodySize,
             Stores.TextStorage.GetID(GetFormattedScore(gems.Total)),
             MoonWorks.Graphics.Font.HorizontalAlignment.Left,
             MoonWorks.Graphics.Font.VerticalAlignment.Middle));
@@ -197,8 +199,8 @@ public class GameState : MoonTools.ECS.System
         Set(scoreEntity, new Score(newScore));
         Set(scoreEntity,
         new Text(
-            Stores.FontStorage.GetID(Content.Fonts.FX300),
-            FontSizes.BodySize,
+            Fonts.BodyFont,
+            Fonts.BodySize,
             Stores.TextStorage.GetID(GetFormattedScore(newScore)),
             MoonWorks.Graphics.Font.HorizontalAlignment.Left,
             MoonWorks.Graphics.Font.VerticalAlignment.Middle));
@@ -211,8 +213,8 @@ public class GameState : MoonTools.ECS.System
 
         Set(highScoreEntity,
          new Text(
-            Stores.FontStorage.GetID(Content.Fonts.FX300),
-            FontSizes.BodySize,
+            Fonts.BodyFont,
+            Fonts.BodySize,
             Stores.TextStorage.GetID(GetFormattedScore(highScore)),
             MoonWorks.Graphics.Font.HorizontalAlignment.Left,
             MoonWorks.Graphics.Font.VerticalAlignment.Middle));

@@ -24,6 +24,7 @@ public class Meters : MoonTools.ECS.System
                 if (Has<Flicker>(entity))
                 {
                     Remove<Flicker>(entity);
+                    Remove<Invisible>(entity);
                 }
                 value -= (float)delta.TotalSeconds * meter.Decay;
 

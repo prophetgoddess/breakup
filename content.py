@@ -153,6 +153,31 @@ if os.path.exists(fonts_in):
             shutil.copy(font, f"{os.path.join(fonts_out, Path(font).stem)}.font")
             hashes[font] = digest
 
+        for font in Path(fonts_in).glob("**/*.otf"):
+            digest = get_digest(font)
+
+            if not font in hashes:
+                fontsDirty
+
+            if not font in hashes or hashes[font] != digest or args.force:
+                subprocess.run(
+                    [
+                        "msdf-atlas-gen",
+                        "-yorigin",
+                        "top",
+                        "-font",
+                        font,
+                        "-imageout",
+                        f"{os.path.join(fonts_out, Path(font).stem)}.png",
+                        "-json",
+                        f"{os.path.join(fonts_out, Path(font).stem)}.json",
+                        "-fontname",
+                        os.path.basename(font),
+                    ]
+                )
+                shutil.copy(font, f"{os.path.join(fonts_out, Path(font).stem)}.font")
+                hashes[font] = digest
+
 
 #
 # CODEGEN

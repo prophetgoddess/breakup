@@ -1,3 +1,6 @@
+using System.Reflection.Metadata;
+using MoonWorks.Graphics.Font;
+
 namespace Ball;
 
 public static class Dimensions
@@ -11,8 +14,11 @@ public static class Dimensions
     public const float WindowAspectRatio = WindowWidth / (float)WindowHeight;
 }
 
-public static class FontSizes
+public static class Fonts
 {
+    public static int HeaderFont = Stores.FontStorage.GetID(Content.Fonts.F500Angular);
+    public static int BodyFont = Stores.FontStorage.GetID(Content.Fonts.F5000);
+
     public const int HeaderSize = 52;
     public const int BodySize = 32;
 }

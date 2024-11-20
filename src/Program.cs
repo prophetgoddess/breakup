@@ -51,8 +51,8 @@ class Program : Game
         World.Set(livesLabel, new Position(new Vector2(10, UILayoutConstants.ScoreLabelY)));
         World.Set(livesLabel,
          new Text(
-            Stores.FontStorage.GetID(Content.Fonts.FX300Angular),
-            FontSizes.HeaderSize,
+            Fonts.HeaderFont,
+            Fonts.HeaderSize,
             Stores.TextStorage.GetID("LIVES")));
         World.Set(livesLabel, new UI());
 
@@ -60,8 +60,8 @@ class Program : Game
         World.Set(scoreLabel, new Position(new Vector2(UILayoutConstants.InfoX, UILayoutConstants.ScoreLabelY)));
         World.Set(scoreLabel,
          new Text(
-            Stores.FontStorage.GetID(Content.Fonts.FX300Angular),
-            FontSizes.HeaderSize,
+            Fonts.HeaderFont,
+            Fonts.HeaderSize,
             Stores.TextStorage.GetID("SCORE")));
         World.Set(scoreLabel, new UI());
 
@@ -69,8 +69,8 @@ class Program : Game
         World.Set(highScoreLabel, new Position(new Vector2(UILayoutConstants.InfoX, UILayoutConstants.HighScoreLabelY)));
         World.Set(highScoreLabel,
          new Text(
-            Stores.FontStorage.GetID(Content.Fonts.FX300Angular),
-            FontSizes.HeaderSize,
+            Fonts.HeaderFont,
+            Fonts.HeaderSize,
             Stores.TextStorage.GetID("BEST")));
         World.Set(highScoreLabel, new UI());
 
@@ -79,8 +79,8 @@ class Program : Game
         World.Set(highScoreEntity, new Position(new Vector2(UILayoutConstants.InfoX, UILayoutConstants.HighScoreY)));
         World.Set(highScoreEntity,
          new Text(
-            Stores.FontStorage.GetID(Content.Fonts.FX300),
-            FontSizes.BodySize,
+            Fonts.BodyFont,
+            Fonts.BodySize,
             Stores.TextStorage.GetID("")));
         World.Set(highScoreEntity, new UI());
         World.Set(highScoreEntity, new Highlight());
@@ -89,8 +89,8 @@ class Program : Game
         World.Set(gemsLabel, new Position(new Vector2(UILayoutConstants.InfoX, UILayoutConstants.GemsLabelY)));
         World.Set(gemsLabel,
          new Text(
-            Stores.FontStorage.GetID(Content.Fonts.FX300Angular),
-            FontSizes.HeaderSize,
+            Fonts.HeaderFont,
+            Fonts.HeaderSize,
             Stores.TextStorage.GetID("GEMS")));
         World.Set(gemsLabel, new UI());
 
