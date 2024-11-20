@@ -84,27 +84,20 @@ public class Renderer : MoonTools.ECS.Renderer
         TextFilter = FilterBuilder.Include<Text>().Include<Position>().Include<UI>().Exclude<Invisible>().Build();
         ColliderFilter = FilterBuilder.Include<Position>().Include<BoundingBox>().Build();
 
-        Shader vertShader = Shader.Create(
+        Shader vertShader = ShaderCross.Create(
             GraphicsDevice,
-            Path.Join(System.AppContext.BaseDirectory, "Shaders", "Vertex.vert.msl"),
-            "main0",
-            new ShaderCreateInfo
-            {
-                Stage = ShaderStage.Vertex,
-                Format = ShaderFormat.MSL,
-                NumUniformBuffers = 1
-            }
+            Path.Join(System.AppContext.BaseDirectory, "Shaders", "Vertex.vert.spv"),
+            "main",
+            ShaderCross.ShaderFormat.SPIRV,
+            ShaderStage.Vertex
         );
 
-        Shader fragShader = Shader.Create(
+        Shader fragShader = ShaderCross.Create(
             GraphicsDevice,
-            Path.Join(System.AppContext.BaseDirectory, "Shaders", "Fragment.frag.msl"),
-            "main0",
-            new ShaderCreateInfo
-            {
-                Stage = ShaderStage.Fragment,
-                Format = ShaderFormat.MSL,
-            }
+            Path.Join(System.AppContext.BaseDirectory, "Shaders", "Fragment.frag.spv"),
+            "main",
+            ShaderCross.ShaderFormat.SPIRV,
+            ShaderStage.Fragment
         );
 
         var renderPipelineCreateInfo = new GraphicsPipelineCreateInfo
@@ -220,7 +213,7 @@ public class Renderer : MoonTools.ECS.Renderer
             Matrix4x4 model = Matrix4x4.CreateScale(new Vector3(scale.X, scale.Y, 0)) * Matrix4x4.CreateFromAxisAngle(Vector3.UnitZ, rotation) * Matrix4x4.CreateTranslation(new Vector3(position, 0)) * cameraMatrix;
             var uniforms = new TransformVertexUniform(model, color);
 
-            gamePass.BindVertexBuffer(mesh.VertexBuffer);
+            gamePass.BindVertexBuffers(mesh.VertexBuffer);
             gamePass.BindIndexBuffer(mesh.IndexBuffer, IndexElementSize.ThirtyTwo);
             cmdbuf.PushVertexUniformData(uniforms);
             gamePass.DrawIndexedPrimitives(mesh.TriangleCount * 3, 1, 0, 0, 0);
@@ -237,7 +230,7 @@ public class Renderer : MoonTools.ECS.Renderer
                 Matrix4x4 model = Matrix4x4.CreateScale(new Vector3(box.Width, box.Height, 0)) * Matrix4x4.CreateTranslation(new Vector3(position + new Vector2(box.X, box.Y), 0)) * cameraMatrix;
                 var uniforms = new TransformVertexUniform(model, Color.Red * 0.5f);
 
-                gamePass.BindVertexBuffer(RectVertexBuffer);
+                gamePass.BindVertexBuffers(RectVertexBuffer);
                 gamePass.BindIndexBuffer(RectIndexBuffer, IndexElementSize.ThirtyTwo);
                 cmdbuf.PushVertexUniformData(uniforms);
                 gamePass.DrawIndexedPrimitives(6, 1, 0, 0, 0);
@@ -290,7 +283,7 @@ public class Renderer : MoonTools.ECS.Renderer
             var uniforms = new TransformVertexUniform(model, color);
 
             uiPass.BindGraphicsPipeline(RenderPipeline);
-            uiPass.BindVertexBuffer(mesh.VertexBuffer);
+            uiPass.BindVertexBuffers(mesh.VertexBuffer);
             uiPass.BindIndexBuffer(mesh.IndexBuffer, IndexElementSize.ThirtyTwo);
             cmdbuf.PushVertexUniformData(uniforms);
             uiPass.DrawIndexedPrimitives(mesh.TriangleCount * 3, 1, 0, 0, 0);
