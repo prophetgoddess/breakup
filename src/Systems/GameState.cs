@@ -68,7 +68,7 @@ public class GameState : MoonTools.ECS.System
         Set(meter, new Orientation(0f));
         Set(meter, new Velocity(Vector2.Zero));
         Set(meter, new Scale(new Vector2(0f, 0.5f)));
-        Set(meter, new Meter(1f, 0.015f, 2f));
+        Set(meter, new Meter(0f, 0.015f, 2f));
         Set(meter, new DestroyOnRestartGame());
         Set(meter, new Highlight());
         Relate(meter, player, new ChildOf(new Vector2(0f, 0f)));
@@ -123,7 +123,7 @@ public class GameState : MoonTools.ECS.System
             Set(lifeEntity, new Model(Content.Models.Donut.ID));
             Set(lifeEntity, new Scale(Vector2.One * 32.0f));
             Set(lifeEntity, new UI());
-            Set(lifeEntity, new Position(new Vector2(100, 50 + i * 100)));
+            Set(lifeEntity, new Position(new Vector2(UILayoutConstants.LivesX, UILayoutConstants.LivesY + i * UILayoutConstants.LivesSpacing)));
             Set(lifeEntity, new DestroyOnRestartGame());
             Set(lifeEntity, new Highlight());
 
@@ -139,22 +139,22 @@ public class GameState : MoonTools.ECS.System
         }
 
         var scoreEntity = Some<Score>() ? GetSingletonEntity<Score>() : CreateEntity();
-        Set(scoreEntity, new Text(Stores.FontStorage.GetID(Content.Fonts.FX300), 24, Stores.TextStorage.GetID("0")));
+        Set(scoreEntity, new Text(Stores.FontStorage.GetID(Content.Fonts.FX300), FontSizes.BodySize, Stores.TextStorage.GetID("0")));
         Set(scoreEntity, new Highlight());
         Set(scoreEntity, new Score(0));
-        Set(scoreEntity, new Position(new Vector2(Dimensions.WindowWidth - 190, 60)));
+        Set(scoreEntity, new Position(new Vector2(UILayoutConstants.InfoX, UILayoutConstants.ScoreY)));
         Set(scoreEntity, new UI());
 
         var gemsEntity = Some<Gems>() ? GetSingletonEntity<Gems>() : CreateEntity();
-        Set(gemsEntity, new Text(Stores.FontStorage.GetID(Content.Fonts.FX300), 24, Stores.TextStorage.GetID("0")));
+        Set(gemsEntity, new Text(Stores.FontStorage.GetID(Content.Fonts.FX300), FontSizes.BodySize, Stores.TextStorage.GetID("0")));
         Set(gemsEntity, new Highlight());
         Set(gemsEntity, new Gems(0, 0));
-        Set(gemsEntity, new Position(new Vector2(Dimensions.WindowWidth - 190, 220)));
+        Set(gemsEntity, new Position(new Vector2(UILayoutConstants.InfoX, UILayoutConstants.GemsY)));
         Set(gemsEntity, new UI());
 
     }
 
-    string GetFormattedScore(int amount, int length = 6)
+    string GetFormattedScore(int amount, int length = 8)
     {
         return amount >= 0
             ? amount.ToString($"D{length}")
@@ -180,7 +180,7 @@ public class GameState : MoonTools.ECS.System
         Set(gemsEntity,
         new Text(
             Stores.FontStorage.GetID(Content.Fonts.FX300),
-            24,
+            FontSizes.BodySize,
             Stores.TextStorage.GetID(GetFormattedScore(gems.Total)),
             MoonWorks.Graphics.Font.HorizontalAlignment.Left,
             MoonWorks.Graphics.Font.VerticalAlignment.Middle));
@@ -198,7 +198,7 @@ public class GameState : MoonTools.ECS.System
         Set(scoreEntity,
         new Text(
             Stores.FontStorage.GetID(Content.Fonts.FX300),
-            24,
+            FontSizes.BodySize,
             Stores.TextStorage.GetID(GetFormattedScore(newScore)),
             MoonWorks.Graphics.Font.HorizontalAlignment.Left,
             MoonWorks.Graphics.Font.VerticalAlignment.Middle));
@@ -212,7 +212,7 @@ public class GameState : MoonTools.ECS.System
         Set(highScoreEntity,
          new Text(
             Stores.FontStorage.GetID(Content.Fonts.FX300),
-            24,
+            FontSizes.BodySize,
             Stores.TextStorage.GetID(GetFormattedScore(highScore)),
             MoonWorks.Graphics.Font.HorizontalAlignment.Left,
             MoonWorks.Graphics.Font.VerticalAlignment.Middle));

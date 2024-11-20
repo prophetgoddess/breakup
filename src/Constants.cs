@@ -10,3 +10,23 @@ public static class Dimensions
     public const int WindowHeight = 900;
     public const float WindowAspectRatio = WindowWidth / (float)WindowHeight;
 }
+
+public static class FontSizes
+{
+    public const int HeaderSize = 52;
+    public const int BodySize = 32;
+}
+
+public static class UILayoutConstants
+{
+    public const int LivesX = 150;
+    public const int LivesY = 130;
+    public const int LivesSpacing = 100;
+    public const int InfoX = Dimensions.WindowWidth - 340;
+    public const int ScoreLabelY = 60;
+    public const int ScoreY = 90;
+    public const int HighScoreLabelY = 170;
+    public const int HighScoreY = 200;
+    public const int GemsLabelY = 280;
+    public const int GemsY = 310;
+}

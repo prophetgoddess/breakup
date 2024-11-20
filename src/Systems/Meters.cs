@@ -34,10 +34,12 @@ public class Meters : MoonTools.ECS.System
                     Set(entity, new Flicker(0.05f));
                     Relate(entity, timer, new LockMeter());
                 }
-                else if (value <= 0)
-                {
-                    UnrelateAll<LockMeter>(entity);
-                }
+            }
+            else if (value <= 0)
+            {
+                Remove<Flicker>(entity);
+                Remove<Invisible>(entity);
+                UnrelateAll<LockMeter>(entity);
             }
 
             value = Math.Clamp(value, 0, 1f);
