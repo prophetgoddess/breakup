@@ -84,7 +84,7 @@ public class Collision : MoonTools.ECS.System
                 newVelocity = new Vector2(-velocity.X, -velocity.Y) * 0.8f;
 
             var otherPos = Get<Position>(other).Value;
-            if (position.Y < otherPos.Y)
+            if (position.Y < otherPos.Y && !Has<Player>(other))
             {
                 newVelocity.Y += Rando.Range(-100f, 0f);
                 newVelocity.X += Rando.Range(-50f, 50f);
