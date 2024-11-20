@@ -51,7 +51,9 @@ public class Collision : MoonTools.ECS.System
             var gems = Get<Gems>(gemsEntity);
             var total = gems.Total;
             total += Get<AddGems>(other).Amount;
-            Set(gemsEntity, new Gems(total));
+            var current = gems.Current;
+            current += Get<AddGems>(other).Amount;
+            Set(gemsEntity, new Gems(current, total));
             Destroy(other);
         }
 

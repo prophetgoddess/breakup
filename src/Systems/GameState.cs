@@ -148,7 +148,7 @@ public class GameState : MoonTools.ECS.System
         var gemsEntity = Some<Gems>() ? GetSingletonEntity<Gems>() : CreateEntity();
         Set(gemsEntity, new Text(Stores.FontStorage.GetID(Content.Fonts.FX300), 24, Stores.TextStorage.GetID("0")));
         Set(gemsEntity, new Highlight());
-        Set(gemsEntity, new Gems(0));
+        Set(gemsEntity, new Gems(0, 0));
         Set(gemsEntity, new Position(new Vector2(Dimensions.WindowWidth - 190, 220)));
         Set(gemsEntity, new UI());
 
@@ -171,10 +171,24 @@ public class GameState : MoonTools.ECS.System
             StartGame();
         }
 
+        if (!Some<Gems>())
+            return;
+
+        var gemsEntity = GetSingletonEntity<Gems>();
+        var gems = Get<Gems>(gemsEntity);
+
+        Set(gemsEntity,
+        new Text(
+            Stores.FontStorage.GetID(Content.Fonts.FX300),
+            24,
+            Stores.TextStorage.GetID(GetFormattedScore(gems.Total)),
+            MoonWorks.Graphics.Font.HorizontalAlignment.Left,
+            MoonWorks.Graphics.Font.VerticalAlignment.Middle));
+
         if (!Some<Score>())
             return;
 
-        var newScore = (int)GetSingleton<CameraPosition>().Y;
+        var newScore = (int)GetSingleton<CameraPosition>().Y + gems.Total;
         var scoreEntity = GetSingletonEntity<Score>();
         var score = Get<Score>(scoreEntity);
         var highScoreEntity = GetSingletonEntity<HighScore>();
@@ -203,19 +217,6 @@ public class GameState : MoonTools.ECS.System
             MoonWorks.Graphics.Font.HorizontalAlignment.Left,
             MoonWorks.Graphics.Font.VerticalAlignment.Middle));
 
-        if (!Some<Gems>())
-            return;
-
-        var gemsEntity = GetSingletonEntity<Gems>();
-        var gems = Get<Gems>(gemsEntity);
-
-        Set(gemsEntity,
-        new Text(
-            Stores.FontStorage.GetID(Content.Fonts.FX300),
-            24,
-            Stores.TextStorage.GetID(GetFormattedScore(gems.Total)),
-            MoonWorks.Graphics.Font.HorizontalAlignment.Left,
-            MoonWorks.Graphics.Font.VerticalAlignment.Middle));
 
     }
 }

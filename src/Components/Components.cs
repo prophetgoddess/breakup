@@ -37,4 +37,4 @@ public readonly record struct AngularVelocity(float Value);
 public readonly record struct Highlight();
 public readonly record struct Flicker(float Rate);
 public readonly record struct Invisible();
-public readonly record struct Gems(int Total);
+public readonly record struct Gems(int Current, int Total);
