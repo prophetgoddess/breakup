@@ -30,6 +30,7 @@ public class GemSpawner : Manipulator
         Set(entity, new FillMeter(0.025f));
         Set(entity, new Highlight());
         Set(entity, new AngularVelocity(Rando.Range(-5f, 5f)));
+        Set(entity, new AddGems(1));
 
         var timer = CreateEntity();
         Set(timer, new Timer(Rando.Range(1f, 2f)));

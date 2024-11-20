@@ -75,6 +75,15 @@ class Program : Game
         World.Set(highScoreEntity, new UI());
         World.Set(highScoreEntity, new Highlight());
 
+        var gemsLabel = World.CreateEntity();
+        World.Set(gemsLabel, new Position(new Vector2(Dimensions.WindowWidth - 190, 200)));
+        World.Set(gemsLabel,
+         new Text(
+            Stores.FontStorage.GetID(Content.Fonts.FX300Angular),
+            28,
+            Stores.TextStorage.GetID("GEMS")));
+        World.Set(gemsLabel, new UI());
+
         World.Set(World.CreateEntity(), Palettes.DefaultLight);
 
     }

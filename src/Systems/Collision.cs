@@ -38,10 +38,7 @@ public class Collision : MoonTools.ECS.System
 
     void HandleGems(Entity entity, Entity other)
     {
-        bool fill = Has<FillMeter>(other);
-        bool player = Has<Player>(entity);
-
-        if (fill && player)
+        if (Has<FillMeter>(other) && Has<AddGems>(other) && Has<Player>(entity))
         {
             var meterEntity = GetSingletonEntity<Meter>();
             var meter = Get<Meter>(meterEntity);
@@ -49,8 +46,15 @@ public class Collision : MoonTools.ECS.System
             value += Get<FillMeter>(other).Amount;
 
             Set(meterEntity, new Meter(value, meter.Decay, meter.Scale));
+
+            var gemsEntity = GetSingletonEntity<Gems>();
+            var gems = Get<Gems>(gemsEntity);
+            var total = gems.Total;
+            total += Get<AddGems>(other).Amount;
+            Set(gemsEntity, new Gems(total));
             Destroy(other);
         }
+
     }
 
     void HandleBounce(Entity entity, Entity other, Colliding collision, bool xCollision, bool yCollision)
