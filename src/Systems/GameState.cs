@@ -1,6 +1,8 @@
+using MoonWorks.Graphics;
 using System.Numerics;
 using MoonTools.ECS;
 using MoonWorks.Audio;
+using Filter = MoonTools.ECS.Filter;
 
 namespace Ball;
 public class GameState : MoonTools.ECS.System
@@ -39,6 +41,7 @@ public class GameState : MoonTools.ECS.System
         Set(ball, new HasGravity(1f));
         Set(ball, new CameraFollows());
         Set(ball, new DestroyOnRestartGame());
+        Set(ball, new Highlight());
 
         var player = CreateEntity();
         Set(player, new Model(Content.Models.EmptyTriangle.ID));
@@ -65,8 +68,9 @@ public class GameState : MoonTools.ECS.System
         Set(meter, new Orientation(0f));
         Set(meter, new Velocity(Vector2.Zero));
         Set(meter, new Scale(new Vector2(0f, 0.5f)));
-        Set(meter, new Meter(0f, 0.015f, 2.7f));
+        Set(meter, new Meter(1f, 0.015f, 2f));
         Set(meter, new DestroyOnRestartGame());
+        Set(meter, new Highlight());
         Relate(meter, player, new ChildOf(new Vector2(0f, 0f)));
 
         Relate(ball, player, new HeldBy(new Vector2(0f, -32.0f)));
@@ -117,10 +121,11 @@ public class GameState : MoonTools.ECS.System
             var lifeEntity = CreateEntity();
             Set(lifeEntity, new Life());
             Set(lifeEntity, new Model(Content.Models.Donut.ID));
-            Set(lifeEntity, new Scale(Vector2.One * 16.0f));
+            Set(lifeEntity, new Scale(Vector2.One * 32.0f));
             Set(lifeEntity, new UI());
-            Set(lifeEntity, new Position(new Vector2(100, 50 + i * 50)));
+            Set(lifeEntity, new Position(new Vector2(100, 50 + i * 100)));
             Set(lifeEntity, new DestroyOnRestartGame());
+            Set(lifeEntity, new Highlight());
 
             if (i == 0)
             {
@@ -135,6 +140,7 @@ public class GameState : MoonTools.ECS.System
 
         var scoreEntity = Some<Score>() ? GetSingletonEntity<Score>() : CreateEntity();
         Set(scoreEntity, new Text(Stores.FontStorage.GetID(Content.Fonts.FX300), 24, Stores.TextStorage.GetID("0")));
+        Set(scoreEntity, new Highlight());
         Set(scoreEntity, new Score(0));
         Set(scoreEntity, new Position(new Vector2(Dimensions.WindowWidth - 190, 60)));
         Set(scoreEntity, new UI());

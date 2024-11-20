@@ -12,7 +12,7 @@ public class Motion : MoonTools.ECS.System
     public Motion(World world) : base(world)
     {
         MotionFilter = FilterBuilder.Include<Velocity>().Include<Position>().Build();
-        ColliderFilter = FilterBuilder.Include<Position>().Include<SolidCollision>().Build();
+        ColliderFilter = FilterBuilder.Include<Position>().Include<BoundingBox>().Build();
     }
 
     public bool Overlaps(Vector2 posA, BoundingBox boxA, Vector2 posB, BoundingBox boxB)
@@ -46,7 +46,12 @@ public class Motion : MoonTools.ECS.System
             var otherBox = Get<BoundingBox>(other);
             if (e != other && Overlaps(new Vector2(destX, position.Y), boundingBox, otherPos, otherBox))
             {
-                if (!Related<IgnoreSolidCollision>(other, e) && !Related<IgnoreSolidCollision>(e, other))
+                if (
+                    !Related<IgnoreSolidCollision>(other, e) &&
+                    !Related<IgnoreSolidCollision>(e, other) &&
+                    Has<SolidCollision>(e) &&
+                    Has<SolidCollision>(other)
+                     )
                 {
                     destX = position.X;
                     Relate(e, other, new Colliding(CollisionDirection.X, true));
@@ -63,7 +68,10 @@ public class Motion : MoonTools.ECS.System
             if (e != other && Overlaps(new Vector2(position.X, destY), boundingBox, otherPos, otherBox))
             {
 
-                if (!Related<IgnoreSolidCollision>(other, e) && !Related<IgnoreSolidCollision>(e, other))
+                if (!Related<IgnoreSolidCollision>(other, e) &&
+                    !Related<IgnoreSolidCollision>(e, other) &&
+                    Has<SolidCollision>(e) &&
+                    Has<SolidCollision>(other))
                 {
                     destY = position.Y;
                     Relate(e, other, new Colliding(CollisionDirection.Y, true));
@@ -83,7 +91,6 @@ public class Motion : MoonTools.ECS.System
 
         foreach (var entity in MotionFilter.Entities)
         {
-
             var position = Get<Position>(entity).Value;
             var velocity = Get<Velocity>(entity).Value;
             if (Has<HasGravity>(entity))
@@ -103,7 +110,7 @@ public class Motion : MoonTools.ECS.System
                 continue;
             }
 
-            if (Has<BoundingBox>(entity) && Has<SolidCollision>(entity))
+            if (Has<BoundingBox>(entity))
             {
                 dest = Sweep(entity, position, velocity * dt, Get<BoundingBox>(entity));
             }

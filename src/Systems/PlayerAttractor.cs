@@ -22,13 +22,16 @@ public class PlayerAttractor : MoonTools.ECS.System
 
         foreach (var entity in PlayerAttractionFilter.Entities)
         {
+            if (HasOutRelation<DontMoveTowardsPlayer>(entity))
+                continue;
+
             var pos = Get<Position>(entity).Value;
             var vel = Get<Velocity>(entity).Value;
-            var speed = Get<MoveTowardsPlayer>(entity).Speed;
+            var speed = Get<MoveTowardsPlayer>(entity).Acceleration;
 
-            vel += Vector2.Normalize(playerPosition - pos) * speed * 0.1f;
+            var dir = playerPosition - pos;
 
-            vel = Vector2.Normalize(vel) * MathF.Min(vel.Length(), speed);
+            vel = Vector2.Normalize(dir) * speed;
 
             Set(entity, new Velocity(vel));
         }

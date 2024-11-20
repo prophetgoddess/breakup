@@ -38,20 +38,18 @@ public class Collision : MoonTools.ECS.System
 
     void HandleGems(Entity entity, Entity other)
     {
-        bool fill = Has<FillMeter>(entity);
-        bool player = Has<Player>(other);
-
-        System.Console.WriteLine($"{fill}, {player}");
+        bool fill = Has<FillMeter>(other);
+        bool player = Has<Player>(entity);
 
         if (fill && player)
         {
             var meterEntity = GetSingletonEntity<Meter>();
             var meter = Get<Meter>(meterEntity);
             var value = meter.Value;
-            value += Get<FillMeter>(entity).Amount;
+            value += Get<FillMeter>(other).Amount;
 
             Set(meterEntity, new Meter(value, meter.Decay, meter.Scale));
-            Destroy(entity);
+            Destroy(other);
         }
     }
 
@@ -80,7 +78,7 @@ public class Collision : MoonTools.ECS.System
                 newVelocity = new Vector2(-velocity.X, -velocity.Y) * 0.8f;
 
             var otherPos = Get<Position>(other).Value;
-            if (yCollision && !Has<CanTakeDamageFromBall>(other) && position.Y < otherPos.Y && velocity.Length() < 0.1f)
+            if (position.Y < otherPos.Y)
             {
                 newVelocity.Y += Rando.Range(-100f, 0f);
                 newVelocity.X += Rando.Range(-50f, 50f);

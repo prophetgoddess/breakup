@@ -12,3 +12,6 @@ public readonly record struct IgnoreSolidCollision();
 public readonly record struct NextLife();
 public readonly record struct HeldBy(Vector2 offset);
 public readonly record struct ChildOf(Vector2 offset);
+public readonly record struct DontMoveTowardsPlayer();
+public readonly record struct LockMeter();
+public readonly record struct FlickerTimer();

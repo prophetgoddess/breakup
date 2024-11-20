@@ -18,7 +18,6 @@ public class Time : MoonTools.ECS.System
     {
         foreach (var entity in TimerFilter.Entities)
         {
-
             var timer = Get<Timer>(entity);
             var time = timer.Time - (float)delta.TotalSeconds;
 

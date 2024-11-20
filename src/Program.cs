@@ -32,8 +32,10 @@ class Program : Game
             new Input(World, Inputs),
             new GameState(World),
             new Time(World),
+            new Flickering(World),
             new PlayerController(World),
             new PlayerAttractor(World),
+            new Rotation(World),
             new Motion(World),
             new Collision(World),
             new FollowCamera(World),
@@ -71,6 +73,9 @@ class Program : Game
             24,
             Stores.TextStorage.GetID("")));
         World.Set(highScoreEntity, new UI());
+        World.Set(highScoreEntity, new Highlight());
+
+        World.Set(World.CreateEntity(), Palettes.DefaultLight);
 
     }
 

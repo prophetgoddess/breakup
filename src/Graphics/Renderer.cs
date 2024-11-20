@@ -79,9 +79,9 @@ public class Renderer : MoonTools.ECS.Renderer
 
         CreateRenderTextures();
 
-        ModelFilter = FilterBuilder.Include<Model>().Include<Position>().Exclude<UI>().Build();
-        UIFilter = FilterBuilder.Include<Model>().Include<Position>().Include<UI>().Build();
-        TextFilter = FilterBuilder.Include<Text>().Include<Position>().Include<UI>().Build();
+        ModelFilter = FilterBuilder.Include<Model>().Include<Position>().Exclude<UI>().Exclude<Invisible>().Build();
+        UIFilter = FilterBuilder.Include<Model>().Include<Position>().Include<UI>().Exclude<Invisible>().Build();
+        TextFilter = FilterBuilder.Include<Text>().Include<Position>().Include<UI>().Exclude<Invisible>().Build();
         ColliderFilter = FilterBuilder.Include<Position>().Include<BoundingBox>().Build();
 
         Shader vertShader = Shader.Create(
@@ -145,7 +145,7 @@ public class Renderer : MoonTools.ECS.Renderer
                     new ColorTargetDescription
                     {
                         Format = Window.SwapchainFormat,
-                        BlendState = ColorTargetBlendState.NonPremultipliedAlphaBlend
+                        BlendState = ColorTargetBlendState.PremultipliedAlphaBlend
                     }
                 ]
             }
@@ -176,8 +176,6 @@ public class Renderer : MoonTools.ECS.Renderer
         );
         resourceUploader.Upload();
         resourceUploader.Dispose();
-
-
     }
 
     public void Draw(CommandBuffer cmdbuf, Texture renderTexture)
@@ -190,6 +188,8 @@ public class Renderer : MoonTools.ECS.Renderer
 
         if (renderTexture == null)
             return;
+
+        var palette = GetSingleton<Palette>();
 
         var cameraPos = GetSingleton<CameraPosition>().Y;
 
@@ -204,7 +204,7 @@ public class Renderer : MoonTools.ECS.Renderer
         );
 
         var gamePass = cmdbuf.BeginRenderPass(
-            new ColorTargetInfo(GameTexture, Color.GhostWhite)
+            new ColorTargetInfo(GameTexture, palette.Background)
         );
 
         gamePass.BindGraphicsPipeline(RenderPipeline);
@@ -215,9 +215,10 @@ public class Renderer : MoonTools.ECS.Renderer
             var rotation = Has<Orientation>(entity) ? Get<Orientation>(entity).Value : 0.0f;
             var mesh = Content.Models.IDToModel[Get<Model>(entity).ID];
             var scale = Has<Scale>(entity) ? Get<Scale>(entity).Value : Vector2.One;
+            var color = Has<Highlight>(entity) ? palette.Highlight : palette.Foreground;
 
             Matrix4x4 model = Matrix4x4.CreateScale(new Vector3(scale.X, scale.Y, 0)) * Matrix4x4.CreateFromAxisAngle(Vector3.UnitZ, rotation) * Matrix4x4.CreateTranslation(new Vector3(position, 0)) * cameraMatrix;
-            var uniforms = new TransformVertexUniform(model, Color.DarkGray);
+            var uniforms = new TransformVertexUniform(model, color);
 
             gamePass.BindVertexBuffer(mesh.VertexBuffer);
             gamePass.BindIndexBuffer(mesh.IndexBuffer, IndexElementSize.ThirtyTwo);
@@ -256,7 +257,7 @@ public class Renderer : MoonTools.ECS.Renderer
                 H = GameTexture.Height
             },
             LoadOp = LoadOp.Clear,
-            ClearColor = Color.GhostWhite,
+            ClearColor = palette.Background,
             FlipMode = FlipMode.None,
             Filter = MoonWorks.Graphics.Filter.Linear,
             Cycle = true
@@ -283,9 +284,10 @@ public class Renderer : MoonTools.ECS.Renderer
             var rotation = Has<Orientation>(entity) ? Get<Orientation>(entity).Value : 0.0f;
             var mesh = Content.Models.IDToModel[Get<Model>(entity).ID];
             var scale = Has<Scale>(entity) ? Get<Scale>(entity).Value : Vector2.One;
+            var color = Has<Highlight>(entity) ? palette.Highlight : palette.Foreground;
 
             Matrix4x4 model = Matrix4x4.CreateScale(new Vector3(scale.X, scale.Y, 0f)) * Matrix4x4.CreateFromAxisAngle(Vector3.UnitZ, rotation) * Matrix4x4.CreateTranslation(new Vector3(position, 0)) * uiCameraMatrix;
-            var uniforms = new TransformVertexUniform(model, Color.DarkGray);
+            var uniforms = new TransformVertexUniform(model, color);
 
             uiPass.BindGraphicsPipeline(RenderPipeline);
             uiPass.BindVertexBuffer(mesh.VertexBuffer);
@@ -302,9 +304,10 @@ public class Renderer : MoonTools.ECS.Renderer
             var textBatch = GetTextBatch();
             var text = Get<Text>(textEntity);
             var position = Get<Position>(textEntity).Value;
+            var color = Has<Highlight>(textEntity) ? palette.Highlight : palette.Foreground;
 
             textBatch.Start(Stores.FontStorage.Get(text.FontID));
-            textBatch.Add(Stores.TextStorage.Get(text.TextID), text.Size, Color.DarkGray, text.HorizontalAlignment, text.VerticalAlignment);
+            textBatch.Add(Stores.TextStorage.Get(text.TextID), text.Size, color, text.HorizontalAlignment, text.VerticalAlignment);
             textBatch.UploadBufferData(cmdbuf);
 
             var textModel = Matrix4x4.CreateTranslation(position.X, position.Y, 0f);
