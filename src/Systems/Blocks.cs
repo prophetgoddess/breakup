@@ -1,3 +1,4 @@
+using System.Drawing;
 using System.Numerics;
 using MoonTools.ECS;
 using MoonWorks.Math;
@@ -21,30 +22,43 @@ public class Blocks : MoonTools.ECS.System
         GemSpawner = new GemSpawner(world);
 
         BlockFilter = FilterBuilder
-        .Include<CanDamagePaddle>()
+        .Include<Block>()
         .Build();
     }
 
     void SpawnBlock(int x, int y)
     {
+        var hp = Rando.IntInclusive(1, 4);
+
         var block = CreateEntity();
         Set(block, new Scale(Vector2.One * 1.9f));
         Set(block, new Position(new Vector2(CellSize * 0.5f + x * CellSize, CellSize * 0.5f + y * CellSize)));
         Set(block, new BoundingBox(0, 0, 32, 32));
         Set(block, new SolidCollision());
+        Set(block, new Block(hp));
         Set(block, new DestroyOnRestartGame());
-        Set(block, new CanDamagePaddle());
 
-        if (Random.NextDouble() < 0.66f)
+
+        if (Rando.Value < 0.75f)
         {
+            Set(block, new HitPoints(hp, hp));
             Set(block, new Model(Content.Models.EmptySquare.ID));
+
             Set(block, new CanTakeDamageFromBall());
-            Set(block, new HitPoints(1));
+            var hpDisplay = CreateEntity();
+            //Set(hpDisplay, new Scale(Vector2.One));
+            Set(hpDisplay, new Position(new Vector2(CellSize * 0.5f + x * CellSize, CellSize * 0.5f + y * CellSize)));
+            Set(hpDisplay, new DestroyOnRestartGame());
+            //Set(hpDisplay, new Model(Content.Models.Square.ID));
+            Relate(block, hpDisplay, new HPDisplay());
+            Set(hpDisplay, new Text(Fonts.BodyFont, Fonts.InfoSize, Stores.TextStorage.GetID($"{hp}"), MoonWorks.Graphics.Font.HorizontalAlignment.Center, MoonWorks.Graphics.Font.VerticalAlignment.Middle));
+
         }
         else
         {
             Set(block, new Model(Content.Models.Square.ID));
         }
+
 
     }
 
@@ -92,14 +106,20 @@ public class Blocks : MoonTools.ECS.System
 
         foreach (var block in BlockFilter.Entities)
         {
+
             if (Has<HitPoints>(block))
             {
-                var hp = Get<HitPoints>(block).Value;
+                var hp = Get<HitPoints>(block);
+                var hpDisplay = OutRelationSingleton<HPDisplay>(block);
 
-                if (hp <= 0)
+                //Set(hpDisplay, new Scale(Vector2.One * (hp.Value / (float)hp.Max)));
+                Set(hpDisplay, new Text(Fonts.BodyFont, Fonts.InfoSize, Stores.TextStorage.GetID($"{hp.Value}"), MoonWorks.Graphics.Font.HorizontalAlignment.Center, MoonWorks.Graphics.Font.VerticalAlignment.Middle));
+
+                if (hp.Value <= 0)
                 {
-
-                    GemSpawner.SpawnGems(Get<Position>(block).Value);
+                    var reward = Get<Block>(block).GemReward;
+                    GemSpawner.SpawnGems(Rando.IntInclusive(reward, reward * 2), Get<Position>(block).Value);
+                    Destroy(hpDisplay);
                     Destroy(block);
                     continue;
                 }
@@ -109,6 +129,10 @@ public class Blocks : MoonTools.ECS.System
 
             if (position.Y > -cam.Y + (Dimensions.GameHeight * 0.7))
             {
+                if (HasOutRelation<HPDisplay>(block))
+                {
+                    Destroy(OutRelationSingleton<HPDisplay>(block));
+                }
                 Destroy(block);
                 continue;
             }

@@ -21,11 +21,12 @@ public static class Fonts
 
     public const int HeaderSize = 52;
     public const int BodySize = 32;
+    public const int InfoSize = 16;
 }
 
 public static class UILayoutConstants
 {
-    public const int LivesX = 150;
+    public const int LivesX = 120;
     public const int LivesY = 130;
     public const int LivesSpacing = 100;
     public const int InfoX = Dimensions.WindowWidth - 340;

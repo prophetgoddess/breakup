@@ -21,6 +21,7 @@ public class Renderer : MoonTools.ECS.Renderer
     MoonTools.ECS.Filter ModelFilter;
     MoonTools.ECS.Filter UIFilter;
     MoonTools.ECS.Filter TextFilter;
+    MoonTools.ECS.Filter GameTextFilter;
     MoonTools.ECS.Filter ColliderFilter;
 
     Queue<TextBatch> TextBatchPool;
@@ -82,6 +83,7 @@ public class Renderer : MoonTools.ECS.Renderer
         ModelFilter = FilterBuilder.Include<Model>().Include<Position>().Exclude<UI>().Exclude<Invisible>().Build();
         UIFilter = FilterBuilder.Include<Model>().Include<Position>().Include<UI>().Exclude<Invisible>().Build();
         TextFilter = FilterBuilder.Include<Text>().Include<Position>().Include<UI>().Exclude<Invisible>().Build();
+        GameTextFilter = FilterBuilder.Include<Text>().Include<Position>().Exclude<UI>().Exclude<Invisible>().Build();
         ColliderFilter = FilterBuilder.Include<Position>().Include<BoundingBox>().Build();
 
         Shader vertShader = ShaderCross.Create(
@@ -219,7 +221,6 @@ public class Renderer : MoonTools.ECS.Renderer
             gamePass.DrawIndexedPrimitives(mesh.TriangleCount * 3, 1, 0, 0, 0);
 
         }
-
         if (Inputs.Keyboard.IsHeld(KeyCode.D1))
         {
             foreach (var entity in ColliderFilter.Entities)
@@ -238,6 +239,29 @@ public class Renderer : MoonTools.ECS.Renderer
         }
 
         cmdbuf.EndRenderPass(gamePass);
+
+        foreach (var textEntity in GameTextFilter.Entities)
+        {
+            var textBatch = GetTextBatch();
+            var text = Get<Text>(textEntity);
+            var position = Get<Position>(textEntity).Value;
+            var color = Has<Highlight>(textEntity) ? palette.Highlight : palette.Foreground;
+
+            textBatch.Start(Stores.FontStorage.Get(text.FontID));
+            textBatch.Add(Stores.TextStorage.Get(text.TextID), text.Size, color, text.HorizontalAlignment, text.VerticalAlignment);
+            textBatch.UploadBufferData(cmdbuf);
+
+            var textModel = Matrix4x4.CreateTranslation(position.X, position.Y, 0f);
+
+            var textPass = cmdbuf.BeginRenderPass(
+                new ColorTargetInfo(GameTexture, LoadOp.Load)
+            );
+            textPass.BindGraphicsPipeline(TextPipeline);
+            textBatch.Render(cmdbuf, textPass, textModel * cameraMatrix);
+            cmdbuf.EndRenderPass(textPass);
+
+            TextBatchPool.Enqueue(textBatch);
+        }
 
         cmdbuf.Blit(new BlitInfo
         {
@@ -308,7 +332,7 @@ public class Renderer : MoonTools.ECS.Renderer
             var textPass = cmdbuf.BeginRenderPass(
                 new ColorTargetInfo(UITexture, LoadOp.Load)
             );
-            uiPass.BindGraphicsPipeline(TextPipeline);
+            textPass.BindGraphicsPipeline(TextPipeline);
             textBatch.Render(cmdbuf, textPass, textModel * uiCameraMatrix);
             cmdbuf.EndRenderPass(textPass);
 

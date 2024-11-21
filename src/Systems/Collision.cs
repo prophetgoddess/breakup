@@ -68,8 +68,8 @@ public class Collision : MoonTools.ECS.System
         {
             if (Has<CanTakeDamageFromBall>(other) && Has<HitPoints>(other))
             {
-                var hitPoints = Get<HitPoints>(other).Value;
-                Set(other, new HitPoints(hitPoints - 1));
+                var hitPoints = Get<HitPoints>(other);
+                Set(other, new HitPoints(hitPoints.Value - 1, hitPoints.Max));
             }
 
             var newVelocity = velocity;

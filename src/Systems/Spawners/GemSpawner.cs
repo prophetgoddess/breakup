@@ -39,10 +39,8 @@ public class GemSpawner : Manipulator
         return entity;
     }
 
-    public void SpawnGems(Vector2 position)
+    public void SpawnGems(int numGems, Vector2 position)
     {
-        int numGems = Rando.IntInclusive(MinGems, MaxGems);
-
         for (var i = 0; i < numGems; i++)
         {
             var gem = SpawnGem();
