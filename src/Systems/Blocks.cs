@@ -21,6 +21,14 @@ public class Blocks : MoonTools.ECS.System
     float MaxBlockDensity = 0.66f;
     float MaxCameraY = 1000000;
 
+    string GetFormattedHP(int amount, int length = 2)
+    {
+        return amount >= 0
+            ? amount.ToString($"D{length}")
+            : amount.ToString($"D{length - 1}");
+    }
+
+
     public Blocks(World world) : base(world)
     {
         GemSpawner = new GemSpawner(world);
@@ -54,7 +62,7 @@ public class Blocks : MoonTools.ECS.System
             Set(hpDisplay, new DestroyOnRestartGame());
             //Set(hpDisplay, new Model(Content.Models.Square.ID));
             Relate(block, hpDisplay, new HPDisplay());
-            Set(hpDisplay, new Text(Fonts.BodyFont, Fonts.InfoSize, Stores.TextStorage.GetID($"{hp}"), MoonWorks.Graphics.Font.HorizontalAlignment.Center, MoonWorks.Graphics.Font.VerticalAlignment.Middle));
+            Set(hpDisplay, new Text(Fonts.BodyFont, Fonts.InfoSize, Stores.TextStorage.GetID($"{GetFormattedHP(hp)}"), MoonWorks.Graphics.Font.HorizontalAlignment.Center, MoonWorks.Graphics.Font.VerticalAlignment.Middle));
 
         }
         else
@@ -116,7 +124,7 @@ public class Blocks : MoonTools.ECS.System
                 var hpDisplay = OutRelationSingleton<HPDisplay>(block);
 
                 //Set(hpDisplay, new Scale(Vector2.One * (hp.Value / (float)hp.Max)));
-                Set(hpDisplay, new Text(Fonts.BodyFont, Fonts.InfoSize, Stores.TextStorage.GetID($"{hp.Value}"), MoonWorks.Graphics.Font.HorizontalAlignment.Center, MoonWorks.Graphics.Font.VerticalAlignment.Middle));
+                Set(hpDisplay, new Text(Fonts.BodyFont, Fonts.InfoSize, Stores.TextStorage.GetID($"{GetFormattedHP(hp.Value)}"), MoonWorks.Graphics.Font.HorizontalAlignment.Center, MoonWorks.Graphics.Font.VerticalAlignment.Middle));
 
                 if (hp.Value <= 0)
                 {

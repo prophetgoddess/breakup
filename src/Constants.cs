@@ -21,7 +21,7 @@ public static class Fonts
 
     public const int HeaderSize = 52;
     public const int BodySize = 32;
-    public const int InfoSize = 16;
+    public const int InfoSize = 10;
 }
 
 public static class UILayoutConstants
