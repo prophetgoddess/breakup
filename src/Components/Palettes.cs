@@ -18,4 +18,10 @@ public static class Palettes
         Color.White,
         Color.LimeGreen
     );
+
+    public static Palette MillenialApartment = new Palette(
+        Color.Azure,
+        new Color(172, 189, 186),
+        new Color(165, 153, 181)
+    );
 }

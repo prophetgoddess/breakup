@@ -5,9 +5,6 @@ using MoonTools.ECS;
 
 public class GemSpawner : Manipulator
 {
-    int MinGems = 5;
-    int MaxGems = 10;
-
     public GemSpawner(World world) : base(world)
     {
     }
@@ -27,7 +24,7 @@ public class GemSpawner : Manipulator
         Set(entity, new Scale(new Vector2(1, 1)));
         Set(entity, new DestroyOnRestartGame());
         Set(entity, new MoveTowardsPlayer(500.0f, 500.0f));
-        Set(entity, new FillMeter(0.025f));
+        Set(entity, new FillMeter(0.033f));
         Set(entity, new Highlight());
         Set(entity, new AngularVelocity(Rando.Range(-5f, 5f)));
         Set(entity, new AddGems(1));

@@ -17,6 +17,10 @@ public class Blocks : MoonTools.ECS.System
     float LastGridOffset = -1.0f;
     GemSpawner GemSpawner;
 
+    float MinBlockDensity = 0.1f;
+    float MaxBlockDensity = 0.66f;
+    float MaxCameraY = 1000000;
+
     public Blocks(World world) : base(world)
     {
         GemSpawner = new GemSpawner(world);
@@ -37,7 +41,6 @@ public class Blocks : MoonTools.ECS.System
         Set(block, new SolidCollision());
         Set(block, new Block(hp));
         Set(block, new DestroyOnRestartGame());
-
 
         if (Rando.Value < 0.75f)
         {
@@ -70,7 +73,7 @@ public class Blocks : MoonTools.ECS.System
         {
             for (int y = -3; y < GridHeight * 0.4f; y++)
             {
-                if (Random.NextDouble() < 0.1f)
+                if (Random.NextDouble() < float.Lerp(MinBlockDensity, MaxBlockDensity, 0f))
                 {
                     SpawnBlock(
                         x,
@@ -96,7 +99,7 @@ public class Blocks : MoonTools.ECS.System
 
             for (int x = 0; x < GridWidth; x++)
             {
-                if (Random.NextDouble() < 0.1f)
+                if (Random.NextDouble() < float.Lerp(MinBlockDensity, MaxBlockDensity, cam.Y / MaxCameraY))
                 {
                     SpawnBlock(x, y);
                 }
