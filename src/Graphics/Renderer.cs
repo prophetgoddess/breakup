@@ -3,8 +3,6 @@ using MoonWorks.Graphics;
 using System.Numerics;
 using Buffer = MoonWorks.Graphics.Buffer;
 using MoonTools.ECS;
-using System.Runtime.InteropServices;
-using System.Net.Mime;
 using MoonWorks.Graphics.Font;
 using MoonWorks.Input;
 
@@ -186,7 +184,10 @@ public class Renderer : MoonTools.ECS.Renderer
 
         var palette = GetSingleton<Palette>();
 
-        var cameraPos = GetSingleton<CameraPosition>().Y;
+        var cameraPos = 0f;
+
+        if (Some<CameraPosition>())
+            cameraPos = GetSingleton<CameraPosition>().Y;
 
         Matrix4x4 cameraMatrix =
         Matrix4x4.CreateOrthographicOffCenter(

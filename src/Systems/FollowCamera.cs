@@ -14,6 +14,9 @@ public class FollowCamera : MoonTools.ECS.System
 
     public override void Update(TimeSpan delta)
     {
+        if (!Some<CameraPosition>() || !Some<CameraFollows>())
+            return;
+
         var camera = GetSingletonEntity<CameraPosition>();
         var offset = Get<CameraPosition>(camera).Y;
         var ball = GetSingletonEntity<CameraFollows>();

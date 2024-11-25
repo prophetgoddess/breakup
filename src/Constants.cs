@@ -19,13 +19,20 @@ public static class Fonts
     public static int HeaderFont = Stores.FontStorage.GetID(Content.Fonts.F500Angular);
     public static int BodyFont = Stores.FontStorage.GetID(Content.Fonts.F5000);
 
+    public const int TitleSize = 72;
     public const int HeaderSize = 52;
+    public const int MidSize = 42;
     public const int BodySize = 32;
+    public const int PromptSize = 22;
     public const int InfoSize = 10;
 }
 
 public static class UILayoutConstants
 {
+    public const int TitleX = (int)(Dimensions.WindowWidth * 0.5f);
+    public const int TitleY = (int)(Dimensions.WindowHeight * 0.33f);
+    public const int PromptX = TitleX;
+    public const int PromptY = (int)(Dimensions.WindowHeight * 0.66f);
     public const int LivesX = 120;
     public const int LivesY = 130;
     public const int LivesSpacing = 100;

@@ -40,7 +40,7 @@ public class Blocks : MoonTools.ECS.System
 
     void SpawnBlock(int x, int y)
     {
-        var hp = Rando.IntInclusive(1, 4);
+        var hp = Rando.IntInclusive(1, 2);
 
         var block = CreateEntity();
         Set(block, new Scale(Vector2.One * 1.9f));
@@ -48,7 +48,7 @@ public class Blocks : MoonTools.ECS.System
         Set(block, new BoundingBox(0, 0, 32, 32));
         Set(block, new SolidCollision());
         Set(block, new Block(hp));
-        Set(block, new DestroyOnRestartGame());
+        Set(block, new DestroyOnStartGame());
 
         if (Rando.Value < 0.75f)
         {
@@ -59,7 +59,7 @@ public class Blocks : MoonTools.ECS.System
             var hpDisplay = CreateEntity();
             //Set(hpDisplay, new Scale(Vector2.One));
             Set(hpDisplay, new Position(new Vector2(CellSize * 0.5f + x * CellSize, CellSize * 0.5f + y * CellSize)));
-            Set(hpDisplay, new DestroyOnRestartGame());
+            Set(hpDisplay, new DestroyOnStartGame());
             //Set(hpDisplay, new Model(Content.Models.Square.ID));
             Relate(block, hpDisplay, new HPDisplay());
             Set(hpDisplay, new Text(Fonts.BodyFont, Fonts.InfoSize, Stores.TextStorage.GetID($"{GetFormattedHP(hp)}"), MoonWorks.Graphics.Font.HorizontalAlignment.Center, MoonWorks.Graphics.Font.VerticalAlignment.Middle));
@@ -94,6 +94,9 @@ public class Blocks : MoonTools.ECS.System
 
     public override void Update(TimeSpan delta)
     {
+        if (!Some<CameraPosition>())
+            return;
+
         if (Some<Initialize>())
             Initialize();
 
@@ -114,16 +117,13 @@ public class Blocks : MoonTools.ECS.System
             }
         }
 
-
         foreach (var block in BlockFilter.Entities)
         {
-
             if (Has<HitPoints>(block))
             {
                 var hp = Get<HitPoints>(block);
                 var hpDisplay = OutRelationSingleton<HPDisplay>(block);
 
-                //Set(hpDisplay, new Scale(Vector2.One * (hp.Value / (float)hp.Max)));
                 Set(hpDisplay, new Text(Fonts.BodyFont, Fonts.InfoSize, Stores.TextStorage.GetID($"{GetFormattedHP(hp.Value)}"), MoonWorks.Graphics.Font.HorizontalAlignment.Center, MoonWorks.Graphics.Font.VerticalAlignment.Middle));
 
                 if (hp.Value <= 0)

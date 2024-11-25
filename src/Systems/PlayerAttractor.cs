@@ -17,7 +17,11 @@ public class PlayerAttractor : MoonTools.ECS.System
 
     public override void Update(TimeSpan delta)
     {
+        if (!Some<Player>())
+            return;
+
         var player = GetSingletonEntity<Player>();
+
         var playerPosition = Get<Position>(player).Value;
 
         foreach (var entity in PlayerAttractionFilter.Entities)

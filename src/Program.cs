@@ -46,54 +46,6 @@ class Program : Game
 
         Renderer = new Renderer(World, MainWindow, GraphicsDevice, Inputs);
 
-
-        var livesLabel = World.CreateEntity();
-        World.Set(livesLabel, new Position(new Vector2(10, UILayoutConstants.ScoreLabelY)));
-        World.Set(livesLabel,
-         new Text(
-            Fonts.HeaderFont,
-            Fonts.HeaderSize,
-            Stores.TextStorage.GetID("LIVES")));
-        World.Set(livesLabel, new UI());
-
-        var scoreLabel = World.CreateEntity();
-        World.Set(scoreLabel, new Position(new Vector2(UILayoutConstants.InfoX, UILayoutConstants.ScoreLabelY)));
-        World.Set(scoreLabel,
-         new Text(
-            Fonts.HeaderFont,
-            Fonts.HeaderSize,
-            Stores.TextStorage.GetID("SCORE")));
-        World.Set(scoreLabel, new UI());
-
-        var highScoreLabel = World.CreateEntity();
-        World.Set(highScoreLabel, new Position(new Vector2(UILayoutConstants.InfoX, UILayoutConstants.HighScoreLabelY)));
-        World.Set(highScoreLabel,
-         new Text(
-            Fonts.HeaderFont,
-            Fonts.HeaderSize,
-            Stores.TextStorage.GetID("BEST")));
-        World.Set(highScoreLabel, new UI());
-
-        var highScoreEntity = World.CreateEntity();
-        World.Set(highScoreEntity, new HighScore(0));
-        World.Set(highScoreEntity, new Position(new Vector2(UILayoutConstants.InfoX, UILayoutConstants.HighScoreY)));
-        World.Set(highScoreEntity,
-         new Text(
-            Fonts.BodyFont,
-            Fonts.BodySize,
-            Stores.TextStorage.GetID("")));
-        World.Set(highScoreEntity, new UI());
-        World.Set(highScoreEntity, new Highlight());
-
-        var gemsLabel = World.CreateEntity();
-        World.Set(gemsLabel, new Position(new Vector2(UILayoutConstants.InfoX, UILayoutConstants.GemsLabelY)));
-        World.Set(gemsLabel,
-         new Text(
-            Fonts.HeaderFont,
-            Fonts.HeaderSize,
-            Stores.TextStorage.GetID("GEMS")));
-        World.Set(gemsLabel, new UI());
-
         World.Set(World.CreateEntity(), Palettes.DefaultLight);
 
     }
