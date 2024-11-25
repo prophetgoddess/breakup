@@ -8,8 +8,11 @@ using MoonWorks.Input;
 
 namespace Ball;
 
+readonly record struct DepthUniforms(float ZNear, float ZFar);
+
 public class Renderer : MoonTools.ECS.Renderer
 {
+
     Window Window;
     GraphicsDevice GraphicsDevice;
     Inputs Inputs;
@@ -23,10 +26,16 @@ public class Renderer : MoonTools.ECS.Renderer
     MoonTools.ECS.Filter ColliderFilter;
 
     Queue<TextBatch> TextBatchPool;
+    Queue<(Entity, TextBatch)> GameTextBatchesToRender = new Queue<(Entity, TextBatch)>();
+    Queue<(Entity, TextBatch)> UITextBatchesToRender = new Queue<(Entity, TextBatch)>();
     GraphicsPipeline TextPipeline;
 
     Texture GameTexture;
     Texture UITexture;
+    Texture DepthTexture;
+    Texture UIDepthTexture;
+    Sampler DepthSampler;
+    DepthUniforms DepthUniforms;
 
     public Buffer RectIndexBuffer;
     public Buffer RectVertexBuffer;
@@ -46,11 +55,35 @@ public class Renderer : MoonTools.ECS.Renderer
             NumLevels = 1
         });
 
+        DepthTexture = Texture.Create(GraphicsDevice, new TextureCreateInfo
+        {
+            Type = TextureType.TwoDimensional,
+            Format = TextureFormat.D16Unorm,
+            Usage = TextureUsageFlags.DepthStencilTarget | TextureUsageFlags.Sampler,
+            Height = Window.Height,
+            Width = (uint)(Window.Height * Dimensions.GameAspectRatio),
+            SampleCount = SampleCount.One,
+            LayerCountOrDepth = 1,
+            NumLevels = 1
+        });
+
         UITexture = Texture.Create(GraphicsDevice, new TextureCreateInfo
         {
             Type = TextureType.TwoDimensional,
             Format = Window.SwapchainFormat,
             Usage = TextureUsageFlags.ColorTarget | TextureUsageFlags.Sampler,
+            Height = Window.Height,
+            Width = (uint)(Window.Height * Dimensions.WindowAspectRatio),
+            SampleCount = SampleCount.One,
+            LayerCountOrDepth = 1,
+            NumLevels = 1
+        });
+
+        UIDepthTexture = Texture.Create(GraphicsDevice, new TextureCreateInfo
+        {
+            Type = TextureType.TwoDimensional,
+            Format = TextureFormat.D16Unorm,
+            Usage = TextureUsageFlags.DepthStencilTarget | TextureUsageFlags.Sampler,
             Height = Window.Height,
             Width = (uint)(Window.Height * Dimensions.WindowAspectRatio),
             SampleCount = SampleCount.One,
@@ -77,6 +110,9 @@ public class Renderer : MoonTools.ECS.Renderer
         TextBatchPool = new Queue<TextBatch>();
 
         CreateRenderTextures();
+
+        DepthSampler = Sampler.Create(GraphicsDevice, new SamplerCreateInfo());
+        DepthUniforms = new DepthUniforms(0.01f, 100f);
 
         ModelFilter = FilterBuilder.Include<Model>().Include<Position>().Exclude<UI>().Exclude<Invisible>().Build();
         UIFilter = FilterBuilder.Include<Model>().Include<Position>().Include<UI>().Exclude<Invisible>().Build();
@@ -105,14 +141,21 @@ public class Renderer : MoonTools.ECS.Renderer
             TargetInfo = new GraphicsPipelineTargetInfo
             {
                 ColorTargetDescriptions = [
-                    new ColorTargetDescription
-                    {
-                        Format = Window.SwapchainFormat,
-                        BlendState = ColorTargetBlendState.NonPremultipliedAlphaBlend
-                    }
-                ]
+                        new ColorTargetDescription
+                        {
+                            Format = Window.SwapchainFormat,
+                            BlendState = ColorTargetBlendState.NonPremultipliedAlphaBlend
+                        }
+                    ],
+                HasDepthStencilTarget = true,
+                DepthStencilFormat = TextureFormat.D16Unorm
             },
-            DepthStencilState = DepthStencilState.Disable,
+            DepthStencilState = new DepthStencilState
+            {
+                EnableDepthTest = true,
+                EnableDepthWrite = true,
+                CompareOp = CompareOp.LessOrEqual
+            },
             MultisampleState = MultisampleState.None,
             PrimitiveType = PrimitiveType.TriangleList,
             RasterizerState = RasterizerState.CCW_CullNone,
@@ -131,17 +174,24 @@ public class Renderer : MoonTools.ECS.Renderer
             PrimitiveType = PrimitiveType.TriangleList,
             RasterizerState = RasterizerState.CCW_CullNone,
             MultisampleState = MultisampleState.None,
-            DepthStencilState = DepthStencilState.Disable,
             TargetInfo = new GraphicsPipelineTargetInfo
             {
                 ColorTargetDescriptions = [
-                    new ColorTargetDescription
-                    {
-                        Format = Window.SwapchainFormat,
-                        BlendState = ColorTargetBlendState.PremultipliedAlphaBlend
-                    }
-                ]
-            }
+                        new ColorTargetDescription
+                        {
+                            Format = Window.SwapchainFormat,
+                            BlendState = ColorTargetBlendState.PremultipliedAlphaBlend
+                        }
+                    ],
+                HasDepthStencilTarget = true,
+                DepthStencilFormat = TextureFormat.D16Unorm
+            },
+            DepthStencilState = new DepthStencilState
+            {
+                EnableDepthTest = true,
+                EnableDepthWrite = true,
+                CompareOp = CompareOp.LessOrEqual
+            },
         };
 
         TextPipeline = GraphicsPipeline.Create(GraphicsDevice, textPipelineCreateInfo);
@@ -199,7 +249,34 @@ public class Renderer : MoonTools.ECS.Renderer
             -1f
         );
 
+        foreach (var textEntity in GameTextFilter.Entities)
+        {
+            var textBatch = GetTextBatch();
+            var text = Get<Text>(textEntity);
+            var color = Has<Highlight>(textEntity) ? palette.Highlight : palette.Foreground;
+
+            textBatch.Start(Stores.FontStorage.Get(text.FontID));
+            textBatch.Add(Stores.TextStorage.Get(text.TextID), text.Size, color, text.HorizontalAlignment, text.VerticalAlignment);
+            textBatch.UploadBufferData(cmdbuf);
+
+            GameTextBatchesToRender.Enqueue((textEntity, textBatch));
+        }
+
+        foreach (var textEntity in TextFilter.Entities)
+        {
+            var textBatch = GetTextBatch();
+            var text = Get<Text>(textEntity);
+            var color = Has<Highlight>(textEntity) ? palette.Highlight : palette.Foreground;
+
+            textBatch.Start(Stores.FontStorage.Get(text.FontID));
+            textBatch.Add(Stores.TextStorage.Get(text.TextID), text.Size, color, text.HorizontalAlignment, text.VerticalAlignment);
+            textBatch.UploadBufferData(cmdbuf);
+
+            UITextBatchesToRender.Enqueue((textEntity, textBatch));
+        }
+
         var gamePass = cmdbuf.BeginRenderPass(
+            new DepthStencilTargetInfo(DepthTexture, 1f, true),
             new ColorTargetInfo(GameTexture, palette.Background)
         );
 
@@ -212,8 +289,9 @@ public class Renderer : MoonTools.ECS.Renderer
             var mesh = Content.Models.IDToModel[Get<Model>(entity).ID];
             var scale = Has<Scale>(entity) ? Get<Scale>(entity).Value : Vector2.One;
             var color = Has<Highlight>(entity) ? palette.Highlight : palette.Foreground;
+            var depth = Has<Depth>(entity) ? Get<Depth>(entity).Value : 0.5f;
 
-            Matrix4x4 model = Matrix4x4.CreateScale(new Vector3(scale.X, scale.Y, 0)) * Matrix4x4.CreateFromAxisAngle(Vector3.UnitZ, rotation) * Matrix4x4.CreateTranslation(new Vector3(position, 0)) * cameraMatrix;
+            Matrix4x4 model = Matrix4x4.CreateScale(new Vector3(scale.X, scale.Y, 0f)) * Matrix4x4.CreateFromAxisAngle(Vector3.UnitZ, rotation) * Matrix4x4.CreateTranslation(new Vector3(position, depth)) * cameraMatrix;
             var uniforms = new TransformVertexUniform(model, color);
 
             gamePass.BindVertexBuffers(mesh.VertexBuffer);
@@ -222,6 +300,7 @@ public class Renderer : MoonTools.ECS.Renderer
             gamePass.DrawIndexedPrimitives(mesh.TriangleCount * 3, 1, 0, 0, 0);
 
         }
+
         if (Inputs.Keyboard.IsHeld(KeyCode.D1))
         {
             foreach (var entity in ColliderFilter.Entities)
@@ -239,30 +318,21 @@ public class Renderer : MoonTools.ECS.Renderer
             }
         }
 
-        cmdbuf.EndRenderPass(gamePass);
+        gamePass.BindGraphicsPipeline(TextPipeline);
 
-        foreach (var textEntity in GameTextFilter.Entities)
+        while (GameTextBatchesToRender.Count > 0)
         {
-            var textBatch = GetTextBatch();
-            var text = Get<Text>(textEntity);
+            var (textEntity, textBatch) = GameTextBatchesToRender.Dequeue();
             var position = Get<Position>(textEntity).Value;
-            var color = Has<Highlight>(textEntity) ? palette.Highlight : palette.Foreground;
+            var depth = Has<Depth>(textEntity) ? Get<Depth>(textEntity).Value : 0.5f;
 
-            textBatch.Start(Stores.FontStorage.Get(text.FontID));
-            textBatch.Add(Stores.TextStorage.Get(text.TextID), text.Size, color, text.HorizontalAlignment, text.VerticalAlignment);
-            textBatch.UploadBufferData(cmdbuf);
+            var textModel = Matrix4x4.CreateTranslation(position.X, position.Y, depth);
 
-            var textModel = Matrix4x4.CreateTranslation(position.X, position.Y, 0f);
-
-            var textPass = cmdbuf.BeginRenderPass(
-                new ColorTargetInfo(GameTexture, LoadOp.Load)
-            );
-            textPass.BindGraphicsPipeline(TextPipeline);
-            textBatch.Render(cmdbuf, textPass, textModel * cameraMatrix);
-            cmdbuf.EndRenderPass(textPass);
-
+            textBatch.Render(cmdbuf, gamePass, textModel * cameraMatrix);
             TextBatchPool.Enqueue(textBatch);
         }
+
+        cmdbuf.EndRenderPass(gamePass);
 
         cmdbuf.Blit(new BlitInfo
         {
@@ -283,8 +353,11 @@ public class Renderer : MoonTools.ECS.Renderer
 
 
         var uiPass = cmdbuf.BeginRenderPass(
+            new DepthStencilTargetInfo(UIDepthTexture, 1f, true),
             new ColorTargetInfo(UITexture, LoadOp.Load)
         );
+
+        gamePass.BindGraphicsPipeline(RenderPipeline);
 
         Matrix4x4 uiCameraMatrix =
         Matrix4x4.CreateOrthographicOffCenter(
@@ -295,6 +368,8 @@ public class Renderer : MoonTools.ECS.Renderer
             0,
             -1f
         );
+
+        uiPass.BindGraphicsPipeline(RenderPipeline);
 
         foreach (var entity in UIFilter.Entities)
         {
@@ -307,38 +382,27 @@ public class Renderer : MoonTools.ECS.Renderer
             Matrix4x4 model = Matrix4x4.CreateScale(new Vector3(scale.X, scale.Y, 0f)) * Matrix4x4.CreateFromAxisAngle(Vector3.UnitZ, rotation) * Matrix4x4.CreateTranslation(new Vector3(position, 0)) * uiCameraMatrix;
             var uniforms = new TransformVertexUniform(model, color);
 
-            uiPass.BindGraphicsPipeline(RenderPipeline);
             uiPass.BindVertexBuffers(mesh.VertexBuffer);
             uiPass.BindIndexBuffer(mesh.IndexBuffer, IndexElementSize.ThirtyTwo);
             cmdbuf.PushVertexUniformData(uniforms);
             uiPass.DrawIndexedPrimitives(mesh.TriangleCount * 3, 1, 0, 0, 0);
+        }
 
+        uiPass.BindGraphicsPipeline(TextPipeline);
+
+        while (UITextBatchesToRender.Count > 0)
+        {
+            var (textEntity, textBatch) = UITextBatchesToRender.Dequeue();
+            var position = Get<Position>(textEntity).Value;
+            var depth = Has<Depth>(textEntity) ? Get<Depth>(textEntity).Value : 0.5f;
+
+            var textModel = Matrix4x4.CreateTranslation(position.X, position.Y, depth);
+
+            textBatch.Render(cmdbuf, uiPass, textModel * uiCameraMatrix);
+            TextBatchPool.Enqueue(textBatch);
         }
 
         cmdbuf.EndRenderPass(uiPass);
-
-        foreach (var textEntity in TextFilter.Entities)
-        {
-            var textBatch = GetTextBatch();
-            var text = Get<Text>(textEntity);
-            var position = Get<Position>(textEntity).Value;
-            var color = Has<Highlight>(textEntity) ? palette.Highlight : palette.Foreground;
-
-            textBatch.Start(Stores.FontStorage.Get(text.FontID));
-            textBatch.Add(Stores.TextStorage.Get(text.TextID), text.Size, color, text.HorizontalAlignment, text.VerticalAlignment);
-            textBatch.UploadBufferData(cmdbuf);
-
-            var textModel = Matrix4x4.CreateTranslation(position.X, position.Y, 0f);
-
-            var textPass = cmdbuf.BeginRenderPass(
-                new ColorTargetInfo(UITexture, LoadOp.Load)
-            );
-            textPass.BindGraphicsPipeline(TextPipeline);
-            textBatch.Render(cmdbuf, textPass, textModel * uiCameraMatrix);
-            cmdbuf.EndRenderPass(textPass);
-
-            TextBatchPool.Enqueue(textBatch);
-        }
 
         cmdbuf.Blit(new BlitInfo
         {

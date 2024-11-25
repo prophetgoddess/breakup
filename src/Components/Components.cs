@@ -23,6 +23,7 @@ public readonly record struct CameraFollows();
 public readonly record struct UI();
 public readonly record struct DestroyOnStartGame();
 public readonly record struct MainMenu();
+public readonly record struct Depth(float Value);
 public readonly record struct Life();
 public readonly record struct FirstLife();
 public readonly record struct HitPoints(int Value, int Max);
