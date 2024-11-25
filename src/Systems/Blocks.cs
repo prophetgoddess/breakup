@@ -42,6 +42,11 @@ public class Blocks : MoonTools.ECS.System
     {
         var hp = Rando.IntInclusive(1, 2);
 
+        if (Rando.Value > 0.9f)
+        {
+            hp = Rando.IntInclusive(2, 4);
+        }
+
         var block = CreateEntity();
         Set(block, new Scale(Vector2.One * 1.9f));
         Set(block, new Position(new Vector2(CellSize * 0.5f + x * CellSize, CellSize * 0.5f + y * CellSize)));

@@ -24,7 +24,7 @@ public class GemSpawner : Manipulator
         Set(entity, new Scale(new Vector2(1, 1)));
         Set(entity, new DestroyOnStartGame());
         Set(entity, new MoveTowardsPlayer(500.0f, 500.0f));
-        Set(entity, new FillMeter(0.066f));
+        Set(entity, new FillMeter(0.05f));
         Set(entity, new Highlight());
         Set(entity, new AngularVelocity(Rando.Range(-5f, 5f)));
         Set(entity, new AddGems(1));

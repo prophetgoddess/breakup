@@ -256,16 +256,11 @@ public class GameState : MoonTools.ECS.System
             MainMenu();
         }
 
-        if (Some<DestroyOnStartGame>() && inputState.Restart.IsPressed)
+        if ((Some<DestroyOnStartGame>() && inputState.Restart.IsPressed) ||
+            (Some<MainMenu>() && inputState.Start.IsPressed))
         {
             StartGame();
         }
-
-        if (Some<MainMenu>() && inputState.Start.IsPressed)
-        {
-            StartGame();
-        }
-
 
         if (!Some<Gems>())
             return;
