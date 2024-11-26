@@ -7,11 +7,13 @@ public class GameState : MoonTools.ECS.System
 {
 
     Filter DestroyFilter;
+    Filter HideFilter;
     Filter LivesFilter;
 
     public GameState(World world) : base(world)
     {
         DestroyFilter = FilterBuilder.Include<DestroyOnStartGame>().Build();
+        HideFilter = FilterBuilder.Include<HideOnMainMenu>().Build();
         LivesFilter = FilterBuilder.Include<Life>().Build();
     }
 
@@ -20,6 +22,11 @@ public class GameState : MoonTools.ECS.System
         foreach (var entity in DestroyFilter.Entities)
         {
             Destroy(entity);
+        }
+
+        foreach (var entity in HideFilter.Entities)
+        {
+            Remove<Invisible>(entity);
         }
 
         Set(CreateEntity(), new Initialize());
@@ -176,7 +183,7 @@ public class GameState : MoonTools.ECS.System
             Stores.TextStorage.GetID("")));
         Set(highScoreEntity, new UI());
         Set(highScoreEntity, new Highlight());
-        Set(highScoreEntity, new DestroyOnStartGame());
+        Set(highScoreEntity, new HideOnMainMenu());
 
         var gemsLabel = CreateEntity();
         Set(gemsLabel, new Position(new Vector2(UILayoutConstants.InfoX, UILayoutConstants.GemsLabelY)));
@@ -211,6 +218,11 @@ public class GameState : MoonTools.ECS.System
         foreach (var entity in DestroyFilter.Entities)
         {
             Destroy(entity);
+        }
+
+        foreach (var entity in HideFilter.Entities)
+        {
+            Set(entity, new Invisible());
         }
 
         var gameTitle = CreateEntity();

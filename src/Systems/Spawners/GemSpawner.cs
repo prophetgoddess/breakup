@@ -14,10 +14,7 @@ public class GemSpawner : Manipulator
         var entity = CreateEntity();
 
         Set(entity, new Model(Content.Models.Triangle.ID));
-        Set(entity, new Position(new Vector2(
-                Dimensions.GameWidth * 0.5f,
-                Dimensions.GameHeight * 0.9f
-            )));
+        Set(entity, new Position(Vector2.Zero));
         Set(entity, new Orientation(Rando.Range(0f, MathF.PI * 2f)));
         Set(entity, new Velocity(Rando.InsideUnitCircle() * 100.0f));
         Set(entity, new BoundingBox(0, 0, 8, 8));
