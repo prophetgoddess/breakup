@@ -19,7 +19,10 @@ public class Blocks : MoonTools.ECS.System
 
     float MinBlockDensity = 0.1f;
     float MaxBlockDensity = 0.66f;
-    float MaxCameraY = 1000000;
+    float MaxCameraY = 10000;
+
+    float MaxHP = 99;
+    float MinHP = 1;
 
     string GetFormattedHP(int amount, int length = 2)
     {
@@ -40,11 +43,16 @@ public class Blocks : MoonTools.ECS.System
 
     void SpawnBlock(int x, int y)
     {
-        var hp = Rando.IntInclusive(1, 2);
+        var cameraY = GetSingleton<CameraPosition>().Y;
+
+        int min = (int)float.Lerp(MinHP, MaxHP, cameraY / MaxCameraY);
+        int max = min * 2;
+
+        var hp = Rando.IntInclusive(min, max);
 
         if (Rando.Value > 0.9f)
         {
-            hp = Rando.IntInclusive(2, 4);
+            hp = Rando.IntInclusive(min * 2, max * 2);
         }
 
         var block = CreateEntity();

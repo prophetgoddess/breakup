@@ -231,7 +231,7 @@ public class GameState : MoonTools.ECS.System
          new Text(
             Fonts.HeaderFont,
             Fonts.TitleSize,
-            Stores.TextStorage.GetID("break.zone"),
+            Stores.TextStorage.GetID("break.up"),
             MoonWorks.Graphics.Font.HorizontalAlignment.Center,
             MoonWorks.Graphics.Font.VerticalAlignment.Middle));
         Set(gameTitle, new UI());
