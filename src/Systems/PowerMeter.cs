@@ -4,20 +4,20 @@ using MoonWorks.Math;
 
 namespace Ball;
 
-public class Meters : MoonTools.ECS.System
+public class PowerMeter : MoonTools.ECS.System
 {
     Filter MeterFilter;
 
-    public Meters(World world) : base(world)
+    public PowerMeter(World world) : base(world)
     {
-        MeterFilter = FilterBuilder.Include<Meter>().Include<Scale>().Build();
+        MeterFilter = FilterBuilder.Include<Power>().Include<Scale>().Build();
     }
 
     public override void Update(TimeSpan delta)
     {
         foreach (var entity in MeterFilter.Entities)
         {
-            var meter = Get<Meter>(entity);
+            var meter = Get<Power>(entity);
             var value = meter.Value;
             if (!HasOutRelation<LockMeter>(entity))
             {
@@ -47,7 +47,7 @@ public class Meters : MoonTools.ECS.System
             var scale = Get<Scale>(entity).Value;
 
             Set(entity, new Scale(Vector2.One * float.Lerp(0f, meter.Scale, meter.Value)));
-            Set(entity, new Meter(value, meter.Decay, meter.Scale));
+            Set(entity, new Power(value, meter.Decay, meter.Scale));
 
 
         }

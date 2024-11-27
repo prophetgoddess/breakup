@@ -40,12 +40,12 @@ public class Collision : MoonTools.ECS.System
     {
         if (Has<FillMeter>(other) && Has<AddGems>(other) && Has<Player>(entity))
         {
-            var meterEntity = GetSingletonEntity<Meter>();
-            var meter = Get<Meter>(meterEntity);
+            var meterEntity = GetSingletonEntity<Power>();
+            var meter = Get<Power>(meterEntity);
             var value = meter.Value;
             value += Get<FillMeter>(other).Amount;
 
-            Set(meterEntity, new Meter(value, meter.Decay, meter.Scale));
+            Set(meterEntity, new Power(value, meter.Decay, meter.Scale));
 
             var gemsEntity = GetSingletonEntity<Gems>();
             var gems = Get<Gems>(gemsEntity);
@@ -54,6 +54,23 @@ public class Collision : MoonTools.ECS.System
             var current = gems.Current;
             current += Get<AddGems>(other).Amount;
             Set(gemsEntity, new Gems(current, total));
+
+            var xpEntity = GetSingletonEntity<XP>();
+            var xp = Get<XP>(xpEntity);
+            var currentXP = xp.Current;
+            var targetXP = xp.Target;
+
+            currentXP += Get<GivesXP>(other).Amount;
+            if (currentXP >= xp.Target)
+            {
+                targetXP *= 2;
+                currentXP = 0;
+                var levelEntity = GetSingletonEntity<Level>();
+                var level = Get<Level>(levelEntity);
+                Set(levelEntity, new Level(level.Value + 1));
+            }
+            Set(xpEntity, new XP(currentXP, targetXP));
+
             Destroy(other);
         }
 
@@ -66,10 +83,11 @@ public class Collision : MoonTools.ECS.System
 
         if (Has<Bounce>(entity) && collision.Solid)
         {
-            if (Has<CanTakeDamageFromBall>(other) && Has<HitPoints>(other))
+            if (Has<CanTakeDamageFromBall>(other) && Has<HitPoints>(other) && Has<CanDealDamageToBlock>(entity))
             {
+                var damage = Get<CanDealDamageToBlock>(entity).Amount;
                 var hitPoints = Get<HitPoints>(other);
-                Set(other, new HitPoints(hitPoints.Value - 1, hitPoints.Max));
+                Set(other, new HitPoints(hitPoints.Value - damage, hitPoints.Max));
             }
 
             var newVelocity = velocity;
@@ -105,18 +123,14 @@ public class Collision : MoonTools.ECS.System
             Unrelate<Colliding>(entity, other);
             Relate(entity, player, new IgnoreSolidCollision());
 
-            var meterEntity = GetSingletonEntity<Meter>();
-            var meter = Get<Meter>(meterEntity);
-            Set(meterEntity, new Meter(0f, meter.Decay, meter.Scale));
+            var meterEntity = GetSingletonEntity<Power>();
+            var meter = Get<Power>(meterEntity);
+            Set(meterEntity, new Power(0f, meter.Decay, meter.Scale));
 
-            var life = GetSingletonEntity<FirstLife>();
+            var livesEntity = GetSingletonEntity<Lives>();
+            var lives = Get<Lives>(livesEntity);
 
-            while (HasOutRelation<NextLife>(life))
-            {
-                life = OutRelationSingleton<NextLife>(life);
-            }
-
-            Destroy(life);
+            Set(livesEntity, new Lives(lives.Value - 1));
         }
     }
 
@@ -127,7 +141,7 @@ public class Collision : MoonTools.ECS.System
 
         if (Has<HitBall>(other) && Has<CanBeHit>(entity))
         {
-            var meterValue = GetSingleton<Meter>().Value * 200.0f;
+            var meterValue = GetSingleton<Power>().Value * 200.0f;
             var otherPos = Get<Position>(other).Value;
             var dir = Vector2.Normalize(otherPos - position);
             velocity = dir * -velocity.Length();

@@ -8,13 +8,11 @@ public class GameState : MoonTools.ECS.System
 
     Filter DestroyFilter;
     Filter HideFilter;
-    Filter LivesFilter;
 
     public GameState(World world) : base(world)
     {
         DestroyFilter = FilterBuilder.Include<DestroyOnStartGame>().Build();
         HideFilter = FilterBuilder.Include<HideOnMainMenu>().Build();
-        LivesFilter = FilterBuilder.Include<Life>().Build();
     }
 
     void StartGame()
@@ -47,6 +45,8 @@ public class GameState : MoonTools.ECS.System
         Set(ball, new CameraFollows());
         Set(ball, new DestroyOnStartGame());
         Set(ball, new Highlight());
+        Set(ball, new CanDealDamageToBlock(1));
+
 
         var player = CreateEntity();
         Set(player, new Model(Content.Models.EmptyTriangle.ID));
@@ -64,23 +64,34 @@ public class GameState : MoonTools.ECS.System
         Set(player, new FollowsCamera(Dimensions.GameHeight * 0.9f));
         Set(player, new DestroyOnStartGame());
 
-        var meter = CreateEntity();
-        Set(meter, new Model(Content.Models.Triangle.ID));
-        Set(meter, new Position(new Vector2(
+        var power = CreateEntity();
+        Set(power, new Model(Content.Models.Triangle.ID));
+        Set(power, new Position(new Vector2(
                 Dimensions.GameWidth * 0.5f,
                 Dimensions.GameHeight * 0.9f
             )));
-        Set(meter, new Orientation(0f));
-        Set(meter, new Velocity(Vector2.Zero));
-        Set(meter, new Scale(new Vector2(0f, 0.5f)));
-        Set(meter, new Meter(0f, 0.015f, 2f));
-        Set(meter, new DestroyOnStartGame());
-        Set(meter, new Highlight());
-        Relate(meter, player, new ChildOf(new Vector2(0f, 0f)));
+        Set(power, new Orientation(0f));
+        Set(power, new Velocity(Vector2.Zero));
+        Set(power, new Scale(new Vector2(0f, 0.5f)));
+        Set(power, new Power(0f, 0.015f, 2f));
+        Set(power, new DestroyOnStartGame());
+        Set(power, new Highlight());
+        Relate(power, player, new ChildOf(new Vector2(0f, 0f)));
+
+        var xp = CreateEntity();
+        Set(xp, new FollowsCamera(Dimensions.GameHeight - 8f));
+        Set(xp, new Model(Content.Models.Square.ID));
+        Set(xp, new Position(new Vector2(
+                Dimensions.GameWidth * 0.5f,
+                Dimensions.GameHeight - 8f
+            )));
+        Set(xp, new Scale(new Vector2(0f, 0.5f)));
+        Set(xp, new XP(0, 10));
+        Set(xp, new DestroyOnStartGame());
+        Set(xp, new Highlight());
 
         Relate(ball, player, new HeldBy(new Vector2(0f, -32.0f)));
         Set(ball, new Velocity(Vector2.Zero));
-        //Relate(ball, player, new IgnoreSolidCollision());
 
         var leftBound = CreateEntity();
         Set(leftBound, new Position(new Vector2(-8, 0)));
@@ -92,8 +103,9 @@ public class GameState : MoonTools.ECS.System
         var leftBoundSprite = CreateEntity();
         Set(leftBoundSprite, new Position(new Vector2(-9, 0)));
         Set(leftBoundSprite, new Model(Content.Models.Square.ID));
-        Set(leftBoundSprite, new Scale(new Vector2(1.5f, 2000)));
+        Set(leftBoundSprite, new Scale(new Vector2(24f, 2000)));
         Set(leftBoundSprite, new DestroyOnStartGame());
+        Set(leftBoundSprite, new FollowsCamera(0));
 
         var rightBound = CreateEntity();
         Set(rightBound, new Position(new Vector2(Dimensions.GameWidth + 8, 0)));
@@ -105,8 +117,10 @@ public class GameState : MoonTools.ECS.System
         var rightBoundSprite = CreateEntity();
         Set(rightBoundSprite, new Position(new Vector2(Dimensions.GameWidth + 9, 0)));
         Set(rightBoundSprite, new Model(Content.Models.Square.ID));
-        Set(rightBoundSprite, new Scale(new Vector2(1.5f, 2000)));
+        Set(rightBoundSprite, new Scale(new Vector2(24f, 2000)));
         Set(rightBoundSprite, new DestroyOnStartGame());
+        Set(rightBoundSprite, new FollowsCamera(0));
+
 
         var bottomBound = CreateEntity();
         Set(bottomBound, new Position(new Vector2(Dimensions.GameWidth * 0.5f, Dimensions.GameHeight + 8)));
@@ -120,29 +134,6 @@ public class GameState : MoonTools.ECS.System
         Set(cameraEntity, new CameraPosition(0f));
         Set(cameraEntity, new DestroyOnStartGame());
 
-        Entity lastLife = default;
-        for (int i = 0; i < 3; i++)
-        {
-            var lifeEntity = CreateEntity();
-            Set(lifeEntity, new Life());
-            Set(lifeEntity, new Model(Content.Models.Donut.ID));
-            Set(lifeEntity, new Scale(Vector2.One * 32.0f));
-            Set(lifeEntity, new UI());
-            Set(lifeEntity, new Position(new Vector2(UILayoutConstants.LivesX, UILayoutConstants.LivesY + i * UILayoutConstants.LivesSpacing)));
-            Set(lifeEntity, new DestroyOnStartGame());
-            Set(lifeEntity, new Highlight());
-
-            if (i == 0)
-            {
-                Set(lifeEntity, new FirstLife());
-            }
-            else
-            {
-                Relate(lastLife, lifeEntity, new NextLife());
-            }
-            lastLife = lifeEntity;
-        }
-
         var livesLabel = CreateEntity();
         Set(livesLabel, new Position(new Vector2(10, UILayoutConstants.ScoreLabelY)));
         Set(livesLabel,
@@ -152,6 +143,40 @@ public class GameState : MoonTools.ECS.System
             Stores.TextStorage.GetID("LIVES")));
         Set(livesLabel, new UI());
         Set(livesLabel, new DestroyOnStartGame());
+
+        var livesEntity = CreateEntity();
+        Set(livesEntity, new Lives(3));
+        Set(livesEntity, new Position(new Vector2(10, UILayoutConstants.ScoreY)));
+        Set(livesEntity,
+         new Text(
+            Fonts.BodyFont,
+            Fonts.MidSize,
+            Stores.TextStorage.GetID("")));
+        Set(livesEntity, new UI());
+        Set(livesEntity, new Highlight());
+        Set(livesEntity, new DestroyOnStartGame());
+
+        var levelLabel = CreateEntity();
+        Set(levelLabel, new Position(new Vector2(10, UILayoutConstants.HighScoreLabelY)));
+        Set(levelLabel,
+         new Text(
+            Fonts.HeaderFont,
+            Fonts.HeaderSize,
+            Stores.TextStorage.GetID("LEVEL")));
+        Set(levelLabel, new UI());
+        Set(levelLabel, new DestroyOnStartGame());
+
+        var levelEntity = CreateEntity();
+        Set(levelEntity, new Level(0));
+        Set(levelEntity, new Position(new Vector2(10, UILayoutConstants.HighScoreY)));
+        Set(levelEntity,
+         new Text(
+            Fonts.BodyFont,
+            Fonts.MidSize,
+            Stores.TextStorage.GetID("")));
+        Set(levelEntity, new UI());
+        Set(levelEntity, new Highlight());
+        Set(levelEntity, new DestroyOnStartGame());
 
         var scoreLabel = CreateEntity();
         Set(scoreLabel, new Position(new Vector2(UILayoutConstants.InfoX, UILayoutConstants.ScoreLabelY)));
@@ -263,7 +288,7 @@ public class GameState : MoonTools.ECS.System
     {
         var inputState = GetSingleton<InputState>();
 
-        if (!Some<DestroyOnStartGame>() || LivesFilter.Count == 0)
+        if (!Some<DestroyOnStartGame>() || (Some<Lives>() && GetSingleton<Lives>().Value <= 0))
         {
             MainMenu();
         }
@@ -320,6 +345,36 @@ public class GameState : MoonTools.ECS.System
             MoonWorks.Graphics.Font.HorizontalAlignment.Left,
             MoonWorks.Graphics.Font.VerticalAlignment.Middle));
 
+        if (!Some<Lives>())
+            return;
+
+        var livesEntity = GetSingletonEntity<Lives>();
+        var lives = Get<Lives>(livesEntity);
+
+        Set(livesEntity,
+        new Text(
+            Fonts.BodyFont,
+            Fonts.MidSize,
+            Stores.TextStorage.GetID(GetFormattedScore(lives.Value, 2)),
+            MoonWorks.Graphics.Font.HorizontalAlignment.Left,
+            MoonWorks.Graphics.Font.VerticalAlignment.Middle));
+
+        if (!Some<Level>())
+            return;
+
+        var levelEntity = GetSingletonEntity<Level>();
+        var level = Get<Level>(levelEntity);
+
+        Set(levelEntity,
+        new Text(
+            Fonts.BodyFont,
+            Fonts.MidSize,
+            Stores.TextStorage.GetID(GetFormattedScore(level.Value, 2)),
+            MoonWorks.Graphics.Font.HorizontalAlignment.Left,
+            MoonWorks.Graphics.Font.VerticalAlignment.Middle));
+
+        var ballEntity = GetSingletonEntity<CanDealDamageToBlock>();
+        Set(ballEntity, new CanDealDamageToBlock(level.Value + 1));
 
     }
 }

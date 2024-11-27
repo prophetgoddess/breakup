@@ -41,7 +41,8 @@ class Program : Game
             new FollowCamera(World),
             new Parent(World),
             new Blocks(World),
-            new Meters(World)
+            new PowerMeter(World),
+            new XPMeter(World),
         ];
 
         Renderer = new Renderer(World, MainWindow, GraphicsDevice, Inputs);

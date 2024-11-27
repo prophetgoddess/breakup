@@ -31,7 +31,6 @@ public class Blocks : MoonTools.ECS.System
             : amount.ToString($"D{length - 1}");
     }
 
-
     public Blocks(World world) : base(world)
     {
         GemSpawner = new GemSpawner(world);
@@ -66,7 +65,7 @@ public class Blocks : MoonTools.ECS.System
         if (Rando.Value < 0.75f)
         {
             Set(block, new HitPoints(hp, hp));
-            Set(block, new Model(Content.Models.EmptySquare.ID));
+            Set(block, new Model(Content.Models.RoundEmptySquare.ID));
 
             Set(block, new CanTakeDamageFromBall());
             var hpDisplay = CreateEntity();
@@ -80,7 +79,7 @@ public class Blocks : MoonTools.ECS.System
         }
         else
         {
-            Set(block, new Model(Content.Models.Square.ID));
+            Set(block, new Model(Content.Models.RoundSquare.ID));
         }
 
 
