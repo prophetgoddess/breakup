@@ -39,14 +39,13 @@ public class GameState : MoonTools.ECS.System
         Set(ball, new Velocity(Vector2.Zero));
         Set(ball, new BoundingBox(0, 0, 18, 18));
         Set(ball, new SolidCollision());
-        Set(ball, new Bounce());
+        Set(ball, new Bounce(0.9f));
         Set(ball, new CanBeHit());
         Set(ball, new HasGravity(1f));
         Set(ball, new CameraFollows());
         Set(ball, new DestroyOnStartGame());
         Set(ball, new Highlight());
         Set(ball, new CanDealDamageToBlock(1));
-
 
         var player = CreateEntity();
         Set(player, new Model(Content.Models.EmptyTriangle.ID));
@@ -120,7 +119,6 @@ public class GameState : MoonTools.ECS.System
         Set(rightBoundSprite, new Scale(new Vector2(24f, 2000)));
         Set(rightBoundSprite, new DestroyOnStartGame());
         Set(rightBoundSprite, new FollowsCamera(0));
-
 
         var bottomBound = CreateEntity();
         Set(bottomBound, new Position(new Vector2(Dimensions.GameWidth * 0.5f, Dimensions.GameHeight + 8)));
@@ -275,6 +273,58 @@ public class GameState : MoonTools.ECS.System
         Set(prompt, new UI());
         Set(prompt, new DestroyOnStartGame());
         Set(prompt, new MainMenu());
+
+        var leftBound = CreateEntity();
+        Set(leftBound, new Position(new Vector2(-8, 0)));
+        Set(leftBound, new BoundingBox(0, 0, 16, 2000));
+        Set(leftBound, new SolidCollision());
+        Set(leftBound, new DestroyOnStartGame());
+        Set(leftBound, new UI());
+
+        var rightBound = CreateEntity();
+        Set(rightBound, new Position(new Vector2(Dimensions.WindowWidth + 8, 0)));
+        Set(rightBound, new BoundingBox(0, 0, 16, 2000));
+        Set(rightBound, new SolidCollision());
+        Set(rightBound, new DestroyOnStartGame());
+        Set(rightBound, new UI());
+
+        var bottomBound = CreateEntity();
+        Set(bottomBound, new Position(new Vector2(Dimensions.WindowWidth * 0.5f, Dimensions.WindowHeight + 8)));
+        Set(bottomBound, new BoundingBox(0, 0, Dimensions.WindowWidth, 16));
+        Set(bottomBound, new SolidCollision());
+        Set(bottomBound, new DestroyOnStartGame());
+        Set(bottomBound, new UI());
+
+        var topBound = CreateEntity();
+        Set(topBound, new Position(new Vector2(Dimensions.WindowWidth * 0.5f, 0f)));
+        Set(topBound, new BoundingBox(0, 0, Dimensions.WindowWidth, 16));
+        Set(topBound, new SolidCollision());
+        Set(topBound, new DestroyOnStartGame());
+        Set(topBound, new UI());
+
+
+        for (int i = 0; i < 100; i++)
+        {
+            var entity = CreateEntity();
+
+            Set(entity, new Model(Content.Models.Triangle.ID));
+            Set(entity, new Position(new Vector2(Dimensions.WindowWidth * 0.5f, Dimensions.WindowHeight * 0.5f) + Rando.InsideUnitCircle() * Dimensions.WindowHeight));
+            Set(entity, new Orientation(Rando.Range(0f, MathF.PI * 2f)));
+            Set(entity, new Velocity(Rando.OnUnitCircle() * Rando.Range(10f, 30f)));
+            Set(entity, new BoundingBox(0, 0, 8, 8));
+            Set(entity, new Scale(new Vector2(1, 1)));
+            Set(entity, new DestroyOnStartGame());
+            Set(entity, new AngularVelocity(Rando.Range(-5f, 5f)));
+            Set(entity, new Depth(0.9f));
+            Set(entity, new UI());
+            Set(entity, new SolidCollision());
+            Set(entity, new Bounce(1f));
+
+            var timer = CreateEntity();
+            Set(timer, new Timer(Rando.Range(1f, 2f)));
+            Relate(entity, timer, new DontMoveTowardsPlayer());
+
+        }
     }
 
     string GetFormattedScore(int amount, int length = 8)

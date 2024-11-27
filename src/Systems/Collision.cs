@@ -93,13 +93,13 @@ public class Collision : MoonTools.ECS.System
             var newVelocity = velocity;
 
             if (xCollision && !yCollision)
-                newVelocity = new Vector2(-velocity.X, velocity.Y) * 0.8f;
+                newVelocity = new Vector2(-velocity.X, velocity.Y) * Get<Bounce>(entity).Coefficient;
 
             else if (yCollision && !xCollision)
-                newVelocity = new Vector2(velocity.X, -velocity.Y) * 0.8f;
+                newVelocity = new Vector2(velocity.X, -velocity.Y) * Get<Bounce>(entity).Coefficient;
 
             else if (yCollision && xCollision)
-                newVelocity = new Vector2(-velocity.X, -velocity.Y) * 0.8f;
+                newVelocity = new Vector2(-velocity.X, -velocity.Y) * Get<Bounce>(entity).Coefficient;
 
             var otherPos = Get<Position>(other).Value;
             if (position.Y < otherPos.Y && !Has<Player>(other))
