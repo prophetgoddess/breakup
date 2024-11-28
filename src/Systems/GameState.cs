@@ -64,30 +64,42 @@ public class GameState : MoonTools.ECS.System
         Set(player, new DestroyOnStartGame());
 
         var power = CreateEntity();
-        Set(power, new Model(Content.Models.Triangle.ID));
+        Set(power, new Model(Content.Models.Square.ID));
+        Set(power, new FollowsCamera(Dimensions.GameHeight - 8f));
         Set(power, new Position(new Vector2(
                 Dimensions.GameWidth * 0.5f,
-                Dimensions.GameHeight * 0.9f
+                Dimensions.GameHeight - 8f
             )));
         Set(power, new Orientation(0f));
         Set(power, new Velocity(Vector2.Zero));
         Set(power, new Scale(new Vector2(0f, 0.5f)));
-        Set(power, new Power(0f, 0.015f, 2f));
+        Set(power, new Power(0f, 0.015f, Dimensions.GameWidth - 16));
         Set(power, new DestroyOnStartGame());
         Set(power, new Highlight());
-        Relate(power, player, new ChildOf(new Vector2(0f, 0f)));
+
+        var charge = CreateEntity();
+        Set(charge, new Model(Content.Models.Triangle.ID));
+        Set(charge, new Position(Vector2.Zero));
+        Set(charge, new Orientation(0f));
+        Set(charge, new Velocity(Vector2.Zero));
+        Set(charge, new Scale(new Vector2(0f, 0f)));
+        Set(charge, new Charge(1f, 2f));
+        Set(charge, new DestroyOnStartGame());
+        Set(charge, new Highlight());
+        Relate(charge, player, new ChildOf());
+
 
         var xp = CreateEntity();
-        Set(xp, new FollowsCamera(Dimensions.GameHeight - 8f));
         Set(xp, new Model(Content.Models.Square.ID));
         Set(xp, new Position(new Vector2(
-                Dimensions.GameWidth * 0.5f,
-                Dimensions.GameHeight - 8f
+                170,
+                UILayoutConstants.HighScoreY + 32
             )));
         Set(xp, new Scale(new Vector2(0f, 0.5f)));
-        Set(xp, new XP(0, 10));
+        Set(xp, new XP(31, 32));
         Set(xp, new DestroyOnStartGame());
         Set(xp, new Highlight());
+        Set(xp, new UI());
 
         Relate(ball, player, new HeldBy(new Vector2(0f, -32.0f)));
         Set(ball, new Velocity(Vector2.Zero));
@@ -310,7 +322,7 @@ public class GameState : MoonTools.ECS.System
             Set(entity, new Model(Content.Models.Triangle.ID));
             Set(entity, new Position(new Vector2(Dimensions.WindowWidth * 0.5f, Dimensions.WindowHeight * 0.5f) + Rando.InsideUnitCircle() * Dimensions.WindowHeight));
             Set(entity, new Orientation(Rando.Range(0f, MathF.PI * 2f)));
-            Set(entity, new Velocity(Rando.OnUnitCircle() * Rando.Range(10f, 30f)));
+            Set(entity, new Velocity(Rando.OnUnitCircle() * 15f));
             Set(entity, new BoundingBox(0, 0, 8, 8));
             Set(entity, new Scale(new Vector2(1, 1)));
             Set(entity, new DestroyOnStartGame());

@@ -141,7 +141,7 @@ public class Collision : MoonTools.ECS.System
 
         if (Has<HitBall>(other) && Has<CanBeHit>(entity))
         {
-            var meterValue = GetSingleton<Power>().Value * 200.0f;
+            var meterValue = GetSingleton<Power>().Value * 200.0f * GetSingleton<Charge>().Value;
             var otherPos = Get<Position>(other).Value;
             var dir = Vector2.Normalize(otherPos - position);
             velocity = dir * -velocity.Length();

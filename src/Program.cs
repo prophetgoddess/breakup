@@ -43,6 +43,7 @@ class Program : Game
             new Blocks(World),
             new PowerMeter(World),
             new XPMeter(World),
+            new ChargeMeter(World)
         ];
 
         Renderer = new Renderer(World, MainWindow, GraphicsDevice, Inputs);
