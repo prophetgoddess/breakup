@@ -87,11 +87,11 @@ public class Collision : MoonTools.ECS.System
         {
             if (Has<CanTakeDamageFromBall>(other) && Has<HitPoints>(other) && Has<CanDealDamageToBlock>(entity))
             {
-                var meterEntity = GetSingletonEntity<Power>();
                 var damage = Get<CanDealDamageToBlock>(entity).Amount;
-                if (HasOutRelation<LockMeter>(meterEntity))
+                if (HasOutRelation<DamageMultiplier>(entity))
                 {
                     damage *= 2;
+                    Remove<DamageMultiplier>(entity);
                 }
                 var hitPoints = Get<HitPoints>(other);
                 Set(other, new HitPoints(hitPoints.Value - damage, hitPoints.Max));
@@ -148,13 +148,15 @@ public class Collision : MoonTools.ECS.System
 
         if (Has<HitBall>(other) && Has<CanBeHit>(entity))
         {
-            var meterValue = GetSingleton<Power>().Value * 200.0f;
             var otherPos = Get<Position>(other).Value;
             var dir = Vector2.Normalize(otherPos - position);
             velocity = dir * -velocity.Length();
 
             if (HasOutRelation<Spinning>(other))
+            {
                 velocity.Y -= 300.0f;
+                Set(entity, new DamageMultiplier(2));
+            }
 
             Set(entity, new Velocity(velocity));
         }

@@ -45,3 +45,4 @@ public readonly record struct Flicker(float Rate);
 public readonly record struct Invisible();
 public readonly record struct Gems(int Current, int Total);
 public readonly record struct Block(int GemReward);
+public readonly record struct DamageMultiplier(int Multiplier);
