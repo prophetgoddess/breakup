@@ -72,7 +72,7 @@ public class GameState : MoonTools.ECS.System
         Set(power, new Orientation(0f));
         Set(power, new Velocity(Vector2.Zero));
         Set(power, new Scale(new Vector2(0f, 0.5f)));
-        Set(power, new Power(0f, 0.015f, 2f));
+        Set(power, new Power(0f, 0.01f, 2f));
         Set(power, new DestroyOnStartGame());
         Set(power, new Highlight());
         Relate(power, player, new ChildOf(new Vector2(0f, 0f)));

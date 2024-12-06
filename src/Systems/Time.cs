@@ -24,7 +24,7 @@ public class Time : MoonTools.ECS.System
             if (time <= 0)
             {
                 Destroy(entity);
-                return;
+                continue;
             }
 
             Set(entity, timer with { Time = time });

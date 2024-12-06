@@ -51,7 +51,6 @@ public static class Rando
 
     public static Vector2 InsideUnitCircle()
     {
-        float theta = Value * MathF.PI * 2.0f;
         return OnUnitCircle() * Value;
     }
 
