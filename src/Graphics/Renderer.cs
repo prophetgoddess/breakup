@@ -303,6 +303,9 @@ public class Renderer : MoonTools.ECS.Renderer
             var text = Get<Text>(textEntity);
             var color = Has<Highlight>(textEntity) ? palette.Highlight : palette.Foreground;
 
+            if (Some<Pause>())
+                color.A = 200;
+
             textBatch.Start(Stores.FontStorage.Get(text.FontID));
             textBatch.Add(Stores.TextStorage.Get(text.TextID), text.Size, color, text.HorizontalAlignment, text.VerticalAlignment);
             textBatch.UploadBufferData(cmdbuf);
@@ -338,6 +341,9 @@ public class Renderer : MoonTools.ECS.Renderer
             var scale = Has<Scale>(entity) ? Get<Scale>(entity).Value : Vector2.One;
             var color = Has<Highlight>(entity) ? palette.Highlight : palette.Foreground;
             var depth = Has<Depth>(entity) ? Get<Depth>(entity).Value : 0.5f;
+
+            if (Some<Pause>())
+                color.A = 128;
 
             Matrix4x4 model = Matrix4x4.CreateScale(new Vector3(scale.X, scale.Y, 0f)) * Matrix4x4.CreateFromAxisAngle(Vector3.UnitZ, rotation) * Matrix4x4.CreateTranslation(new Vector3(position, depth)) * cameraMatrix;
             var uniforms = new TransformVertexUniform(model, color);
