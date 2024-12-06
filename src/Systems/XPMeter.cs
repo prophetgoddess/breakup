@@ -19,6 +19,6 @@ public class XPMeter : MoonTools.ECS.System
         var xpEntity = GetSingletonEntity<XP>();
         var xp = Get<XP>(xpEntity);
 
-        Set(xpEntity, new Scale(new Vector2(float.Lerp(0f, 340, (float)xp.Current / xp.Target), 2f)));
+        Set(xpEntity, new Scale(new Vector2(float.Lerp(0f, Dimensions.GameWidth - 16, (float)xp.Current / xp.Target), 2f)));
     }
 }

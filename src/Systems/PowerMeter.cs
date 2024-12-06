@@ -44,9 +44,12 @@ public class PowerMeter : MoonTools.ECS.System
             }
 
             value = Math.Clamp(value, 0, 1f);
+            var scale = Get<Scale>(entity).Value;
 
-            Set(entity, new Scale(new Vector2(float.Lerp(0f, meter.Scale, meter.Value), 2f)));
+            Set(entity, new Scale(Vector2.One * float.Lerp(0f, meter.Scale, meter.Value)));
             Set(entity, new Power(value, meter.Decay, meter.Scale));
+
+
         }
     }
 }
