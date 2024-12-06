@@ -1,4 +1,5 @@
 using System.Reflection.Metadata;
+using MoonWorks;
 using MoonWorks.Graphics.Font;
 
 namespace Ball;
@@ -12,6 +13,9 @@ public static class Dimensions
     public const int WindowWidth = 1600;
     public const int WindowHeight = 900;
     public const float WindowAspectRatio = WindowWidth / (float)WindowHeight;
+    public const float WindowAspectRatioReciprocal = 1f / WindowAspectRatio;
+
+    public static float GameAspectRatioReciprocal = 1f / GameAspectRatio;
 }
 
 public static class Fonts

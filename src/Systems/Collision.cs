@@ -1,6 +1,7 @@
 
 using System.Numerics;
 using MoonTools.ECS;
+using MoonWorks.Math;
 
 namespace Ball;
 
@@ -63,10 +64,11 @@ public class Collision : MoonTools.ECS.System
             currentXP += Get<GivesXP>(other).Amount;
             if (currentXP >= xp.Target)
             {
-                targetXP *= 2;
-                currentXP = 0;
                 var levelEntity = GetSingletonEntity<Level>();
                 var level = Get<Level>(levelEntity);
+
+                targetXP = (int)MathF.Ceiling(float.Lerp(10, 9999, Easing.InQuad(level.Value / 99.0f)));
+                currentXP = 0;
                 Set(levelEntity, new Level(level.Value + 1));
             }
             Set(xpEntity, new XP(currentXP, targetXP));
@@ -85,7 +87,12 @@ public class Collision : MoonTools.ECS.System
         {
             if (Has<CanTakeDamageFromBall>(other) && Has<HitPoints>(other) && Has<CanDealDamageToBlock>(entity))
             {
+                var meterEntity = GetSingletonEntity<Power>();
                 var damage = Get<CanDealDamageToBlock>(entity).Amount;
+                if (HasOutRelation<LockMeter>(meterEntity))
+                {
+                    damage *= 2;
+                }
                 var hitPoints = Get<HitPoints>(other);
                 Set(other, new HitPoints(hitPoints.Value - damage, hitPoints.Max));
             }
@@ -147,7 +154,7 @@ public class Collision : MoonTools.ECS.System
             velocity = dir * -velocity.Length();
 
             if (HasOutRelation<Spinning>(other))
-                velocity.Y -= 200.0f + meterValue;
+                velocity.Y -= 300.0f;
 
             Set(entity, new Velocity(velocity));
         }

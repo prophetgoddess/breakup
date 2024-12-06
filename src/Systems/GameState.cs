@@ -77,18 +77,6 @@ public class GameState : MoonTools.ECS.System
         Set(power, new Highlight());
         Relate(power, player, new ChildOf(new Vector2(0f, 0f)));
 
-        var xp = CreateEntity();
-        Set(xp, new FollowsCamera(Dimensions.GameHeight - 8f));
-        Set(xp, new Model(Content.Models.Square.ID));
-        Set(xp, new Position(new Vector2(
-                Dimensions.GameWidth * 0.5f,
-                Dimensions.GameHeight - 8f
-            )));
-        Set(xp, new Scale(new Vector2(0f, 0.5f)));
-        Set(xp, new XP(0, 10));
-        Set(xp, new DestroyOnStartGame());
-        Set(xp, new Highlight());
-
         Relate(ball, player, new HeldBy(new Vector2(0f, -32.0f)));
         Set(ball, new Velocity(Vector2.Zero));
 
@@ -175,6 +163,31 @@ public class GameState : MoonTools.ECS.System
         Set(levelEntity, new UI());
         Set(levelEntity, new Highlight());
         Set(levelEntity, new DestroyOnStartGame());
+
+        var xpLabel = CreateEntity();
+        Set(xpLabel, new Position(new Vector2(10, UILayoutConstants.GemsLabelY)));
+        Set(xpLabel,
+         new Text(
+            Fonts.HeaderFont,
+            Fonts.HeaderSize,
+            Stores.TextStorage.GetID("NEXT")));
+        Set(xpLabel, new UI());
+        Set(xpLabel, new DestroyOnStartGame());
+
+        var xp = CreateEntity();
+        Set(xp, new Position(new Vector2(
+                10,
+                UILayoutConstants.GemsY
+            )));
+        Set(xp, new XP(0, 10));
+        Set(xp,
+        new Text(
+            Fonts.BodyFont,
+            Fonts.InfoSize,
+            Stores.TextStorage.GetID("")));
+        Set(xp, new DestroyOnStartGame());
+        Set(xp, new Highlight());
+        Set(xp, new UI());
 
         var scoreLabel = CreateEntity();
         Set(scoreLabel, new Position(new Vector2(UILayoutConstants.InfoX, UILayoutConstants.ScoreLabelY)));
@@ -425,6 +438,16 @@ public class GameState : MoonTools.ECS.System
 
         var ballEntity = GetSingletonEntity<CanDealDamageToBlock>();
         Set(ballEntity, new CanDealDamageToBlock(level.Value + 1));
+
+        var xpEntity = GetSingletonEntity<XP>();
+        var xp = Get<XP>(xpEntity);
+        Set(xpEntity,
+        new Text(
+            Fonts.BodyFont,
+            Fonts.BodySize,
+            Stores.TextStorage.GetID($"{GetFormattedScore(xp.Current, 4)} | {GetFormattedScore(xp.Target, 4)}"),
+            MoonWorks.Graphics.Font.HorizontalAlignment.Left,
+            MoonWorks.Graphics.Font.VerticalAlignment.Middle));
 
     }
 }

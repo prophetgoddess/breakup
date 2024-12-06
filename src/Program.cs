@@ -10,6 +10,7 @@ class Program : Game
     World World = new World();
     Renderer Renderer;
     MoonTools.ECS.System[] Systems;
+    System.Random Random = new System.Random();
 
     public Program(
         WindowCreateInfo windowCreateInfo,
@@ -75,14 +76,21 @@ class Program : Game
 
 #if DEBUG
         debugMode = true;
-#endif
-
+        var windowCreateInfo = new WindowCreateInfo(
+            "Ball",
+            (uint)Rando.IntInclusive(1280, 1920),
+            (uint)Rando.IntInclusive(720, 1080),
+            ScreenMode.Windowed
+        );
+#else
         var windowCreateInfo = new WindowCreateInfo(
             "Ball",
             Dimensions.WindowWidth,
             Dimensions.WindowHeight,
             ScreenMode.Windowed
         );
+#endif
+
 
         var frameLimiterSettings = new FrameLimiterSettings(
             FrameLimiterMode.Capped,

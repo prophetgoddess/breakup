@@ -13,12 +13,12 @@ public class XPMeter : MoonTools.ECS.System
 
     public override void Update(TimeSpan delta)
     {
-        if (!Some<XP>())
-            return;
+        // if (!Some<XP>())
+        //     return;
 
-        var xpEntity = GetSingletonEntity<XP>();
-        var xp = Get<XP>(xpEntity);
+        // var xpEntity = GetSingletonEntity<XP>();
+        // var xp = Get<XP>(xpEntity);
 
-        Set(xpEntity, new Scale(new Vector2(float.Lerp(0f, Dimensions.GameWidth - 16, (float)xp.Current / xp.Target), 2f)));
+        // Set(xpEntity, new Scale(new Vector2(float.Lerp(0f, Dimensions.GameWidth - 16, (float)xp.Current / xp.Target), 2f)));
     }
 }
