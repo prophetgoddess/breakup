@@ -143,6 +143,8 @@ public class Renderer : MoonTools.ECS.Renderer
             });
         }
 
+        Console.WriteLine($"game: {GameTexture.Width}x{GameTexture.Height}; ui: ${UITexture.Width}x{UITexture.Height}");
+
     }
 
     TextBatch GetTextBatch()

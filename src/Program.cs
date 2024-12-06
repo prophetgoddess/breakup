@@ -78,10 +78,11 @@ class Program : Game
         debugMode = true;
         var windowCreateInfo = new WindowCreateInfo(
             "Ball",
-            (uint)Rando.IntInclusive(1280, 1920),
-            (uint)Rando.IntInclusive(720, 1080),
+            Dimensions.WindowWidth,
+            Dimensions.WindowHeight,
             ScreenMode.Windowed
         );
+
 #else
         var windowCreateInfo = new WindowCreateInfo(
             "Ball",

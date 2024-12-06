@@ -444,8 +444,8 @@ public class GameState : MoonTools.ECS.System
         Set(xpEntity,
         new Text(
             Fonts.BodyFont,
-            Fonts.BodySize,
-            Stores.TextStorage.GetID($"{GetFormattedScore(xp.Current, 4)} | {GetFormattedScore(xp.Target, 4)}"),
+            Fonts.MidSize,
+            Stores.TextStorage.GetID(GetFormattedScore(xp.Target - xp.Current, 4)),
             MoonWorks.Graphics.Font.HorizontalAlignment.Left,
             MoonWorks.Graphics.Font.VerticalAlignment.Middle));
 
