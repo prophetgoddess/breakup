@@ -359,7 +359,17 @@ public class GameState : MoonTools.ECS.System
             }
             else
             {
-                Set(CreateEntity(), new Pause());
+                var pauseEntity = CreateEntity();
+                Set(pauseEntity, new Position(new Vector2(Dimensions.WindowWidth * 0.5f, Dimensions.WindowHeight * 0.5f)));
+                Set(pauseEntity,
+                 new Text(
+                    Fonts.HeaderFont,
+                    Fonts.HeaderSize,
+                    Stores.TextStorage.GetID("PAUSED"),
+                    MoonWorks.Graphics.Font.HorizontalAlignment.Center,
+                    MoonWorks.Graphics.Font.VerticalAlignment.Middle));
+                Set(pauseEntity, new UI());
+                Set(pauseEntity, new Pause());
             }
         }
 
