@@ -13,6 +13,9 @@ public class Flickering : MoonTools.ECS.System
 
     public override void Update(TimeSpan delta)
     {
+        if (Some<Pause>())
+            return;
+
         foreach (var entity in FlickerFilter.Entities)
         {
             var flicker = Get<Flicker>(entity);

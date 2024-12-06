@@ -33,6 +33,9 @@ public class Stars : MoonTools.ECS.System
 
     public override void Update(TimeSpan delta)
     {
+        if (Some<Pause>())
+            return;
+
         foreach (var entity in BallFilter.Entities)
         {
             var star = SpawnStar();

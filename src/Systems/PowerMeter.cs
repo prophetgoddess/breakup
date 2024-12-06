@@ -14,6 +14,9 @@ public class PowerMeter : MoonTools.ECS.System
 
     public override void Update(TimeSpan delta)
     {
+        if (Some<Pause>())
+            return;
+
         if (!Some<Power>())
             return;
 
@@ -32,7 +35,7 @@ public class PowerMeter : MoonTools.ECS.System
             if (value >= 1.0f)
             {
                 var timer = CreateEntity();
-                Set(timer, new Timer(2.0f));
+                Set(timer, new Timer(10.0f));
                 Set(entity, new Flicker(0.05f));
                 Relate(entity, timer, new LockMeter());
             }

@@ -351,6 +351,18 @@ public class GameState : MoonTools.ECS.System
     {
         var inputState = GetSingleton<InputState>();
 
+        if (inputState.Start.IsPressed)
+        {
+            if (Some<Pause>())
+            {
+                Destroy(GetSingletonEntity<Pause>());
+            }
+            else
+            {
+                Set(CreateEntity(), new Pause());
+            }
+        }
+
         if (!Some<DestroyOnStartGame>() || (Some<Lives>() && GetSingleton<Lives>().Value <= 0))
         {
             MainMenu();

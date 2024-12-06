@@ -87,6 +87,9 @@ public class Motion : MoonTools.ECS.System
 
     public override void Update(TimeSpan delta)
     {
+        if (Some<Pause>())
+            return;
+
         var dt = (float)delta.TotalSeconds;
 
         foreach (var entity in MotionFilter.Entities)

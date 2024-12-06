@@ -16,6 +16,9 @@ public class Collision : MoonTools.ECS.System
 
     public override void Update(TimeSpan delta)
     {
+        if (Some<Pause>())
+            return;
+
         foreach (var entity in CollidingFilter.Entities)
         {
             foreach (var other in OutRelations<Colliding>(entity))

@@ -12,6 +12,9 @@ public class Rotation : MoonTools.ECS.System
 
     public override void Update(TimeSpan delta)
     {
+        if (Some<Pause>())
+            return;
+
         foreach (var entity in RotationFilter.Entities)
         {
             var orientation = Get<Orientation>(entity).Value;

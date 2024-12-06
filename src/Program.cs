@@ -48,7 +48,7 @@ class Program : Game
 
         Renderer = new Renderer(World, MainWindow, GraphicsDevice, Inputs);
 
-        World.Set(World.CreateEntity(), Palettes.DefaultLight);
+        World.Set(World.CreateEntity(), Palettes.MillenialApartment);
 
     }
 

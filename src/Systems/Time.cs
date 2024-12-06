@@ -16,6 +16,9 @@ public class Time : MoonTools.ECS.System
 
     public override void Update(TimeSpan delta)
     {
+        if (Some<Pause>())
+            return;
+
         foreach (var entity in TimerFilter.Entities)
         {
             var timer = Get<Timer>(entity);

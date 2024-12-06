@@ -17,6 +17,9 @@ public class PlayerAttractor : MoonTools.ECS.System
 
     public override void Update(TimeSpan delta)
     {
+        if (Some<Pause>())
+            return;
+
         if (!Some<Player>())
             return;
 
