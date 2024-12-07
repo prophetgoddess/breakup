@@ -9,9 +9,12 @@ public class Collision : MoonTools.ECS.System
 {
     Filter CollidingFilter;
 
+    XPAndLevel XPAndLevel;
+
     public Collision(World world) : base(world)
     {
         CollidingFilter = FilterBuilder.Include<SolidCollision>().Include<Position>().Include<BoundingBox>().Build();
+        XPAndLevel = new XPAndLevel(world);
     }
 
     public override void Update(TimeSpan delta)
@@ -59,22 +62,7 @@ public class Collision : MoonTools.ECS.System
             current += Get<AddGems>(other).Amount;
             Set(gemsEntity, new Gems(current, total));
 
-            var xpEntity = GetSingletonEntity<XP>();
-            var xp = Get<XP>(xpEntity);
-            var currentXP = xp.Current;
-            var targetXP = xp.Target;
-
-            currentXP += Get<GivesXP>(other).Amount;
-            if (currentXP >= xp.Target)
-            {
-                var levelEntity = GetSingletonEntity<Level>();
-                var level = Get<Level>(levelEntity);
-
-                targetXP = (int)MathF.Ceiling(float.Lerp(10, 9999, Easing.InQuad(level.Value / 99.0f)));
-                currentXP = 0;
-                Set(levelEntity, new Level(level.Value + 1));
-            }
-            Set(xpEntity, new XP(currentXP, targetXP));
+            XPAndLevel.GiveXP(Get<GivesXP>(other).Amount);
 
             Destroy(other);
         }
