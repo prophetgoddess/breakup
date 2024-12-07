@@ -373,6 +373,8 @@ public class GameState : MoonTools.ECS.System
                 Set(pauseEntity, new KeepOpacityWhenPaused());
                 Set(pauseEntity, new Pause());
                 Set(pauseEntity, new Marquee(100f));
+                Set(pauseEntity, new Depth(0.1f));
+                Set(pauseEntity, new FollowsCamera(Dimensions.GameHeight * 0.5f));
             }
         }
 

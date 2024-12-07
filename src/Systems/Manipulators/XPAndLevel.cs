@@ -23,7 +23,7 @@ public class XPAndLevel : Manipulator
 
         var promptEntity = CreateEntity();
         Set(promptEntity,
-        new Position(new Vector2(Dimensions.WindowWidth * 0.5f, Dimensions.WindowHeight * 0.25f)));
+        new Position(new Vector2(Dimensions.GameWidth * 0.5f, Dimensions.GameHeight * 0.25f)));
         Set(promptEntity,
          new Text(
             Fonts.HeaderFont,
@@ -31,8 +31,11 @@ public class XPAndLevel : Manipulator
             Stores.TextStorage.GetID("LEVEL UP"),
             MoonWorks.Graphics.Font.HorizontalAlignment.Center,
             MoonWorks.Graphics.Font.VerticalAlignment.Middle));
-        Set(promptEntity, new UI());
+        Set(promptEntity, new KeepOpacityWhenPaused());
         Set(promptEntity, new Pause());
+        Set(promptEntity, new Depth(0.1f));
+        Set(promptEntity, new Marquee(100f));
+        Set(promptEntity, new FollowsCamera(Dimensions.GameHeight * 0.25f));
     }
 
     public void GiveXP(int amt)
