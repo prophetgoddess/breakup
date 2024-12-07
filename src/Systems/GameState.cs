@@ -362,7 +362,7 @@ public class GameState : MoonTools.ECS.System
             else if (!Some<MainMenu>())
             {
                 var pauseEntity = CreateEntity();
-                Set(pauseEntity, new Position(new Vector2(Dimensions.WindowWidth * 0.5f, Dimensions.WindowHeight * 0.5f)));
+                Set(pauseEntity, new Position(new Vector2(Dimensions.GameWidth * 0.5f, Dimensions.GameHeight * 0.5f)));
                 Set(pauseEntity,
                  new Text(
                     Fonts.HeaderFont,
@@ -370,8 +370,9 @@ public class GameState : MoonTools.ECS.System
                     Stores.TextStorage.GetID("PAUSED"),
                     MoonWorks.Graphics.Font.HorizontalAlignment.Center,
                     MoonWorks.Graphics.Font.VerticalAlignment.Middle));
-                Set(pauseEntity, new UI());
+                Set(pauseEntity, new KeepOpacityWhenPaused());
                 Set(pauseEntity, new Pause());
+                Set(pauseEntity, new Marquee(100f));
             }
         }
 

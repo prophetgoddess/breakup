@@ -44,6 +44,7 @@ class Program : Game
             new Blocks(World),
             new PowerMeter(World),
             new Stars(World),
+            new MarqueeController(World)
         ];
 
         Renderer = new Renderer(World, MainWindow, GraphicsDevice, Inputs);

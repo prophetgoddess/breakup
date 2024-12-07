@@ -20,6 +20,19 @@ public class XPAndLevel : Manipulator
         Set(levelEntity, new Level(level.Value + 1));
 
         Set(GetSingletonEntity<XP>(), new XP(currentXP, targetXP));
+
+        var promptEntity = CreateEntity();
+        Set(promptEntity,
+        new Position(new Vector2(Dimensions.WindowWidth * 0.5f, Dimensions.WindowHeight * 0.25f)));
+        Set(promptEntity,
+         new Text(
+            Fonts.HeaderFont,
+            Fonts.HeaderSize,
+            Stores.TextStorage.GetID("LEVEL UP"),
+            MoonWorks.Graphics.Font.HorizontalAlignment.Center,
+            MoonWorks.Graphics.Font.VerticalAlignment.Middle));
+        Set(promptEntity, new UI());
+        Set(promptEntity, new Pause());
     }
 
     public void GiveXP(int amt)

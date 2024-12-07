@@ -303,7 +303,7 @@ public class Renderer : MoonTools.ECS.Renderer
             var text = Get<Text>(textEntity);
             var color = Has<Highlight>(textEntity) ? palette.Highlight : palette.Foreground;
 
-            if (Some<Pause>())
+            if (Some<Pause>() && !Has<KeepOpacityWhenPaused>(textEntity))
                 color.A = 200;
 
             textBatch.Start(Stores.FontStorage.Get(text.FontID));

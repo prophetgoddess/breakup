@@ -48,3 +48,4 @@ public readonly record struct Block(int GemReward);
 public readonly record struct DamageMultiplier(int Multiplier);
 public readonly record struct Pause();
 public readonly record struct KeepOpacityWhenPaused();
+public readonly record struct Marquee(float Speed);
