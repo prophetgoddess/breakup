@@ -93,6 +93,7 @@ public class GameState : MoonTools.ECS.System
         Set(leftBoundSprite, new Scale(new Vector2(24f, 2000)));
         Set(leftBoundSprite, new DestroyOnStartGame());
         Set(leftBoundSprite, new FollowsCamera(0));
+        Set(leftBoundSprite, new KeepOpacityWhenPaused());
 
         var rightBound = CreateEntity();
         Set(rightBound, new Position(new Vector2(Dimensions.GameWidth + 8, 0)));
@@ -107,6 +108,7 @@ public class GameState : MoonTools.ECS.System
         Set(rightBoundSprite, new Scale(new Vector2(24f, 2000)));
         Set(rightBoundSprite, new DestroyOnStartGame());
         Set(rightBoundSprite, new FollowsCamera(0));
+        Set(rightBoundSprite, new KeepOpacityWhenPaused());
 
         var bottomBound = CreateEntity();
         Set(bottomBound, new Position(new Vector2(Dimensions.GameWidth * 0.5f, Dimensions.GameHeight + 8)));
@@ -357,7 +359,7 @@ public class GameState : MoonTools.ECS.System
             {
                 Destroy(GetSingletonEntity<Pause>());
             }
-            else
+            else if (!Some<MainMenu>())
             {
                 var pauseEntity = CreateEntity();
                 Set(pauseEntity, new Position(new Vector2(Dimensions.WindowWidth * 0.5f, Dimensions.WindowHeight * 0.5f)));

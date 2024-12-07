@@ -342,10 +342,14 @@ public class Renderer : MoonTools.ECS.Renderer
             var color = Has<Highlight>(entity) ? palette.Highlight : palette.Foreground;
             var depth = Has<Depth>(entity) ? Get<Depth>(entity).Value : 0.5f;
 
-            if (Some<Pause>())
+            if (Some<Pause>() && !Has<KeepOpacityWhenPaused>(entity))
                 color.A = 128;
 
-            Matrix4x4 model = Matrix4x4.CreateScale(new Vector3(scale.X, scale.Y, 0f)) * Matrix4x4.CreateFromAxisAngle(Vector3.UnitZ, rotation) * Matrix4x4.CreateTranslation(new Vector3(position, depth)) * cameraMatrix;
+            Matrix4x4 model =
+                Matrix4x4.CreateScale(new Vector3(scale.X, scale.Y, 0f)) *
+                Matrix4x4.CreateFromAxisAngle(Vector3.UnitZ, rotation) *
+                Matrix4x4.CreateTranslation(new Vector3(position, depth)) * cameraMatrix;
+
             var uniforms = new TransformVertexUniform(model, color);
 
             gamePass.BindVertexBuffers(mesh.VertexBuffer);
