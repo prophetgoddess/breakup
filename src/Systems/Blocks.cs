@@ -145,6 +145,7 @@ public class Blocks : MoonTools.ECS.System
                 {
                     var reward = Get<Block>(block).GemReward;
                     GemSpawner.SpawnGems(Rando.IntInclusive(reward, reward * 2), Get<Position>(block).Value);
+                    Set(CreateEntity(), new PlayOnce(Stores.SFXStorage.GetID(Content.SFX.pop)));
                     Destroy(hpDisplay);
                     Destroy(block);
                     continue;

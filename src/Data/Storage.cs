@@ -1,3 +1,4 @@
+using MoonWorks.Audio;
 using MoonWorks.Graphics.Font;
 
 namespace Ball;
@@ -6,6 +7,7 @@ public static class Stores
 {
     public static Storage<string> TextStorage = new Storage<string>();
     public static Storage<Font> FontStorage = new Storage<Font>();
+    public static Storage<AudioBuffer> SFXStorage = new Storage<AudioBuffer>();
 }
 
 // Generic class for storing managed types

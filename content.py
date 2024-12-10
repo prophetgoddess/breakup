@@ -119,6 +119,25 @@ if os.path.exists(texture_in):
             subprocess.run(["cramcli", os.path.join(texture_in, dir), texture_out, dir])
 
 #
+# SFX
+#
+
+if os.path.exists(audio_in):
+    if not os.path.isdir(audio_out):
+        os.mkdir(audio_out)
+
+    for sfx in Path(audio_in).glob("**/*.wav"):
+        subprocess.run(
+            [
+                "ffmpeg",
+                "-y",
+                "-i",
+                sfx,
+                os.path.join(audio_out, f"{Path(sfx).stem}.wav"),
+            ]
+        )
+
+#
 # MSDF FONT ATLAS GENERATION
 #
 
@@ -193,6 +212,7 @@ using System;
 using System.Text;
 using System.Numerics;
 using MoonWorks.Graphics.Font;
+using MoonWorks.Audio;
 using System.Reflection;
 using Path = System.IO.Path;
 using Buffer = MoonWorks.Graphics.Buffer;
@@ -287,6 +307,28 @@ public static class Content
     f.write("\n}\n}\n\n")
 
     f.write(
+        """public static class SFX
+        {
+"""
+    )
+
+    for sfx in Path(audio_out).glob("*.wav"):
+        f.write(f"public static AudioBuffer {Path(sfx).stem};\n")
+
+    f.write(
+        """public static void LoadSFX(AudioDevice audioDevice, string path)
+        {
+"""
+    )
+
+    for sfx in Path(audio_out).glob("*.wav"):
+        f.write(
+            f'{Path(sfx).stem} = AudioDataWav.CreateBuffer(audioDevice, Path.Join(path, "{Path(sfx).stem}.wav"));\n'
+        )
+
+    f.write("\n}\n}\n\n")
+
+    f.write(
         """public static class Models
         {
         public abstract class Model
@@ -361,11 +403,12 @@ public static class Content
     f.write("\n}\n\n")
 
     f.write(
-        """public static void LoadAll(GraphicsDevice graphicsDevice)
+        """public static void LoadAll(GraphicsDevice graphicsDevice, AudioDevice audioDevice)
         {
             var cmdbuf = graphicsDevice.AcquireCommandBuffer();
 
             Fonts.LoadFonts(graphicsDevice, Path.Join(System.AppContext.BaseDirectory, "Fonts"));
+            SFX.LoadSFX(audioDevice, Path.Join(System.AppContext.BaseDirectory, "Audio"));
 
             graphicsDevice.Submit(cmdbuf);
     

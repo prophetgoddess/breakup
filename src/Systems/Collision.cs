@@ -87,6 +87,10 @@ public class Collision : MoonTools.ECS.System
                 var hitPoints = Get<HitPoints>(other);
                 Set(other, new HitPoints(hitPoints.Value - damage, hitPoints.Max));
             }
+            else if (Has<CanDealDamageToBlock>(entity) && !Has<HitBall>(other))
+            {
+                Set(CreateEntity(), new PlayOnce(Stores.SFXStorage.GetID(Content.SFX.clink)));
+            }
 
             var newVelocity = velocity;
 
@@ -107,6 +111,8 @@ public class Collision : MoonTools.ECS.System
             }
 
             Set(entity, new Velocity(newVelocity));
+
+
 
         }
     }

@@ -26,7 +26,7 @@ class Program : Game
         debugMode
     )
     {
-        Content.LoadAll(GraphicsDevice);
+        Content.LoadAll(GraphicsDevice, AudioDevice);
 
         Systems =
         [
@@ -44,7 +44,8 @@ class Program : Game
             new Blocks(World),
             new PowerMeter(World),
             new Stars(World),
-            new MarqueeController(World)
+            new MarqueeController(World),
+            new Audio(World, AudioDevice)
         ];
 
         Renderer = new Renderer(World, MainWindow, GraphicsDevice, Inputs);
