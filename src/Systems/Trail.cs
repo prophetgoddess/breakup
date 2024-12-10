@@ -5,28 +5,28 @@ using MoonWorks.Math;
 
 namespace Ball;
 
-public class Stars : MoonTools.ECS.System
+public class Trail : MoonTools.ECS.System
 {
     Filter BallFilter;
 
-    public Stars(World world) : base(world)
+    public Trail(World world) : base(world)
     {
         BallFilter = FilterBuilder.Include<DamageMultiplier>().Build();
     }
 
-    public Entity SpawnStar()
+    public Entity SpawnTrail(int model)
     {
         var entity = CreateEntity();
 
-        Set(entity, new Model(Content.Models.Star.ID));
+        Set(entity, new Model(model));
         Set(entity, new Position(Vector2.Zero));
-        Set(entity, new Orientation(Rando.Range(0f, MathF.PI * 2f)));
         Set(entity, new Scale(new Vector2(8, 8)));
         Set(entity, new DestroyOnStartGame());
         Set(entity, new Highlight());
         Set(entity, new AngularVelocity(Rando.Range(-5f, 5f)));
-        Set(entity, new Depth(0.01f));
-        Set(entity, new Timer(0.2f));
+        Set(entity, new Depth(0.99f));
+        Set(entity, new Timer(0.1f));
+        Set(entity, new Alpha(128));
         return entity;
     }
 
@@ -38,8 +38,16 @@ public class Stars : MoonTools.ECS.System
 
         foreach (var entity in BallFilter.Entities)
         {
-            var star = SpawnStar();
-            Set(star, new Position(Get<Position>(entity).Value + Rando.InsideUnitCircle() * 8.0f));
+            if (!HasOutRelation<TrailTimer>(entity))
+            {
+                var t = SpawnTrail(Get<Model>(entity).ID);
+                Set(t, new Scale(Get<Scale>(entity).Value));
+                Set(t, new Position(Get<Position>(entity).Value));
+
+                var timer = CreateEntity();
+                Set(timer, new Timer(0.033f));
+                Relate(entity, timer, new TrailTimer());
+            }
         }
     }
 }

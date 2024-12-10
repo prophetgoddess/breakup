@@ -340,6 +340,7 @@ public class Renderer : MoonTools.ECS.Renderer
             var mesh = Content.Models.IDToModel[Get<Model>(entity).ID];
             var scale = Has<Scale>(entity) ? Get<Scale>(entity).Value : Vector2.One;
             var color = Has<Highlight>(entity) ? palette.Highlight : palette.Foreground;
+            color.A = Has<Alpha>(entity) ? Get<Alpha>(entity).A : color.A;
             var depth = Has<Depth>(entity) ? Get<Depth>(entity).Value : 0.5f;
 
             if (Some<Pause>() && !Has<KeepOpacityWhenPaused>(entity))

@@ -155,7 +155,7 @@ public class Collision : MoonTools.ECS.System
             if (HasOutRelation<Spinning>(other))
             {
                 velocity.Y -= 300.0f;
-                if (meter.Value == 1.0f)
+                if (meter.Value >= 0.0f)
                 {
                     Set(entity, new DamageMultiplier(2));
                 }

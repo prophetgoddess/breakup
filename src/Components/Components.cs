@@ -50,3 +50,4 @@ public readonly record struct Pause();
 public readonly record struct KeepOpacityWhenPaused();
 public readonly record struct Marquee(float Speed);
 public readonly record struct PlayOnce(int AudioID);
+public readonly record struct Alpha(byte A);

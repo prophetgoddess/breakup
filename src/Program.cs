@@ -43,7 +43,7 @@ class Program : Game
             new Parent(World),
             new Blocks(World),
             new PowerMeter(World),
-            new Stars(World),
+            new Trail(World),
             new MarqueeController(World),
             new Audio(World, AudioDevice)
         ];
