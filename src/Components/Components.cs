@@ -18,7 +18,7 @@ public readonly record struct HasGravity(float Scale);
 public readonly record struct ResetBallOnHit();
 public readonly record struct CanTakeDamageFromBall();
 public readonly record struct CanDealDamageToBlock(int Amount);
-public readonly record struct CameraPosition(float Y, float TargetY);
+public readonly record struct CameraPosition(float Y);
 public readonly record struct FollowsCamera(float Y);
 public readonly record struct CameraFollows();
 public readonly record struct UI();

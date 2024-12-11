@@ -92,18 +92,6 @@ public class Collision : MoonTools.ECS.System
                 Set(CreateEntity(), new PlayOnce(Stores.SFXStorage.GetID(Content.SFX.clink)));
             }
 
-            if (Some<CameraPosition>())
-            {
-                var camera = GetSingletonEntity<CameraPosition>();
-                var offset = Get<CameraPosition>(camera);
-                var otherPosition = Get<Position>(other).Value;
-
-                if (otherPosition.Y < -offset.Y)
-                {
-                    Set(camera, new CameraPosition(offset.Y, -otherPosition.Y));
-                }
-            }
-
             var newVelocity = velocity;
 
             if (xCollision && !yCollision)

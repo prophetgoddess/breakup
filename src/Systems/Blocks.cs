@@ -121,7 +121,7 @@ public class Blocks : MoonTools.ECS.System
         {
             LastGridOffset = cam.Y;
 
-            int y = -(int)(MathF.Floor(cam.Y + CellSize) / CellSize);
+            int y = -(int)(MathF.Floor(cam.Y + CellSize) / CellSize) - 3;
             System.Console.WriteLine("y: " + y);
 
             for (int x = 0; x < GridWidth; x++)

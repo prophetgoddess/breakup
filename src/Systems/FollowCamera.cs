@@ -28,11 +28,7 @@ public class FollowCamera : MoonTools.ECS.System
             offset = -ballPosition.Y;
         }
 
-        if (pos.TargetY > offset)
-        {
-            offset += (pos.TargetY - offset) * (float)delta.TotalSeconds;
-        }
-        Set(camera, new CameraPosition(offset, Get<CameraPosition>(camera).TargetY));
+        Set(camera, new CameraPosition(offset));
 
         foreach (var entity in FollowFilter.Entities)
         {

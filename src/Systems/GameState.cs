@@ -121,7 +121,7 @@ public class GameState : MoonTools.ECS.System
         Set(bottomBound, new DestroyOnStartGame());
 
         var cameraEntity = CreateEntity();
-        Set(cameraEntity, new CameraPosition(0f, 0f));
+        Set(cameraEntity, new CameraPosition(0f));
         Set(cameraEntity, new DestroyOnStartGame());
 
         var livesLabel = CreateEntity();
