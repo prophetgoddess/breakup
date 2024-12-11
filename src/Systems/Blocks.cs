@@ -40,7 +40,7 @@ public class Blocks : MoonTools.ECS.System
         .Build();
     }
 
-    void SpawnBlock(int x, int y)
+    void SpawnBlock(int x, int y, bool barrier = false)
     {
         var cameraY = GetSingleton<CameraPosition>().Y;
 
@@ -49,7 +49,7 @@ public class Blocks : MoonTools.ECS.System
 
         var hp = Rando.IntInclusive(min, max);
 
-        if (Rando.Value > 0.9f)
+        if (Rando.Value > 0.9f || barrier)
         {
             hp = Rando.IntInclusive(min * 2, max * 2);
         }
@@ -62,7 +62,7 @@ public class Blocks : MoonTools.ECS.System
         Set(block, new Block(hp));
         Set(block, new DestroyOnStartGame());
 
-        if (Rando.Value < 0.75f)
+        if (Rando.Value < 0.75f || barrier)
         {
             Set(block, new HitPoints(hp, hp));
             Set(block, new Model(Content.Models.RoundEmptySquare.ID));
@@ -121,7 +121,8 @@ public class Blocks : MoonTools.ECS.System
         {
             LastGridOffset = cam.Y;
 
-            int y = -(int)(MathF.Floor(cam.Y + CellSize) / CellSize) - 3;
+            int y = -(int)(MathF.Floor(cam.Y + CellSize) / CellSize);
+            System.Console.WriteLine("y: " + y);
 
             for (int x = 0; x < GridWidth; x++)
             {

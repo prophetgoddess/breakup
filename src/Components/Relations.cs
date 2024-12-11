@@ -17,3 +17,4 @@ public readonly record struct LockMeter();
 public readonly record struct FlickerTimer();
 public readonly record struct HPDisplay();
 public readonly record struct TrailTimer();
+public readonly record struct HorizontalConnection();

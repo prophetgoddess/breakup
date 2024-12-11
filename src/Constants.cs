@@ -28,6 +28,7 @@ public static class Fonts
     public const int MidSize = 42;
     public const int BodySize = 32;
     public const int PromptSize = 22;
+    public const int UpgradeSize = 16;
     public const int InfoSize = 10;
 }
 

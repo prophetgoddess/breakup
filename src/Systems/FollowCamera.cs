@@ -18,7 +18,8 @@ public class FollowCamera : MoonTools.ECS.System
             return;
 
         var camera = GetSingletonEntity<CameraPosition>();
-        var offset = Get<CameraPosition>(camera).Y;
+        var pos = Get<CameraPosition>(camera);
+        var offset = pos.Y;
         var ball = GetSingletonEntity<CameraFollows>();
         var ballPosition = Get<Position>(ball).Value;
 
@@ -27,7 +28,11 @@ public class FollowCamera : MoonTools.ECS.System
             offset = -ballPosition.Y;
         }
 
-        Set(camera, new CameraPosition(offset));
+        if (pos.TargetY > offset)
+        {
+            offset += (pos.TargetY - offset) * (float)delta.TotalSeconds;
+        }
+        Set(camera, new CameraPosition(offset, Get<CameraPosition>(camera).TargetY));
 
         foreach (var entity in FollowFilter.Entities)
         {

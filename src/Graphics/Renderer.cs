@@ -299,6 +299,9 @@ public class Renderer : MoonTools.ECS.Renderer
 
         foreach (var textEntity in GameTextFilter.Entities)
         {
+            if (Has<Invisible>(textEntity))
+                continue;
+
             var textBatch = GetTextBatch();
             var text = Get<Text>(textEntity);
             var color = Has<Highlight>(textEntity) ? palette.Highlight : palette.Foreground;
@@ -315,6 +318,9 @@ public class Renderer : MoonTools.ECS.Renderer
 
         foreach (var textEntity in TextFilter.Entities)
         {
+            if (Has<Invisible>(textEntity))
+                continue;
+
             var textBatch = GetTextBatch();
             var text = Get<Text>(textEntity);
             var color = Has<Highlight>(textEntity) ? palette.Highlight : palette.Foreground;

@@ -10,6 +10,26 @@ public class XPAndLevel : Manipulator
     {
     }
 
+    Entity CreateUpgrade(float x)
+    {
+        var upgrade = CreateEntity();
+        Set(upgrade,
+        new Position(new Vector2(x, Dimensions.GameHeight * 0.4f)));
+        Set(upgrade,
+         new Text(
+            Fonts.HeaderFont,
+            Fonts.UpgradeSize,
+            Stores.TextStorage.GetID("UPGRADE"),
+            MoonWorks.Graphics.Font.HorizontalAlignment.Center,
+            MoonWorks.Graphics.Font.VerticalAlignment.Middle));
+        Set(upgrade, new KeepOpacityWhenPaused());
+        Set(upgrade, new Pause());
+        Set(upgrade, new Depth(0.1f));
+        Set(upgrade, new FollowsCamera(Dimensions.GameHeight * 0.4f));
+        Set(upgrade, new DestroyWhenLeavingUpgradeMenu());
+        return upgrade;
+    }
+
     public void LevelUp()
     {
         var levelEntity = GetSingletonEntity<Level>();
@@ -36,6 +56,19 @@ public class XPAndLevel : Manipulator
         Set(promptEntity, new Depth(0.1f));
         Set(promptEntity, new Marquee(100f));
         Set(promptEntity, new FollowsCamera(Dimensions.GameHeight * 0.25f));
+        Set(promptEntity, new DestroyWhenLeavingUpgradeMenu());
+
+
+        var upgrade1 = CreateUpgrade(Dimensions.GameWidth * 0.15f);
+        var upgrade2 = CreateUpgrade(Dimensions.GameWidth * 0.5f);
+        var upgrade3 = CreateUpgrade(Dimensions.GameWidth * 0.85f);
+
+        Relate(upgrade1, upgrade2, new HorizontalConnection());
+        Relate(upgrade2, upgrade3, new HorizontalConnection());
+
+        Set(upgrade2, new Selected());
+
+
     }
 
     public void GiveXP(int amt)

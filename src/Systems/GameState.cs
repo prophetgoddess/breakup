@@ -119,7 +119,7 @@ public class GameState : MoonTools.ECS.System
         Set(bottomBound, new DestroyOnStartGame());
 
         var cameraEntity = CreateEntity();
-        Set(cameraEntity, new CameraPosition(0f));
+        Set(cameraEntity, new CameraPosition(0f, 0f));
         Set(cameraEntity, new DestroyOnStartGame());
 
         var livesLabel = CreateEntity();
@@ -181,7 +181,7 @@ public class GameState : MoonTools.ECS.System
                 10,
                 UILayoutConstants.GemsY
             )));
-        Set(xp, new XP(0, 10));
+        Set(xp, new XP(0, 1));
         Set(xp,
         new Text(
             Fonts.BodyFont,
@@ -355,11 +355,11 @@ public class GameState : MoonTools.ECS.System
 
         if (inputState.Start.IsPressed)
         {
-            if (Some<Pause>())
+            if (Some<Pause>() && !Some<Selected>())
             {
                 Destroy(GetSingletonEntity<Pause>());
             }
-            else if (!Some<MainMenu>())
+            else if (!Some<MainMenu>() && !Some<Selected>())
             {
                 var pauseEntity = CreateEntity();
                 Set(pauseEntity, new Position(new Vector2(Dimensions.GameWidth * 0.5f, Dimensions.GameHeight * 0.5f)));
