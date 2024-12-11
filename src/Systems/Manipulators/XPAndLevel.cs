@@ -14,7 +14,7 @@ public class XPAndLevel : Manipulator
     {
         var upgrade = CreateEntity();
         Set(upgrade,
-        new Position(new Vector2(x, Dimensions.GameHeight * 0.4f)));
+        new Position(new Vector2(x, Dimensions.GameHeight * 0.45f)));
         Set(upgrade,
          new Text(
             Fonts.HeaderFont,
@@ -25,8 +25,27 @@ public class XPAndLevel : Manipulator
         Set(upgrade, new KeepOpacityWhenPaused());
         Set(upgrade, new Pause());
         Set(upgrade, new Depth(0.1f));
-        Set(upgrade, new FollowsCamera(Dimensions.GameHeight * 0.4f));
+        Set(upgrade, new FollowsCamera(Dimensions.GameHeight * 0.45f));
         Set(upgrade, new DestroyWhenLeavingUpgradeMenu());
+
+        var description = CreateEntity();
+        Set(description,
+            new Position(new Vector2(x, Dimensions.GameHeight * 0.5f)));
+        Set(description,
+         new Text(
+            Fonts.BodyFont,
+            Fonts.InfoSize,
+            Stores.TextStorage.GetID("Lorem ipsum"),
+            MoonWorks.Graphics.Font.HorizontalAlignment.Center,
+            MoonWorks.Graphics.Font.VerticalAlignment.Middle));
+        Set(description, new KeepOpacityWhenPaused());
+        Set(description, new Pause());
+        Set(description, new Depth(0.1f));
+        Set(description, new FollowsCamera(Dimensions.GameHeight * 0.5f));
+        Set(description, new DestroyWhenLeavingUpgradeMenu());
+
+        Relate(upgrade, description, new Description());
+
         return upgrade;
     }
 
@@ -87,6 +106,7 @@ public class XPAndLevel : Manipulator
 
         Relate(upgrade1, upgrade2, new HorizontalConnection());
         Relate(upgrade2, upgrade3, new HorizontalConnection());
+        Relate(upgrade3, upgrade1, new HorizontalConnection());
 
         Set(upgrade2, new Selected());
 
