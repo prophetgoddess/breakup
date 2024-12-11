@@ -58,6 +58,28 @@ public class XPAndLevel : Manipulator
         Set(promptEntity, new FollowsCamera(Dimensions.GameHeight * 0.25f));
         Set(promptEntity, new DestroyWhenLeavingUpgradeMenu());
 
+        var text = Get<Text>(promptEntity);
+        var font = Stores.FontStorage.Get(text.FontID);
+        var str = Stores.TextStorage.Get(text.TextID);
+        WellspringCS.Wellspring.Rectangle rect;
+        font.TextBounds(str, text.Size, text.HorizontalAlignment, text.VerticalAlignment, out rect);
+
+        var promptDouble = CreateEntity();
+        Set(promptDouble,
+            new Position(new Vector2(Dimensions.GameWidth * 0.5f - rect.W - text.Size, Dimensions.GameHeight * 0.25f)));
+        Set(promptDouble,
+         new Text(
+            Fonts.HeaderFont,
+            Fonts.HeaderSize,
+            Stores.TextStorage.GetID("LEVEL UP"),
+            MoonWorks.Graphics.Font.HorizontalAlignment.Center,
+            MoonWorks.Graphics.Font.VerticalAlignment.Middle));
+        Set(promptDouble, new KeepOpacityWhenPaused());
+        Set(promptDouble, new Depth(0.1f));
+        Set(promptDouble, new Marquee(100f));
+        Set(promptDouble, new FollowsCamera(Dimensions.GameHeight * 0.25f));
+        Set(promptDouble, new DestroyWhenLeavingUpgradeMenu());
+
 
         var upgrade1 = CreateUpgrade(Dimensions.GameWidth * 0.15f);
         var upgrade2 = CreateUpgrade(Dimensions.GameWidth * 0.5f);
