@@ -38,7 +38,6 @@ public class Upgrade : MoonTools.ECS.System
 
             Set(selector, new Position(new Vector2(Get<Position>(selected).Value.X, Get<Position>(selected).Value.Y - 20f)));
             Set(selector, new FollowsCamera(Get<Position>(selected).Value.Y - 20));
-            Set(selected, new Flicker(0.1f));
 
             if (inputState.Right.IsPressed)
             {

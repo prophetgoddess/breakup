@@ -13,8 +13,6 @@ public class Flickering : MoonTools.ECS.System
 
     public override void Update(TimeSpan delta)
     {
-        if (Some<Pause>())
-            return;
 
         foreach (var entity in FlickerFilter.Entities)
         {
@@ -31,6 +29,7 @@ public class Flickering : MoonTools.ECS.System
                 }
 
                 var timer = CreateEntity();
+                Set(timer, new WhilePaused());
                 Set(timer, new Timer(flicker.Rate));
                 Relate(entity, timer, new FlickerTimer());
             }

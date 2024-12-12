@@ -12,6 +12,8 @@ public class Blocks : MoonTools.ECS.System
     int CellSize = 32;
     int GridWidth { get { return Dimensions.GameWidth / CellSize; } }
     int GridHeight { get { return Dimensions.GameHeight / CellSize; } }
+    UpgradeMenuSpawner UpgradeMenuSpawner;
+
 
     System.Random Random = new System.Random();
     float LastGridOffset = -1.0f;
@@ -38,6 +40,8 @@ public class Blocks : MoonTools.ECS.System
         BlockFilter = FilterBuilder
         .Include<Block>()
         .Build();
+
+        UpgradeMenuSpawner = new UpgradeMenuSpawner(world);
     }
 
     void SpawnBlock(int x, int y, bool barrier = false)
@@ -67,6 +71,7 @@ public class Blocks : MoonTools.ECS.System
             Set(block, new HitPoints(hp, hp));
             Set(block, new Model(Content.Models.RoundEmptySquare.ID));
 
+
             Set(block, new CanTakeDamageFromBall());
             var hpDisplay = CreateEntity();
             //Set(hpDisplay, new Scale(Vector2.One));
@@ -75,6 +80,17 @@ public class Blocks : MoonTools.ECS.System
             //Set(hpDisplay, new Model(Content.Models.Square.ID));
             Relate(block, hpDisplay, new HPDisplay());
             Set(hpDisplay, new Text(Fonts.BodyFont, Fonts.InfoSize, Stores.TextStorage.GetID($"{GetFormattedHP(hp)}"), MoonWorks.Graphics.Font.HorizontalAlignment.Center, MoonWorks.Graphics.Font.VerticalAlignment.Middle));
+
+            if (Rando.Value < 0.01)
+            {
+                Set(block, new GivesUpgrade());
+                Set(block, new Highlight());
+                Set(hpDisplay, new Highlight());
+                hp *= 2;
+                Set(block, new HitPoints(hp, hp));
+                Set(hpDisplay, new Text(Fonts.BodyFont, Fonts.InfoSize, Stores.TextStorage.GetID($"{GetFormattedHP(hp)}"), MoonWorks.Graphics.Font.HorizontalAlignment.Center, MoonWorks.Graphics.Font.VerticalAlignment.Middle));
+
+            }
 
         }
         else
@@ -144,8 +160,18 @@ public class Blocks : MoonTools.ECS.System
 
                 if (hp.Value <= 0)
                 {
-                    var reward = Get<Block>(block).GemReward;
-                    GemSpawner.SpawnGems(Rando.IntInclusive(reward, reward * 2), Get<Position>(block).Value);
+
+                    if (Has<GivesUpgrade>(block))
+                    {
+                        UpgradeMenuSpawner.OpenUpgradeMenu();
+
+                    }
+                    else
+                    {
+                        var reward = Get<Block>(block).GemReward;
+                        GemSpawner.SpawnGems(Rando.IntInclusive(reward, reward * 2), Get<Position>(block).Value);
+                    }
+
                     Set(CreateEntity(), new PlayOnce(Stores.SFXStorage.GetID(Content.SFX.pop)));
                     Destroy(hpDisplay);
                     Destroy(block);

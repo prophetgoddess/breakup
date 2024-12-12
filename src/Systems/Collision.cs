@@ -111,9 +111,6 @@ public class Collision : MoonTools.ECS.System
             }
 
             Set(entity, new Velocity(newVelocity));
-
-
-
         }
     }
 
