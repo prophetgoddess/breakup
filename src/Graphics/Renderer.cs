@@ -507,6 +507,5 @@ public class Renderer : MoonTools.ECS.Renderer
                 Cycle = false
             });
         }
-
     }
 }

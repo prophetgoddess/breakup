@@ -183,7 +183,7 @@ public class GameState : MoonTools.ECS.System
                 10,
                 UILayoutConstants.GemsY
             )));
-        Set(xp, new XP(0, 1));
+        Set(xp, new XP(0, 10));
         Set(xp,
         new Text(
             Fonts.BodyFont,
