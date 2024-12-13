@@ -1,6 +1,7 @@
 ﻿using MoonTools.ECS;
 using MoonWorks;
 using MoonWorks.Graphics;
+using SDL3;
 using System.Numerics;
 
 namespace Ball;
@@ -26,6 +27,9 @@ class Program : Game
         debugMode
     )
     {
+        AppDomain.CurrentDomain.UnhandledException += HandleUnhandledException;
+
+
         Content.LoadAll(GraphicsDevice, AudioDevice);
 
         Systems =
@@ -53,6 +57,21 @@ class Program : Game
 
         World.Set(World.CreateEntity(), Palettes.MillenialApartment);
 
+    }
+
+    private static void HandleUnhandledException(object sender, UnhandledExceptionEventArgs args)
+    {
+        var e = (Exception)args.ExceptionObject;
+
+        var outFile = Path.Combine(AppContext.BaseDirectory, $"error-{DateTimeOffset.UtcNow.ToUnixTimeSeconds()}.txt");
+        File.WriteAllText(outFile, e.ToString());
+
+        SDL.SDL_ShowSimpleMessageBox(
+            SDL.SDL_MessageBoxFlags.SDL_MESSAGEBOX_ERROR,
+            "FLAGRANT SYSTEM ERROR",
+            e.ToString(),
+            IntPtr.Zero
+        );
     }
 
     protected override void Update(TimeSpan delta)
