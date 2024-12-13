@@ -19,6 +19,8 @@ public class GameState : MoonTools.ECS.System
 
     void StartGame()
     {
+        UpgradeMenuSpawner.ResetUpgrades();
+
         foreach (var entity in DestroyFilter.Entities)
         {
             Destroy(entity);

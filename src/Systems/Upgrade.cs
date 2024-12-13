@@ -7,10 +7,12 @@ namespace Ball;
 public class Upgrade : MoonTools.ECS.System
 {
     Filter CleanupFilter;
+    UpgradeMenuSpawner UpgradeMenuSpawner;
 
     public Upgrade(World world) : base(world)
     {
         CleanupFilter = FilterBuilder.Include<DestroyWhenLeavingUpgradeMenu>().Build();
+        UpgradeMenuSpawner = new UpgradeMenuSpawner(world);
     }
 
     Entity CreateSelector()
@@ -25,6 +27,66 @@ public class Upgrade : MoonTools.ECS.System
         Set(selector, new DestroyWhenLeavingUpgradeMenu());
 
         return selector;
+    }
+
+    bool GiveUpgrade(Entity upgrade)
+    {
+        var type = Get<UpgradeOption>(upgrade).Upgrade;
+
+        if (type == Upgrades.ChainReaction)
+        {
+
+        }
+        else if (type == Upgrades.Combo)
+        {
+
+        }
+        else if (type == Upgrades.Confidence)
+        {
+
+        }
+        else if (type == Upgrades.Invictus)
+        {
+
+        }
+        else if (type == Upgrades.MedSchool)
+        {
+
+        }
+        else if (type == Upgrades.OptimalHealth)
+        {
+
+        }
+        else if (type == Upgrades.Piercing)
+        {
+
+        }
+        else if (type == Upgrades.Emergency)
+        {
+            var entity = GetSingletonEntity<Lives>();
+            var lives = Get<Lives>(entity);
+            Set(entity, new Lives(lives.Value + 3));
+        }
+        else if (type == Upgrades.Refresh)
+        {
+            foreach (var entity in CleanupFilter.Entities)
+            {
+                Destroy(entity);
+            }
+
+            UpgradeMenuSpawner.OpenUpgradeMenu();
+            return false;
+        }
+        else if (type == Upgrades.Revenge)
+        {
+
+        }
+        else if (type == Upgrades.Safety)
+        {
+
+        }
+
+        return true;
     }
 
     public override void Update(TimeSpan delta)
@@ -59,9 +121,12 @@ public class Upgrade : MoonTools.ECS.System
             }
             if (inputState.Swing.IsPressed)
             {
-                foreach (var entity in CleanupFilter.Entities)
+                if (GiveUpgrade(selected))
                 {
-                    Destroy(entity);
+                    foreach (var entity in CleanupFilter.Entities)
+                    {
+                        Destroy(entity);
+                    }
                 }
             }
         }

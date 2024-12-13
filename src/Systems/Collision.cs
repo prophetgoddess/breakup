@@ -94,7 +94,7 @@ public class Collision : MoonTools.ECS.System
                 Set(numberEntity, new Velocity(
                     new Vector2(
                         Rando.Range(-100f, 100f),
-                        Rando.Range(-100f, -20f)
+                        Rando.Range(20f, 100f)
                     )
                 ));
                 Set(numberEntity, new Depth(0.01f));

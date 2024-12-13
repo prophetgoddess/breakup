@@ -2,24 +2,111 @@ using MoonWorks.Graphics;
 using System.Numerics;
 using Ball;
 using MoonTools.ECS;
+using System.Collections;
+
+public enum Upgrades
+{
+    Emergency, //+3 lives
+    ChainReaction, //destroying blocks damages neighbors
+    Buddy, // Extra paddle
+    Bonus, //blocks can release ball when destroyed
+    Refresh, //refresh upgrades once per chest
+    Safety, // ball must hit bottom twice
+    Piercing, //ball travels through destroyed blocks
+    Confidence, //blocks spawn with less hp
+    MedSchool, //extra lives give +2 
+    Revenge, //losing a ball deals damage to all on-screen blocks
+    OptimalHealth, //ball does 2x damage on 1 life remaining
+    Invictus, //revive with one life, recharge with 3 lives
+    Combo, //ball does +1 damage for each destroyed block until it returns to the paddle
+}
 
 public class UpgradeMenuSpawner : Manipulator
 {
-    public UpgradeMenuSpawner(World world) : base(world)
+
+    static Queue<int> AvailableUpgrades = new Queue<int>();
+
+    public static bool UpgradesAvailable()
     {
+        return AvailableUpgrades.Count >= 3;
     }
 
-    Entity CreateUpgrade(float x)
+    Upgrades SetUpgradeType(Entity e)
+    {
+        var upgrade = (Upgrades)AvailableUpgrades.Dequeue();
+
+        Set(e, new UpgradeOption(upgrade));
+        return upgrade;
+    }
+
+    static string GetUpgradeName(Upgrades upgrade)
+    {
+        return upgrade switch
+        {
+            Upgrades.Emergency => "Emergency",
+            Upgrades.ChainReaction => "Chain",
+            Upgrades.Buddy => "Buddy",
+            Upgrades.Bonus => "Bonus",
+            Upgrades.Refresh => "Refresh",
+            Upgrades.Safety => "Safety",
+            Upgrades.Piercing => "Piercing",
+            Upgrades.Confidence => "Intimidate",
+            Upgrades.MedSchool => "Medicine",
+            Upgrades.Revenge => "Revenge",
+            Upgrades.OptimalHealth => "Optimal",
+            Upgrades.Invictus => "Invictus",
+            Upgrades.Combo => "Combo",
+            _ => throw new NotImplementedException()
+        };
+    }
+
+    static string GetUpgradeDescription(Upgrades upgrade)
+    {
+        return upgrade switch
+        {
+            Upgrades.Emergency => "+3 Lives",
+            Upgrades.ChainReaction => "Destroying blocks damages neighbors",
+            Upgrades.Buddy => "Extra paddle",
+            Upgrades.Bonus => "Blocks sometimes release extra balls",
+            Upgrades.Refresh => "Get new upgrades",
+            Upgrades.Safety => "Fragile barrier keeps the ball in play",
+            Upgrades.Piercing => "Ball travels through destroyed blocks",
+            Upgrades.Confidence => "Blocks spawn with less HP",
+            Upgrades.MedSchool => "Extra lives give +2",
+            Upgrades.Revenge => "Losing a life damages all blocks",
+            Upgrades.OptimalHealth => "2x damage on 1 life remaining",
+            Upgrades.Invictus => "Revive with one life, recharges at 3 lives",
+            Upgrades.Combo => "+1 damage for each block destroyed without touching paddle",
+            _ => throw new NotImplementedException()
+        };
+    }
+
+    public static void ResetUpgrades()
+    {
+        AvailableUpgrades.Clear();
+        foreach (var n in RandomManager.LinearCongruentialSequence(Enum.GetValues(typeof(Upgrades)).Length))
+        {
+            AvailableUpgrades.Enqueue(n);
+        }
+    }
+
+    public UpgradeMenuSpawner(World world) : base(world)
+    {
+
+    }
+
+    Entity CreateUpgrade(float x, MoonWorks.Graphics.Font.HorizontalAlignment horizontalAlignment)
     {
         var upgrade = CreateEntity();
+        var type = SetUpgradeType(upgrade);
         Set(upgrade,
         new Position(new Vector2(x, Dimensions.GameHeight * 0.45f)));
         Set(upgrade,
          new Text(
             Fonts.HeaderFont,
             Fonts.UpgradeSize,
-            Stores.TextStorage.GetID("UPGRADE"),
-            MoonWorks.Graphics.Font.HorizontalAlignment.Center,
+            Stores.TextStorage.GetID(GetUpgradeName(type)),
+            horizontalAlignment,
             MoonWorks.Graphics.Font.VerticalAlignment.Middle));
         Set(upgrade, new KeepOpacityWhenPaused());
         Set(upgrade, new Pause());
@@ -34,7 +121,7 @@ public class UpgradeMenuSpawner : Manipulator
          new Text(
             Fonts.BodyFont,
             Fonts.InfoSize,
-            Stores.TextStorage.GetID("Lorem ipsum"),
+            Stores.TextStorage.GetID(GetUpgradeDescription(type)),
             MoonWorks.Graphics.Font.HorizontalAlignment.Center,
             MoonWorks.Graphics.Font.VerticalAlignment.Middle));
         Set(description, new KeepOpacityWhenPaused());
@@ -42,12 +129,12 @@ public class UpgradeMenuSpawner : Manipulator
         Set(description, new Depth(0.1f));
         Set(description, new FollowsCamera(Dimensions.GameHeight * 0.5f));
         Set(description, new DestroyWhenLeavingUpgradeMenu());
+        Set(description, new WordWrap(90));
 
         Relate(upgrade, description, new Description());
 
         return upgrade;
     }
-
 
     public void OpenUpgradeMenu()
     {
@@ -90,10 +177,9 @@ public class UpgradeMenuSpawner : Manipulator
         Set(promptDouble, new FollowsCamera(Dimensions.GameHeight * 0.25f));
         Set(promptDouble, new DestroyWhenLeavingUpgradeMenu());
 
-
-        var upgrade1 = CreateUpgrade(Dimensions.GameWidth * 0.15f);
-        var upgrade2 = CreateUpgrade(Dimensions.GameWidth * 0.5f);
-        var upgrade3 = CreateUpgrade(Dimensions.GameWidth * 0.85f);
+        var upgrade1 = CreateUpgrade(Dimensions.GameWidth * 0.15f, MoonWorks.Graphics.Font.HorizontalAlignment.Center);
+        var upgrade2 = CreateUpgrade(Dimensions.GameWidth * 0.5f, MoonWorks.Graphics.Font.HorizontalAlignment.Center);
+        var upgrade3 = CreateUpgrade(Dimensions.GameWidth * 0.85f, MoonWorks.Graphics.Font.HorizontalAlignment.Center);
 
         Relate(upgrade1, upgrade2, new HorizontalConnection());
         Relate(upgrade2, upgrade3, new HorizontalConnection());

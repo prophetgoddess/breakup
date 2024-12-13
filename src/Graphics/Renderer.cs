@@ -5,6 +5,7 @@ using Buffer = MoonWorks.Graphics.Buffer;
 using MoonTools.ECS;
 using MoonWorks.Graphics.Font;
 using MoonWorks.Input;
+using System.Text;
 
 namespace Ball;
 
@@ -26,8 +27,8 @@ public class Renderer : MoonTools.ECS.Renderer
     MoonTools.ECS.Filter ColliderFilter;
 
     Queue<TextBatch> TextBatchPool;
-    Queue<(Entity, TextBatch)> GameTextBatchesToRender = new Queue<(Entity, TextBatch)>();
-    Queue<(Entity, TextBatch)> UITextBatchesToRender = new Queue<(Entity, TextBatch)>();
+    Queue<(Vector2 pos, float depth, TextBatch batch)> GameTextBatchesToRender = new Queue<(Vector2 pos, float depth, TextBatch batch)>();
+    Queue<(Vector2 pos, float depth, TextBatch batchs)> UITextBatchesToRender = new Queue<(Vector2 pos, float depth, TextBatch batch)>();
     GraphicsPipeline TextPipeline;
 
     Texture GameTexture;
@@ -36,6 +37,7 @@ public class Renderer : MoonTools.ECS.Renderer
     Texture UIDepthTexture;
     Sampler DepthSampler;
     DepthUniforms DepthUniforms;
+    StringBuilder StringBuilder = new StringBuilder();
 
     public Buffer RectIndexBuffer;
     public Buffer RectVertexBuffer;
@@ -300,18 +302,56 @@ public class Renderer : MoonTools.ECS.Renderer
             if (Has<Invisible>(textEntity))
                 continue;
 
-            var textBatch = GetTextBatch();
             var text = Get<Text>(textEntity);
             var color = Has<Highlight>(textEntity) ? palette.Highlight : palette.Foreground;
+            var textBatch = GetTextBatch();
+            var position = Get<Position>(textEntity).Value;
+            var depth = Has<Depth>(textEntity) ? Get<Depth>(textEntity).Value : 0.5f;
 
             if (Some<Pause>() && !Has<KeepOpacityWhenPaused>(textEntity))
                 color.A = 200;
+            if (!Has<WordWrap>(textEntity))
+            {
+                textBatch.Start(Stores.FontStorage.Get(text.FontID));
+                textBatch.Add(Stores.TextStorage.Get(text.TextID), text.Size, color, text.HorizontalAlignment, text.VerticalAlignment);
+                textBatch.UploadBufferData(cmdbuf);
 
-            textBatch.Start(Stores.FontStorage.Get(text.FontID));
-            textBatch.Add(Stores.TextStorage.Get(text.TextID), text.Size, color, text.HorizontalAlignment, text.VerticalAlignment);
-            textBatch.UploadBufferData(cmdbuf);
+                GameTextBatchesToRender.Enqueue((position, depth, textBatch));
+            }
+            else
+            {
+                var max = Get<WordWrap>(textEntity).Max;
+                var font = Stores.FontStorage.Get(text.FontID);
+                var str = Stores.TextStorage.Get(text.TextID);
+                var words = str.Split(' ');
+                StringBuilder.Clear();
+                var y = position.Y;
+                WellspringCS.Wellspring.Rectangle rect;
 
-            GameTextBatchesToRender.Enqueue((textEntity, textBatch));
+                foreach (var word in words)
+                {
+                    StringBuilder.Append(word);
+                    StringBuilder.Append(" ");
+                    var current = StringBuilder.ToString();
+                    font.TextBounds(current, text.Size, text.HorizontalAlignment, text.VerticalAlignment, out rect);
+                    if (rect.W >= max)
+                    {
+                        textBatch = GetTextBatch();
+                        textBatch.Start(font);
+                        textBatch.Add(current, text.Size, color, text.HorizontalAlignment, text.VerticalAlignment);
+                        textBatch.UploadBufferData(cmdbuf);
+                        GameTextBatchesToRender.Enqueue((new Vector2(position.X, y), depth, textBatch));
+                        y += rect.H + 2;
+                        StringBuilder.Clear();
+                    }
+                }
+
+                textBatch = GetTextBatch();
+                textBatch.Start(Stores.FontStorage.Get(text.FontID));
+                textBatch.Add(StringBuilder.ToString(), text.Size, color, text.HorizontalAlignment, text.VerticalAlignment);
+                textBatch.UploadBufferData(cmdbuf);
+                GameTextBatchesToRender.Enqueue((new Vector2(position.X, y), depth, textBatch));
+            }
         }
 
         foreach (var textEntity in TextFilter.Entities)
@@ -322,12 +362,15 @@ public class Renderer : MoonTools.ECS.Renderer
             var textBatch = GetTextBatch();
             var text = Get<Text>(textEntity);
             var color = Has<Highlight>(textEntity) ? palette.Highlight : palette.Foreground;
+            var position = Get<Position>(textEntity).Value;
+            var depth = Has<Depth>(textEntity) ? Get<Depth>(textEntity).Value : 0.5f;
+
 
             textBatch.Start(Stores.FontStorage.Get(text.FontID));
             textBatch.Add(Stores.TextStorage.Get(text.TextID), text.Size, color, text.HorizontalAlignment, text.VerticalAlignment);
             textBatch.UploadBufferData(cmdbuf);
 
-            UITextBatchesToRender.Enqueue((textEntity, textBatch));
+            UITextBatchesToRender.Enqueue((position, depth, textBatch));
         }
 
         var gamePass = cmdbuf.BeginRenderPass(
@@ -385,9 +428,7 @@ public class Renderer : MoonTools.ECS.Renderer
 
         while (GameTextBatchesToRender.Count > 0)
         {
-            var (textEntity, textBatch) = GameTextBatchesToRender.Dequeue();
-            var position = Get<Position>(textEntity).Value;
-            var depth = Has<Depth>(textEntity) ? Get<Depth>(textEntity).Value : 0.5f;
+            var (position, depth, textBatch) = GameTextBatchesToRender.Dequeue();
 
             var textModel = Matrix4x4.CreateTranslation(position.X, position.Y, depth);
 
@@ -455,9 +496,7 @@ public class Renderer : MoonTools.ECS.Renderer
 
         while (UITextBatchesToRender.Count > 0)
         {
-            var (textEntity, textBatch) = UITextBatchesToRender.Dequeue();
-            var position = Get<Position>(textEntity).Value;
-            var depth = Has<Depth>(textEntity) ? Get<Depth>(textEntity).Value : 0.5f;
+            var (position, depth, textBatch) = UITextBatchesToRender.Dequeue();
 
             var textModel = Matrix4x4.CreateTranslation(position.X, position.Y, depth);
 
