@@ -80,6 +80,7 @@ public class Collision : MoonTools.ECS.System
     {
         var velocity = Get<Velocity>(entity).Value;
         var position = Get<Position>(entity).Value;
+        bool blockDestroyed = false;
 
         if (Has<Bounce>(entity) && collision.Solid)
         {
@@ -91,6 +92,12 @@ public class Collision : MoonTools.ECS.System
                     damage *= Get<DamageMultiplier>(entity).Multiplier;
                     Remove<DamageMultiplier>(entity);
                 }
+
+                if (Some<DoubleDamageOnOneLife>() && GetSingleton<Lives>().Value == 1)
+                {
+                    damage *= 2;
+                }
+
                 var hitPoints = Get<HitPoints>(other);
                 Set(other, new HitPoints(hitPoints.Value - damage, hitPoints.Max));
 
@@ -112,31 +119,38 @@ public class Collision : MoonTools.ECS.System
                 {
                     Set(CreateEntity(), new PlayOnce(Stores.SFXStorage.GetID(Content.SFX.blockhit)));
                 }
+                else
+                {
+                    blockDestroyed = true;
+                }
             }
             else if (Has<CanDealDamageToBlock>(entity) && !Has<HitBall>(other))
             {
                 Set(CreateEntity(), new PlayOnce(Stores.SFXStorage.GetID(Content.SFX.clink), true));
             }
 
-            var newVelocity = velocity;
-
-            if (xCollision && !yCollision)
-                newVelocity = new Vector2(-velocity.X, velocity.Y) * Get<Bounce>(entity).Coefficient;
-
-            else if (yCollision && !xCollision)
-                newVelocity = new Vector2(velocity.X, -velocity.Y) * Get<Bounce>(entity).Coefficient;
-
-            else if (yCollision && xCollision)
-                newVelocity = new Vector2(-velocity.X, -velocity.Y) * Get<Bounce>(entity).Coefficient;
-
-            var otherPos = Get<Position>(other).Value;
-            if (position.Y < otherPos.Y && !Has<Player>(other))
+            if (!(Some<PiercingBalls>() && blockDestroyed))
             {
-                newVelocity.Y += Rando.Range(-100f, 0f);
-                newVelocity.X += Rando.Range(-50f, 50f);
-            }
+                var newVelocity = velocity;
 
-            Set(entity, new Velocity(newVelocity));
+                if (xCollision && !yCollision)
+                    newVelocity = new Vector2(-velocity.X, velocity.Y) * Get<Bounce>(entity).Coefficient;
+
+                else if (yCollision && !xCollision)
+                    newVelocity = new Vector2(velocity.X, -velocity.Y) * Get<Bounce>(entity).Coefficient;
+
+                else if (yCollision && xCollision)
+                    newVelocity = new Vector2(-velocity.X, -velocity.Y) * Get<Bounce>(entity).Coefficient;
+
+                var otherPos = Get<Position>(other).Value;
+                if (position.Y < otherPos.Y && !Has<Player>(other))
+                {
+                    newVelocity.Y += Rando.Range(-100f, 0f);
+                    newVelocity.X += Rando.Range(-50f, 50f);
+                }
+
+                Set(entity, new Velocity(newVelocity));
+            }
         }
     }
 

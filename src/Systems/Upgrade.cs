@@ -55,11 +55,11 @@ public class Upgrade : MoonTools.ECS.System
         }
         else if (type == Upgrades.OptimalHealth)
         {
-
+            Set(GetSingletonEntity<Player>(), new DoubleDamageOnOneLife());
         }
         else if (type == Upgrades.Piercing)
         {
-
+            Set(GetSingletonEntity<Player>(), new PiercingBalls());
         }
         else if (type == Upgrades.Emergency)
         {

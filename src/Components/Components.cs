@@ -59,3 +59,5 @@ public readonly record struct DestroyWhenLeavingUpgradeMenu();
 public readonly record struct GivesUpgrade();
 public readonly record struct UpgradeOption(Upgrades Upgrade);
 public readonly record struct DamageBlocksOnLostLife();
+public readonly record struct DoubleDamageOnOneLife();
+public readonly record struct PiercingBalls();
