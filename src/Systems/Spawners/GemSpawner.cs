@@ -25,6 +25,7 @@ public class GemSpawner : Manipulator
         Set(entity, new Highlight());
         Set(entity, new AngularVelocity(Rando.Range(-5f, 5f)));
         Set(entity, new AddGems(1));
+        Set(entity, new HasGravity(0.1f));
         Set(entity, new Depth(0.1f));
         Set(entity, new GivesXP(1));
 

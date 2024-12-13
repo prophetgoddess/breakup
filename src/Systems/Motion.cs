@@ -117,6 +117,10 @@ public class Motion : MoonTools.ECS.System
             {
                 dest = Sweep(entity, position, velocity * dt, Get<BoundingBox>(entity));
             }
+            else
+            {
+                dest = position + velocity * dt;
+            }
 
             Set(entity, new Position(dest));
 

@@ -89,6 +89,20 @@ public class Collision : MoonTools.ECS.System
                 var hitPoints = Get<HitPoints>(other);
                 Set(other, new HitPoints(hitPoints.Value - damage, hitPoints.Max));
 
+                var numberEntity = CreateEntity();
+                Set(numberEntity, new Position(Get<Position>(other).Value));
+                Set(numberEntity, new Velocity(
+                    new Vector2(
+                        Rando.Range(-100f, 100f),
+                        Rando.Range(-100f, -20f)
+                    )
+                ));
+                Set(numberEntity, new Depth(0.01f));
+                Set(numberEntity, new Text(Fonts.BodyFont, Fonts.InfoSize, Stores.TextStorage.GetID($"{damage}"), MoonWorks.Graphics.Font.HorizontalAlignment.Center, MoonWorks.Graphics.Font.VerticalAlignment.Middle));
+                Set(numberEntity, new Timer(2f));
+                Set(numberEntity, new Highlight());
+                Set(numberEntity, new HasGravity(1f));
+
                 if (hitPoints.Value - damage > 0)
                 {
                     Set(CreateEntity(), new PlayOnce(Stores.SFXStorage.GetID(Content.SFX.blockhit)));
