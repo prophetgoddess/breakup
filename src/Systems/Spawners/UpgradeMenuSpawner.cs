@@ -24,7 +24,7 @@ public enum Upgrades
 public class UpgradeMenuSpawner : Manipulator
 {
 
-    static Queue<int> AvailableUpgrades = new Queue<int>();
+    static Queue<Upgrades> AvailableUpgrades = new Queue<Upgrades>();
 
     public static bool UpgradesAvailable()
     {
@@ -33,7 +33,7 @@ public class UpgradeMenuSpawner : Manipulator
 
     Upgrades SetUpgradeType(Entity e)
     {
-        var upgrade = (Upgrades)AvailableUpgrades.Dequeue();
+        var upgrade = AvailableUpgrades.Dequeue();
 
         Set(e, new UpgradeOption(upgrade));
         return upgrade;
@@ -43,14 +43,14 @@ public class UpgradeMenuSpawner : Manipulator
     {
         return upgrade switch
         {
-            Upgrades.Emergency => "Emergency",
+            Upgrades.Emergency => "Revive",
             Upgrades.ChainReaction => "Chain",
             Upgrades.Buddy => "Buddy",
             Upgrades.Bonus => "Bonus",
             Upgrades.Refresh => "Refresh",
             Upgrades.Safety => "Safety",
             Upgrades.Piercing => "Piercing",
-            Upgrades.Confidence => "Intimidate",
+            Upgrades.Confidence => "Fright",
             Upgrades.MedSchool => "Medicine",
             Upgrades.Revenge => "Revenge",
             Upgrades.OptimalHealth => "Optimal",
@@ -86,7 +86,7 @@ public class UpgradeMenuSpawner : Manipulator
         AvailableUpgrades.Clear();
         foreach (var n in RandomManager.LinearCongruentialSequence(Enum.GetValues(typeof(Upgrades)).Length))
         {
-            AvailableUpgrades.Enqueue(n);
+            AvailableUpgrades.Enqueue((Upgrades)n);
         }
     }
 
@@ -129,7 +129,7 @@ public class UpgradeMenuSpawner : Manipulator
         Set(description, new Depth(0.1f));
         Set(description, new FollowsCamera(Dimensions.GameHeight * 0.5f));
         Set(description, new DestroyWhenLeavingUpgradeMenu());
-        Set(description, new WordWrap(90));
+        Set(description, new WordWrap(100));
 
         Relate(upgrade, description, new Description());
 

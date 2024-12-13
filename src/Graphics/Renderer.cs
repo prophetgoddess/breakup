@@ -304,7 +304,6 @@ public class Renderer : MoonTools.ECS.Renderer
 
             var text = Get<Text>(textEntity);
             var color = Has<Highlight>(textEntity) ? palette.Highlight : palette.Foreground;
-            var textBatch = GetTextBatch();
             var position = Get<Position>(textEntity).Value;
             var depth = Has<Depth>(textEntity) ? Get<Depth>(textEntity).Value : 0.5f;
 
@@ -312,6 +311,7 @@ public class Renderer : MoonTools.ECS.Renderer
                 color.A = 200;
             if (!Has<WordWrap>(textEntity))
             {
+                var textBatch = GetTextBatch();
                 textBatch.Start(Stores.FontStorage.Get(text.FontID));
                 textBatch.Add(Stores.TextStorage.Get(text.TextID), text.Size, color, text.HorizontalAlignment, text.VerticalAlignment);
                 textBatch.UploadBufferData(cmdbuf);
@@ -320,20 +320,21 @@ public class Renderer : MoonTools.ECS.Renderer
             }
             else
             {
+                TextBatch textBatch;
                 var max = Get<WordWrap>(textEntity).Max;
                 var font = Stores.FontStorage.Get(text.FontID);
                 var str = Stores.TextStorage.Get(text.TextID);
                 var words = str.Split(' ');
                 StringBuilder.Clear();
                 var y = position.Y;
+                var current = "";
                 WellspringCS.Wellspring.Rectangle rect;
 
                 foreach (var word in words)
                 {
                     StringBuilder.Append(word);
                     StringBuilder.Append(" ");
-                    var current = StringBuilder.ToString();
-                    font.TextBounds(current, text.Size, text.HorizontalAlignment, text.VerticalAlignment, out rect);
+                    font.TextBounds(StringBuilder.ToString(), text.Size, text.HorizontalAlignment, text.VerticalAlignment, out rect);
                     if (rect.W >= max)
                     {
                         textBatch = GetTextBatch();
@@ -343,7 +344,10 @@ public class Renderer : MoonTools.ECS.Renderer
                         GameTextBatchesToRender.Enqueue((new Vector2(position.X, y), depth, textBatch));
                         y += rect.H + 2;
                         StringBuilder.Clear();
+                        StringBuilder.Append(word);
+                        StringBuilder.Append(" ");
                     }
+                    current = StringBuilder.ToString();
                 }
 
                 textBatch = GetTextBatch();
