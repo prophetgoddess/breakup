@@ -81,16 +81,16 @@ class Program : Game
         debugMode = true;
         var windowCreateInfo = new WindowCreateInfo(
             "Ball",
-            Dimensions.WindowWidth,
-            Dimensions.WindowHeight,
+            1920,
+            1080,
             ScreenMode.Windowed
         );
 
 #else
         var windowCreateInfo = new WindowCreateInfo(
             "Ball",
-            Dimensions.WindowWidth,
-            Dimensions.WindowHeight,
+            1920,
+            1080,
             ScreenMode.Windowed
         );
 #endif

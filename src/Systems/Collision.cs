@@ -63,6 +63,8 @@ public class Collision : MoonTools.ECS.System
             Set(gemsEntity, new Gems(current, total));
 
             XPAndLevel.GiveXP(Get<GivesXP>(other).Amount);
+            Set(CreateEntity(), new PlayOnce(Stores.SFXStorage.GetID(Content.SFX.gemcollect)));
+
 
             Destroy(other);
         }
@@ -89,7 +91,7 @@ public class Collision : MoonTools.ECS.System
             }
             else if (Has<CanDealDamageToBlock>(entity) && !Has<HitBall>(other))
             {
-                Set(CreateEntity(), new PlayOnce(Stores.SFXStorage.GetID(Content.SFX.clink)));
+                Set(CreateEntity(), new PlayOnce(Stores.SFXStorage.GetID(Content.SFX.clink), true));
             }
 
             var newVelocity = velocity;

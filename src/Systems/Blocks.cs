@@ -138,7 +138,6 @@ public class Blocks : MoonTools.ECS.System
             LastGridOffset = cam.Y;
 
             int y = -(int)(MathF.Floor(cam.Y + CellSize) / CellSize) - 3;
-            System.Console.WriteLine("y: " + y);
 
             for (int x = 0; x < GridWidth; x++)
             {
@@ -172,7 +171,7 @@ public class Blocks : MoonTools.ECS.System
                         GemSpawner.SpawnGems(Rando.IntInclusive(reward, reward * 2), Get<Position>(block).Value);
                     }
 
-                    Set(CreateEntity(), new PlayOnce(Stores.SFXStorage.GetID(Content.SFX.pop)));
+                    Set(CreateEntity(), new PlayOnce(Stores.SFXStorage.GetID(Content.SFX.pop), true));
                     Destroy(hpDisplay);
                     Destroy(block);
                     continue;

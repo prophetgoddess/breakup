@@ -41,7 +41,12 @@ public class Audio : MoonTools.ECS.System
             voice.SetVolume(0.1f);
             voice.Submit(buffer);
             voice.Play();
+            if (Get<PlayOnce>(entity).RandomizePitch)
+            {
+                voice.SetPitch(Rando.Range(-0.1f, 0.1f));
+            }
             Playing.Enqueue(voice);
+
 
             Destroy(entity);
         }
