@@ -71,7 +71,6 @@ public class Blocks : MoonTools.ECS.System
             Set(block, new HitPoints(hp, hp));
             Set(block, new Model(Content.Models.RoundEmptySquare.ID));
 
-
             Set(block, new CanTakeDamageFromBall());
             var hpDisplay = CreateEntity();
             //Set(hpDisplay, new Scale(Vector2.One));

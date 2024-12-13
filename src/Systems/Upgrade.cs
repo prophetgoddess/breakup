@@ -79,7 +79,7 @@ public class Upgrade : MoonTools.ECS.System
         }
         else if (type == Upgrades.Revenge)
         {
-
+            Set(GetSingletonEntity<Player>(), new DamageBlocksOnLostLife());
         }
         else if (type == Upgrades.Safety)
         {

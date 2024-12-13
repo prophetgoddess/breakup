@@ -8,6 +8,7 @@ namespace Ball;
 public class Collision : MoonTools.ECS.System
 {
     Filter CollidingFilter;
+    Filter BlocksFilter;
 
     XPAndLevel XPAndLevel;
 
@@ -15,6 +16,10 @@ public class Collision : MoonTools.ECS.System
     {
         CollidingFilter = FilterBuilder.Include<SolidCollision>().Include<Position>().Include<BoundingBox>().Build();
         XPAndLevel = new XPAndLevel(world);
+        BlocksFilter = FilterBuilder
+        .Include<Block>()
+        .Include<HitPoints>()
+        .Build();
     }
 
     public override void Update(TimeSpan delta)
@@ -153,6 +158,17 @@ public class Collision : MoonTools.ECS.System
             var lives = Get<Lives>(livesEntity);
 
             Set(livesEntity, new Lives(lives.Value - 1));
+
+            if (Some<DamageBlocksOnLostLife>())
+            {
+                var dmg = Get<CanDealDamageToBlock>(entity).Amount;
+                foreach (var block in BlocksFilter.Entities)
+                {
+                    var hitPoints = Get<HitPoints>(block);
+                    Set(block, new HitPoints(hitPoints.Value - dmg, hitPoints.Max));
+                }
+
+            }
         }
     }
 
