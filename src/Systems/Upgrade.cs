@@ -35,7 +35,7 @@ public class Upgrade : MoonTools.ECS.System
 
         if (type == Upgrades.ChainReaction)
         {
-
+            Set(GetSingletonEntity<Player>(), new DestroyedBlocksDamageNeighbors());
         }
         else if (type == Upgrades.Combo)
         {
@@ -43,6 +43,7 @@ public class Upgrade : MoonTools.ECS.System
         }
         else if (type == Upgrades.Confidence)
         {
+            Set(GetSingletonEntity<Player>(), new BlocksSpawnWithLessHealth());
 
         }
         else if (type == Upgrades.Invictus)

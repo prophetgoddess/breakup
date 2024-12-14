@@ -53,6 +53,9 @@ public class Blocks : MoonTools.ECS.System
 
         var hp = Rando.IntInclusive(min, max);
 
+        if (Some<BlocksSpawnWithLessHealth>())
+            hp = (int)MathF.Ceiling(hp * 0.8f);
+
         if (Rando.Value > 0.9f || barrier)
         {
             hp = Rando.IntInclusive(min * 2, max * 2);
@@ -71,7 +74,7 @@ public class Blocks : MoonTools.ECS.System
             Set(block, new HitPoints(hp, hp));
             Set(block, new Model(Content.Models.RoundEmptySquare.ID));
 
-            Set(block, new CanTakeDamageFromBall());
+            Set(block, new CanTakeDamage());
             var hpDisplay = CreateEntity();
             //Set(hpDisplay, new Scale(Vector2.One));
             Set(hpDisplay, new Position(new Vector2(CellSize * 0.5f + x * CellSize, CellSize * 0.5f + y * CellSize)));
@@ -88,9 +91,7 @@ public class Blocks : MoonTools.ECS.System
                 hp *= 2;
                 Set(block, new HitPoints(hp, hp));
                 Set(hpDisplay, new Text(Fonts.BodyFont, Fonts.InfoSize, Stores.TextStorage.GetID($"{GetFormattedHP(hp)}"), MoonWorks.Graphics.Font.HorizontalAlignment.Center, MoonWorks.Graphics.Font.VerticalAlignment.Middle));
-
             }
-
         }
         else
         {
@@ -162,12 +163,57 @@ public class Blocks : MoonTools.ECS.System
                     if (Has<GivesUpgrade>(block))
                     {
                         UpgradeMenuSpawner.OpenUpgradeMenu();
-
                     }
                     else
                     {
                         var reward = Get<Block>(block).GemReward;
                         GemSpawner.SpawnGems(Rando.IntInclusive(reward, reward * 2), Get<Position>(block).Value);
+                    }
+
+                    if (Some<DestroyedBlocksDamageNeighbors>())
+                    {
+                        var pos = Get<Position>(block).Value;
+                        var dmg = GetSingleton<Level>().Value + 1;
+
+                        var up = CreateEntity();
+                        Set(up, new Position(new Vector2(pos.X, pos.Y - CellSize)));
+                        Set(up, new CanDealDamageToBlock(dmg));
+                        Set(up, new BoundingBox(0, 0, 16, 16));
+                        Set(up, new DestroyOnStartGame());
+                        Set(up, new Velocity(-Vector2.UnitY));
+                        Set(up, new BlockDestroyer());
+                        //Set(up, new SolidCollision());
+                        Set(up, new Timer(0.1f));
+
+                        var down = CreateEntity();
+                        Set(down, new Position(new Vector2(pos.X, pos.Y + CellSize)));
+                        Set(down, new CanDealDamageToBlock());
+                        Set(down, new BoundingBox(0, 0, 16, 16));
+                        Set(down, new DestroyOnStartGame());
+                        Set(down, new Velocity(Vector2.UnitY));
+                        Set(down, new BlockDestroyer());
+                        //Set(down, new SolidCollision());
+                        Set(down, new Timer(0.1f));
+
+                        var left = CreateEntity();
+                        Set(left, new Position(new Vector2(pos.X - CellSize, pos.Y)));
+                        Set(left, new CanDealDamageToBlock(dmg));
+                        Set(left, new BoundingBox(0, 10, 16, 16));
+                        Set(left, new DestroyOnStartGame());
+                        Set(left, new Velocity(-Vector2.UnitX));
+                        Set(left, new BlockDestroyer());
+                        //Set(left, new SolidCollision());
+                        Set(left, new Timer(0.1f));
+
+                        var right = CreateEntity();
+                        Set(right, new Position(new Vector2(pos.X + CellSize, pos.Y)));
+                        Set(right, new CanDealDamageToBlock(dmg));
+                        Set(right, new BoundingBox(0, 0, 16, 16));
+                        Set(right, new DestroyOnStartGame());
+                        Set(right, new Velocity(Vector2.UnitX));
+                        Set(right, new BlockDestroyer());
+                        //Set(right, new SolidCollision());
+                        Set(right, new Timer(0.1f));
                     }
 
                     Set(CreateEntity(), new PlayOnce(Stores.SFXStorage.GetID(Content.SFX.pop), true));

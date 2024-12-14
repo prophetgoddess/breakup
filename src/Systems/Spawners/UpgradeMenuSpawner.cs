@@ -132,12 +132,15 @@ public class UpgradeMenuSpawner : Manipulator
         Set(description, new WordWrap(100));
 
         Relate(upgrade, description, new Description());
+        Set(upgrade, new DestroyOnStartGame());
+        Set(description, new DestroyOnStartGame());
 
         return upgrade;
     }
 
     public void OpenUpgradeMenu()
     {
+
         var promptEntity = CreateEntity();
         Set(promptEntity,
         new Position(new Vector2(Dimensions.GameWidth * 0.5f, Dimensions.GameHeight * 0.25f)));
@@ -154,6 +157,7 @@ public class UpgradeMenuSpawner : Manipulator
         Set(promptEntity, new Marquee(100f));
         Set(promptEntity, new FollowsCamera(Dimensions.GameHeight * 0.25f));
         Set(promptEntity, new DestroyWhenLeavingUpgradeMenu());
+        Set(promptEntity, new DestroyOnStartGame());
 
         var text = Get<Text>(promptEntity);
         var font = Stores.FontStorage.Get(text.FontID);

@@ -14,7 +14,7 @@ public class Collision : MoonTools.ECS.System
 
     public Collision(World world) : base(world)
     {
-        CollidingFilter = FilterBuilder.Include<SolidCollision>().Include<Position>().Include<BoundingBox>().Build();
+        CollidingFilter = FilterBuilder.Include<Position>().Include<BoundingBox>().Build();
         XPAndLevel = new XPAndLevel(world);
         BlocksFilter = FilterBuilder
         .Include<Block>()
@@ -34,6 +34,9 @@ public class Collision : MoonTools.ECS.System
                 var collision = GetRelationData<Colliding>(entity, other);
                 var xCollision = collision.Direction == CollisionDirection.X;
                 var yCollision = collision.Direction == CollisionDirection.Y;
+
+                HandleDamage(entity, other);
+                HandleDamage(other, entity);
 
                 HandleBounce(entity, other, collision, xCollision, yCollision);
 
@@ -76,60 +79,59 @@ public class Collision : MoonTools.ECS.System
 
     }
 
+    void HandleDamage(Entity entity, Entity other)
+    {
+        if (Has<CanTakeDamage>(other) && Has<HitPoints>(other) && Has<CanDealDamageToBlock>(entity))
+        {
+            var damage = Get<CanDealDamageToBlock>(entity).Amount;
+            if (Has<DamageMultiplier>(entity))
+            {
+                damage *= Get<DamageMultiplier>(entity).Multiplier;
+                Remove<DamageMultiplier>(entity);
+            }
+
+            if (Some<DoubleDamageOnOneLife>() && GetSingleton<Lives>().Value == 1 && Has<Bounce>(entity))
+            {
+                damage *= 2;
+            }
+
+            var hitPoints = Get<HitPoints>(other);
+            Set(other, new HitPoints(hitPoints.Value - damage, hitPoints.Max));
+
+            var numberEntity = CreateEntity();
+            Set(numberEntity, new Position(Get<Position>(other).Value));
+            Set(numberEntity, new Velocity(
+                new Vector2(
+                    Rando.Range(-100f, 100f),
+                    Rando.Range(20f, 100f)
+                )
+            ));
+            Set(numberEntity, new Depth(0.01f));
+            Set(numberEntity, new Text(Fonts.BodyFont, Fonts.InfoSize, Stores.TextStorage.GetID($"{damage}"), MoonWorks.Graphics.Font.HorizontalAlignment.Center, MoonWorks.Graphics.Font.VerticalAlignment.Middle));
+            Set(numberEntity, new Timer(2f));
+            Set(numberEntity, new Highlight());
+            Set(numberEntity, new HasGravity(1f));
+
+            if (hitPoints.Value - damage > 0)
+            {
+                Set(CreateEntity(), new PlayOnce(Stores.SFXStorage.GetID(Content.SFX.blockhit)));
+            }
+        }
+    }
+
     void HandleBounce(Entity entity, Entity other, Colliding collision, bool xCollision, bool yCollision)
     {
         var velocity = Get<Velocity>(entity).Value;
         var position = Get<Position>(entity).Value;
-        bool blockDestroyed = false;
 
         if (Has<Bounce>(entity) && collision.Solid)
         {
-            if (Has<CanTakeDamageFromBall>(other) && Has<HitPoints>(other) && Has<CanDealDamageToBlock>(entity))
-            {
-                var damage = Get<CanDealDamageToBlock>(entity).Amount;
-                if (Has<DamageMultiplier>(entity))
-                {
-                    damage *= Get<DamageMultiplier>(entity).Multiplier;
-                    Remove<DamageMultiplier>(entity);
-                }
-
-                if (Some<DoubleDamageOnOneLife>() && GetSingleton<Lives>().Value == 1)
-                {
-                    damage *= 2;
-                }
-
-                var hitPoints = Get<HitPoints>(other);
-                Set(other, new HitPoints(hitPoints.Value - damage, hitPoints.Max));
-
-                var numberEntity = CreateEntity();
-                Set(numberEntity, new Position(Get<Position>(other).Value));
-                Set(numberEntity, new Velocity(
-                    new Vector2(
-                        Rando.Range(-100f, 100f),
-                        Rando.Range(20f, 100f)
-                    )
-                ));
-                Set(numberEntity, new Depth(0.01f));
-                Set(numberEntity, new Text(Fonts.BodyFont, Fonts.InfoSize, Stores.TextStorage.GetID($"{damage}"), MoonWorks.Graphics.Font.HorizontalAlignment.Center, MoonWorks.Graphics.Font.VerticalAlignment.Middle));
-                Set(numberEntity, new Timer(2f));
-                Set(numberEntity, new Highlight());
-                Set(numberEntity, new HasGravity(1f));
-
-                if (hitPoints.Value - damage > 0)
-                {
-                    Set(CreateEntity(), new PlayOnce(Stores.SFXStorage.GetID(Content.SFX.blockhit)));
-                }
-                else
-                {
-                    blockDestroyed = true;
-                }
-            }
-            else if (Has<CanDealDamageToBlock>(entity) && !Has<HitBall>(other))
+            if (Has<CanDealDamageToBlock>(entity) && !Has<HitBall>(other))
             {
                 Set(CreateEntity(), new PlayOnce(Stores.SFXStorage.GetID(Content.SFX.clink), true));
             }
 
-            if (!(Some<PiercingBalls>() && blockDestroyed))
+            if (!(Some<PiercingBalls>() && Has<HitPoints>(other) && Get<HitPoints>(other).Value <= 0))
             {
                 var newVelocity = velocity;
 
