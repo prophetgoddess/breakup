@@ -52,6 +52,7 @@ public class GameState : MoonTools.ECS.System
         Set(ball, new CanDealDamageToBlock(1));
 
         var player = CreateEntity();
+        Set(player, new BlocksSpawnBonusBalls());
         Set(player, new Model(Content.Models.EmptyTriangle.ID));
         Set(player, new BarrierTakesExtraHit(true));
         Set(player, new Position(new Vector2(

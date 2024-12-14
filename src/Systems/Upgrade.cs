@@ -88,6 +88,10 @@ public class Upgrade : MoonTools.ECS.System
             Set(GetSingletonEntity<Player>(), new BarrierTakesExtraHit(true));
 
         }
+        else if (type == Upgrades.Bonus)
+        {
+            Set(GetSingletonEntity<Player>(), new BlocksSpawnBonusBalls());
+        }
 
         return true;
     }

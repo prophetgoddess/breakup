@@ -181,7 +181,6 @@ public class Blocks : MoonTools.ECS.System
                         Set(up, new BoundingBox(0, 0, 16, 16));
                         Set(up, new DestroyOnStartGame());
                         Set(up, new Velocity(-Vector2.UnitY));
-                        //Set(up, new SolidCollision());
                         Set(up, new Timer(0.1f));
 
                         var down = CreateEntity();
@@ -190,7 +189,6 @@ public class Blocks : MoonTools.ECS.System
                         Set(down, new BoundingBox(0, 0, 16, 16));
                         Set(down, new DestroyOnStartGame());
                         Set(down, new Velocity(Vector2.UnitY));
-                        //Set(down, new SolidCollision());
                         Set(down, new Timer(0.1f));
 
                         var left = CreateEntity();
@@ -199,7 +197,6 @@ public class Blocks : MoonTools.ECS.System
                         Set(left, new BoundingBox(0, 10, 16, 16));
                         Set(left, new DestroyOnStartGame());
                         Set(left, new Velocity(-Vector2.UnitX));
-                        //Set(left, new SolidCollision());
                         Set(left, new Timer(0.1f));
 
                         var right = CreateEntity();
@@ -208,8 +205,27 @@ public class Blocks : MoonTools.ECS.System
                         Set(right, new BoundingBox(0, 0, 16, 16));
                         Set(right, new DestroyOnStartGame());
                         Set(right, new Velocity(Vector2.UnitX));
-                        //Set(right, new SolidCollision());
                         Set(right, new Timer(0.1f));
+                    }
+
+                    if (Some<BlocksSpawnBonusBalls>() && Rando.Value < 0.2f)
+                    {
+                        var ball = CreateEntity();
+                        Set(ball, new Model(Content.Models.Donut.ID));
+                        Set(ball, new Scale(Vector2.One * 10.0f));
+                        Set(ball, new Position(Get<Position>(block).Value));
+                        Set(ball, new Velocity(new Vector2(Rando.Range(-50f, 50f), Rando.Range(-100f, -10f))));
+                        Set(ball, new BoundingBox(0, 0, 18, 18));
+                        Set(ball, new SolidCollision());
+                        Set(ball, new Bounce(0.9f));
+                        Set(ball, new CanBeHit());
+                        Set(ball, new HasGravity(1f));
+                        Set(ball, new CameraFollows());
+                        Set(ball, new DestroyOnStartGame());
+                        Set(ball, new Highlight());
+                        Set(ball, new CanDealDamageToBlock(1));
+                        Set(ball, new DontLoseLife());
+                        Set(ball, new Alpha(128));
                     }
 
                     Set(CreateEntity(), new PlayOnce(Stores.SFXStorage.GetID(Content.SFX.pop), true));
