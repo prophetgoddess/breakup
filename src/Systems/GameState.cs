@@ -426,9 +426,10 @@ public class GameState : MoonTools.ECS.System
                 MainMenu();
             }
         }
-        else if (Some<Lives>() && GetSingleton<Lives>().Value >= 3)
+        else if (Some<Lives>() && GetSingleton<Lives>().Value >= 3 && Some<ReviveWithOneHealth>())
         {
-
+            var revive = GetSingletonEntity<ReviveWithOneHealth>();
+            Set(revive, new ReviveWithOneHealth(true));
         }
 
         if ((Some<DestroyOnStartGame>() && inputState.Restart.IsPressed) ||

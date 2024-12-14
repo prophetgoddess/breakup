@@ -39,10 +39,11 @@ public class Collision : MoonTools.ECS.System
 
                 HandleBounce(entity, other, collision, xCollision, yCollision);
 
-
                 HandleHitBall(entity, other);
 
                 HandleGems(entity, other);
+
+                HandleExtraLife(entity, other);
 
                 HandleDestroyBall(entity, other);
 
@@ -77,6 +78,17 @@ public class Collision : MoonTools.ECS.System
             Destroy(other);
         }
 
+    }
+
+    void HandleExtraLife(Entity entity, Entity other)
+    {
+        if (Has<GivesExtraLife>(other) && Has<Player>(entity))
+        {
+            var l = GetSingletonEntity<Lives>();
+            var lives = Get<Lives>(l);
+            Set(l, new Lives(lives.Value + (Some<BonusLives>() ? 2 : 1)));
+            Destroy(other);
+        }
     }
 
     void HandleDamage(Entity entity, Entity other)

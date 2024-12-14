@@ -68,3 +68,5 @@ public readonly record struct ReviveWithOneHealth(bool Active);
 public readonly record struct BarrierTakesExtraHit(bool Active);
 public readonly record struct BlocksSpawnBonusBalls();
 public readonly record struct DontLoseLife();
+public readonly record struct BonusLives();
+public readonly record struct GivesExtraLife();

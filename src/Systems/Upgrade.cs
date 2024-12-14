@@ -53,7 +53,7 @@ public class Upgrade : MoonTools.ECS.System
         }
         else if (type == Upgrades.MedSchool)
         {
-
+            Set(GetSingletonEntity<Player>(), new BonusLives());
         }
         else if (type == Upgrades.OptimalHealth)
         {
@@ -91,6 +91,9 @@ public class Upgrade : MoonTools.ECS.System
         else if (type == Upgrades.Bonus)
         {
             Set(GetSingletonEntity<Player>(), new BlocksSpawnBonusBalls());
+        }
+        else if (type == Upgrades.Buddy)
+        {
         }
 
         return true;
