@@ -8,6 +8,8 @@ public class Audio : MoonTools.ECS.System
     Filter SFXFilter;
     AudioDevice AudioDevice;
 
+    StreamingVoice MusicVoice;
+
     Queue<PersistentVoice> Voices = new Queue<PersistentVoice>();
     Queue<PersistentVoice> Playing = new Queue<PersistentVoice>();
 
@@ -24,6 +26,10 @@ public class Audio : MoonTools.ECS.System
     {
         AudioDevice = audioDevice;
         SFXFilter = FilterBuilder.Include<PlayOnce>().Build();
+        MusicVoice = new StreamingVoice(audioDevice, Content.Music.music.Format);
+        Content.Music.music.Load();
+        MusicVoice.Load(Content.Music.music);
+        //MusicVoice.Play();
     }
 
     public override void Update(TimeSpan delta)
@@ -38,7 +44,7 @@ public class Audio : MoonTools.ECS.System
             var voice = GetVoice();
             var buffer = Stores.SFXStorage.Get(Get<PlayOnce>(entity).AudioID);
             voice.Reset();
-            voice.SetVolume(0.1f);
+            voice.SetVolume(0.5f);
             voice.Submit(buffer);
             voice.Play();
             if (Get<PlayOnce>(entity).RandomizePitch)

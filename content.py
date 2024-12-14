@@ -47,13 +47,15 @@ shader_in = os.path.join(input, "Shaders")
 texture_in = os.path.join(input, "Textures")
 levels_in = os.path.join(input, "Levels")
 models_in = os.path.join(input, "Models")
-audio_in = os.path.join(input, "Audio")
+sfx_in = os.path.join(input, "SFX")
+music_in = os.path.join(input, "Music")
 fonts_in = os.path.join(input, "Fonts")
 text_in = os.path.join(input, "Text")
 
 shader_out = os.path.join(output, "Shaders")
 texture_out = os.path.join(output, "Textures")
-audio_out = os.path.join(output, "Audio")
+sfx_out = os.path.join(output, "SFX")
+music_out = os.path.join(output, "Music")
 fonts_out = os.path.join(output, "Fonts")
 text_out = os.path.join(output, "Text")
 levels_out = os.path.join(output, "Levels")
@@ -122,18 +124,37 @@ if os.path.exists(texture_in):
 # SFX
 #
 
-if os.path.exists(audio_in):
-    if not os.path.isdir(audio_out):
-        os.mkdir(audio_out)
+if os.path.exists(sfx_in):
+    if not os.path.isdir(sfx_out):
+        os.mkdir(sfx_out)
 
-    for sfx in Path(audio_in).glob("**/*.wav"):
+    for sfx in Path(sfx_in).glob("**/*.wav"):
         subprocess.run(
             [
                 "ffmpeg",
                 "-y",
                 "-i",
                 sfx,
-                os.path.join(audio_out, f"{Path(sfx).stem}.wav"),
+                os.path.join(sfx_out, f"{Path(sfx).stem}.wav"),
+            ]
+        )
+
+#
+# MUSIC
+#
+
+if os.path.exists(music_in):
+    if not os.path.isdir(music_out):
+        os.mkdir(music_out)
+
+    for song in Path(music_in).glob("**/*.wav"):
+        subprocess.run(
+            [
+                "ffmpeg",
+                "-y",
+                "-i",
+                song,
+                os.path.join(music_out, f"{Path(song).stem}.ogg"),
             ]
         )
 
@@ -312,7 +333,7 @@ public static class Content
 """
     )
 
-    for sfx in Path(audio_out).glob("*.wav"):
+    for sfx in Path(sfx_out).glob("*.wav"):
         f.write(f"public static AudioBuffer {Path(sfx).stem};\n")
 
     f.write(
@@ -321,9 +342,31 @@ public static class Content
 """
     )
 
-    for sfx in Path(audio_out).glob("*.wav"):
+    for sfx in Path(sfx_out).glob("*.wav"):
         f.write(
             f'{Path(sfx).stem} = AudioDataWav.CreateBuffer(audioDevice, Path.Join(path, "{Path(sfx).stem}.wav"));\n'
+        )
+
+    f.write("\n}\n}\n\n")
+
+    f.write(
+        """public static class Music
+        {
+"""
+    )
+
+    for song in Path(music_out).glob("*.ogg"):
+        f.write(f"public static AudioDataOgg {Path(song).stem};\n")
+
+    f.write(
+        """public static void LoadMusic(AudioDevice audioDevice, string path)
+        {
+"""
+    )
+
+    for song in Path(music_out).glob("*.ogg"):
+        f.write(
+            f'{Path(song).stem} = new AudioDataOgg(audioDevice, Path.Join(path, "{Path(song).stem}.ogg"));\n'
         )
 
     f.write("\n}\n}\n\n")
@@ -408,7 +451,8 @@ public static class Content
             var cmdbuf = graphicsDevice.AcquireCommandBuffer();
 
             Fonts.LoadFonts(graphicsDevice, Path.Join(System.AppContext.BaseDirectory, "Fonts"));
-            SFX.LoadSFX(audioDevice, Path.Join(System.AppContext.BaseDirectory, "Audio"));
+            SFX.LoadSFX(audioDevice, Path.Join(System.AppContext.BaseDirectory, "SFX"));
+            Music.LoadMusic(audioDevice, Path.Join(System.AppContext.BaseDirectory, "Music"));
 
             graphicsDevice.Submit(cmdbuf);
     

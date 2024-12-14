@@ -29,7 +29,6 @@ class Program : Game
     {
         AppDomain.CurrentDomain.UnhandledException += HandleUnhandledException;
 
-
         Content.LoadAll(GraphicsDevice, AudioDevice);
 
         Systems =
@@ -123,7 +122,7 @@ class Program : Game
         var game = new Program(
             windowCreateInfo,
             frameLimiterSettings,
-            ShaderFormat.MSL,
+            ShaderFormat.SPIRV | ShaderFormat.MSL,
             60,
             debugMode
         );
