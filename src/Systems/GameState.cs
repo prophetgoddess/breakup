@@ -407,9 +407,28 @@ public class GameState : MoonTools.ECS.System
             }
         }
 
-        if (!Some<DestroyOnStartGame>() || (Some<Lives>() && GetSingleton<Lives>().Value <= 0))
+        if (!Some<DestroyOnStartGame>())
         {
             MainMenu();
+        }
+
+        if (Some<Lives>() && GetSingleton<Lives>().Value <= 0)
+        {
+            if (Some<ReviveWithOneHealth>() && GetSingleton<ReviveWithOneHealth>().Active)
+            {
+                var revive = GetSingletonEntity<ReviveWithOneHealth>();
+                Set(revive, new ReviveWithOneHealth(false));
+                var l = GetSingletonEntity<Lives>();
+                Set(l, new Lives(1));
+            }
+            else
+            {
+                MainMenu();
+            }
+        }
+        else if (Some<Lives>() && GetSingleton<Lives>().Value >= 3)
+        {
+
         }
 
         if ((Some<DestroyOnStartGame>() && inputState.Restart.IsPressed) ||

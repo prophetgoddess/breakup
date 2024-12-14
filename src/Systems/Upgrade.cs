@@ -49,7 +49,7 @@ public class Upgrade : MoonTools.ECS.System
         }
         else if (type == Upgrades.Invictus)
         {
-
+            Set(GetSingletonEntity<Player>(), new ReviveWithOneHealth(true));
         }
         else if (type == Upgrades.MedSchool)
         {

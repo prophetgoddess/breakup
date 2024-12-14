@@ -64,3 +64,4 @@ public readonly record struct PiercingBalls();
 public readonly record struct BlocksSpawnWithLessHealth();
 public readonly record struct DestroyedBlocksDamageNeighbors();
 public readonly record struct ComboBuilder(int Combo);
+public readonly record struct ReviveWithOneHealth(bool Active);
