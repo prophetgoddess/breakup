@@ -173,6 +173,16 @@ public class Collision : MoonTools.ECS.System
     {
         if (Has<Bounce>(entity) && Has<ResetBallOnHit>(other))
         {
+            if (Some<BarrierTakesExtraHit>() && GetSingleton<BarrierTakesExtraHit>().Active)
+            {
+                Set(GetSingletonEntity<BarrierTakesExtraHit>(), new BarrierTakesExtraHit(false));
+                return;
+            }
+            else if (Some<BarrierTakesExtraHit>() && !GetSingleton<BarrierTakesExtraHit>().Active)
+            {
+                Set(GetSingletonEntity<BarrierTakesExtraHit>(), new BarrierTakesExtraHit(true));
+            }
+
             var player = GetSingletonEntity<Player>();
             Relate(entity, player, new HeldBy(new Vector2(0f, -32.0f)));
             Set(entity, new Velocity(Vector2.Zero));
@@ -188,6 +198,7 @@ public class Collision : MoonTools.ECS.System
 
             Set(livesEntity, new Lives(lives.Value - 1));
 
+
             if (Some<DamageBlocksOnLostLife>())
             {
                 var dmg = Get<CanDealDamageToBlock>(entity).Amount;
@@ -196,7 +207,6 @@ public class Collision : MoonTools.ECS.System
                     var hitPoints = Get<HitPoints>(block);
                     Set(block, new HitPoints(hitPoints.Value - dmg, hitPoints.Max));
                 }
-
             }
         }
     }

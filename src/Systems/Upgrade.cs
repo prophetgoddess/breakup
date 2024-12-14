@@ -85,6 +85,7 @@ public class Upgrade : MoonTools.ECS.System
         }
         else if (type == Upgrades.Safety)
         {
+            Set(GetSingletonEntity<Player>(), new BarrierTakesExtraHit(true));
 
         }
 

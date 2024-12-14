@@ -53,6 +53,7 @@ public class GameState : MoonTools.ECS.System
 
         var player = CreateEntity();
         Set(player, new Model(Content.Models.EmptyTriangle.ID));
+        Set(player, new BarrierTakesExtraHit(true));
         Set(player, new Position(new Vector2(
                 Dimensions.GameWidth * 0.5f,
                 Dimensions.GameHeight * 0.9f
