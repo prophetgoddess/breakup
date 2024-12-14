@@ -181,7 +181,6 @@ public class Blocks : MoonTools.ECS.System
                         Set(up, new BoundingBox(0, 0, 16, 16));
                         Set(up, new DestroyOnStartGame());
                         Set(up, new Velocity(-Vector2.UnitY));
-                        Set(up, new BlockDestroyer());
                         //Set(up, new SolidCollision());
                         Set(up, new Timer(0.1f));
 
@@ -191,7 +190,6 @@ public class Blocks : MoonTools.ECS.System
                         Set(down, new BoundingBox(0, 0, 16, 16));
                         Set(down, new DestroyOnStartGame());
                         Set(down, new Velocity(Vector2.UnitY));
-                        Set(down, new BlockDestroyer());
                         //Set(down, new SolidCollision());
                         Set(down, new Timer(0.1f));
 
@@ -201,7 +199,6 @@ public class Blocks : MoonTools.ECS.System
                         Set(left, new BoundingBox(0, 10, 16, 16));
                         Set(left, new DestroyOnStartGame());
                         Set(left, new Velocity(-Vector2.UnitX));
-                        Set(left, new BlockDestroyer());
                         //Set(left, new SolidCollision());
                         Set(left, new Timer(0.1f));
 
@@ -211,7 +208,6 @@ public class Blocks : MoonTools.ECS.System
                         Set(right, new BoundingBox(0, 0, 16, 16));
                         Set(right, new DestroyOnStartGame());
                         Set(right, new Velocity(Vector2.UnitX));
-                        Set(right, new BlockDestroyer());
                         //Set(right, new SolidCollision());
                         Set(right, new Timer(0.1f));
                     }

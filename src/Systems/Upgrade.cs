@@ -39,6 +39,7 @@ public class Upgrade : MoonTools.ECS.System
         }
         else if (type == Upgrades.Combo)
         {
+            Set(GetSingletonEntity<Player>(), new ComboBuilder());
 
         }
         else if (type == Upgrades.Confidence)

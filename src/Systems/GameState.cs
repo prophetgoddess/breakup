@@ -66,6 +66,7 @@ public class GameState : MoonTools.ECS.System
         Set(player, new Player());
         Set(player, new FollowsCamera(Dimensions.GameHeight * 0.9f));
         Set(player, new DestroyOnStartGame());
+        Set(player, new ComboBuilder());
 
         var power = CreateEntity();
         Set(power, new Model(Content.Models.Triangle.ID));

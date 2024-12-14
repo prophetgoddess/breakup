@@ -63,4 +63,4 @@ public readonly record struct DoubleDamageOnOneLife();
 public readonly record struct PiercingBalls();
 public readonly record struct BlocksSpawnWithLessHealth();
 public readonly record struct DestroyedBlocksDamageNeighbors();
-public readonly record struct BlockDestroyer();
+public readonly record struct ComboBuilder(int Combo);

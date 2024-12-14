@@ -36,7 +36,6 @@ public class Collision : MoonTools.ECS.System
                 var yCollision = collision.Direction == CollisionDirection.Y;
 
                 HandleDamage(entity, other);
-                HandleDamage(other, entity);
 
                 HandleBounce(entity, other, collision, xCollision, yCollision);
 
@@ -73,7 +72,6 @@ public class Collision : MoonTools.ECS.System
             XPAndLevel.GiveXP(Get<GivesXP>(other).Amount);
             Set(CreateEntity(), new PlayOnce(Stores.SFXStorage.GetID(Content.SFX.gemcollect)));
 
-
             Destroy(other);
         }
 
@@ -93,6 +91,11 @@ public class Collision : MoonTools.ECS.System
             if (Some<DoubleDamageOnOneLife>() && GetSingleton<Lives>().Value == 1 && Has<Bounce>(entity))
             {
                 damage *= 2;
+            }
+
+            if (Has<ComboBuilder>(entity))
+            {
+                damage += Get<ComboBuilder>(entity).Combo;
             }
 
             var hitPoints = Get<HitPoints>(other);
@@ -116,6 +119,11 @@ public class Collision : MoonTools.ECS.System
             {
                 Set(CreateEntity(), new PlayOnce(Stores.SFXStorage.GetID(Content.SFX.blockhit)));
             }
+            else if (Has<ComboBuilder>(entity))
+            {
+                var combo = Get<ComboBuilder>(entity);
+                Set(entity, new ComboBuilder(combo.Combo + 1));
+            }
         }
     }
 
@@ -129,6 +137,11 @@ public class Collision : MoonTools.ECS.System
             if (Has<CanDealDamageToBlock>(entity) && !Has<HitBall>(other))
             {
                 Set(CreateEntity(), new PlayOnce(Stores.SFXStorage.GetID(Content.SFX.clink), true));
+            }
+
+            if (Has<ComboBuilder>(other) && Has<Player>(other))
+            {
+                Set(entity, new ComboBuilder(0));
             }
 
             if (!(Some<PiercingBalls>() && Has<HitPoints>(other) && Get<HitPoints>(other).Value <= 0))
