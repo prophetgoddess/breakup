@@ -94,6 +94,20 @@ public class Upgrade : MoonTools.ECS.System
         }
         else if (type == Upgrades.Buddy)
         {
+            var buddy = CreateEntity();
+            Set(buddy, new Model(Content.Models.Square.ID));
+            Set(buddy, new Position(new Vector2(
+                    Dimensions.GameWidth * 0.5f,
+                    Dimensions.GameHeight * 0.75f
+                )));
+            Set(buddy, new Orientation(0f));
+            Set(buddy, new Velocity(Vector2.Zero));
+            Set(buddy, new BoundingBox(0, 10, 32, 4));
+            Set(buddy, new SolidCollision());
+            Set(buddy, new Scale(new Vector2(32, 4)));
+            Set(buddy, new FollowsCamera(Dimensions.GameHeight * 0.75f));
+            Set(buddy, new DestroyOnStartGame());
+            Set(buddy, new MoveBackAndForth(64, Dimensions.GameWidth - 64, 100f));
         }
 
         return true;

@@ -70,3 +70,4 @@ public readonly record struct BlocksSpawnBonusBalls();
 public readonly record struct DontLoseLife();
 public readonly record struct BonusLives();
 public readonly record struct GivesExtraLife();
+public readonly record struct MoveBackAndForth(float Min, float Max, float Speed);

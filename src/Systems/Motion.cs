@@ -102,6 +102,22 @@ public class Motion : MoonTools.ECS.System
                 Set(entity, new Velocity(velocity));
             }
 
+            if (Has<MoveBackAndForth>(entity))
+            {
+                var data = Get<MoveBackAndForth>(entity);
+
+                if (position.X >= data.Max && data.Speed > 0f)
+                {
+                    Set(entity, new MoveBackAndForth(data.Min, data.Max, -data.Speed));
+                }
+                if (position.X <= data.Min && data.Speed < 0f)
+                {
+                    Set(entity, new MoveBackAndForth(data.Min, data.Max, -data.Speed));
+                }
+
+                velocity.X += data.Speed;
+            }
+
             var dest = position + velocity;
 
             if (HasOutRelation<HeldBy>(entity))
