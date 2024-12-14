@@ -19,6 +19,7 @@ public class Renderer : MoonTools.ECS.Renderer
     Inputs Inputs;
 
     GraphicsPipeline RenderPipeline;
+    GraphicsPipeline TexturePipeline;
 
     MoonTools.ECS.Filter ModelFilter;
     MoonTools.ECS.Filter UIFilter;
@@ -36,11 +37,17 @@ public class Renderer : MoonTools.ECS.Renderer
     Texture DepthTexture;
     Texture UIDepthTexture;
     Sampler DepthSampler;
+    Sampler TextureSampler;
     DepthUniforms DepthUniforms;
     StringBuilder StringBuilder = new StringBuilder();
 
+    Texture QRCode;
+
     public Buffer RectIndexBuffer;
     public Buffer RectVertexBuffer;
+
+    private Buffer QuadVertexBuffer;
+    private Buffer QuadIndexBuffer;
 
     void CreateRenderTextures()
     {
@@ -190,6 +197,23 @@ public class Renderer : MoonTools.ECS.Renderer
             ShaderStage.Fragment
         );
 
+        Shader texturedVertShader = ShaderCross.Create(
+            GraphicsDevice,
+            Path.Join(System.AppContext.BaseDirectory, "Shaders", "TexturedQuad.vert.spv"),
+            "main",
+            ShaderCross.ShaderFormat.SPIRV,
+            ShaderStage.Vertex
+        );
+
+        Shader texturedFragShader = ShaderCross.Create(
+            GraphicsDevice,
+            Path.Join(System.AppContext.BaseDirectory, "Shaders", "TexturedQuad.frag.spv"),
+            "main",
+            ShaderCross.ShaderFormat.SPIRV,
+            ShaderStage.Fragment
+        );
+
+
         var renderPipelineCreateInfo = new GraphicsPipelineCreateInfo
         {
             TargetInfo = new GraphicsPipelineTargetInfo
@@ -219,6 +243,35 @@ public class Renderer : MoonTools.ECS.Renderer
         };
 
         RenderPipeline = GraphicsPipeline.Create(GraphicsDevice, renderPipelineCreateInfo);
+
+        var texturePipelineCreateInfo = new GraphicsPipelineCreateInfo
+        {
+            TargetInfo = new GraphicsPipelineTargetInfo
+            {
+                ColorTargetDescriptions = [
+                    new ColorTargetDescription
+                    {
+                        Format = Window.SwapchainFormat,
+                        BlendState = ColorTargetBlendState.NonPremultipliedAlphaBlend
+                    }
+                ]
+            },
+            DepthStencilState = new DepthStencilState
+            {
+                EnableDepthTest = true,
+                EnableDepthWrite = true,
+                CompareOp = CompareOp.LessOrEqual
+            },
+            MultisampleState = MultisampleState.None,
+            PrimitiveType = PrimitiveType.TriangleList,
+            RasterizerState = RasterizerState.CCW_CullNone,
+            VertexInputState = VertexInputState.CreateSingleBinding<PositionTextureVertex>(),
+            VertexShader = texturedVertShader,
+            FragmentShader = texturedFragShader
+        };
+
+        TexturePipeline = GraphicsPipeline.Create(graphicsDevice, texturePipelineCreateInfo);
+        TextureSampler = Sampler.Create(GraphicsDevice, SamplerCreateInfo.PointClamp);
 
         var textPipelineCreateInfo = new GraphicsPipelineCreateInfo
         {
@@ -250,6 +303,19 @@ public class Renderer : MoonTools.ECS.Renderer
 
         TextPipeline = GraphicsPipeline.Create(GraphicsDevice, textPipelineCreateInfo);
 
+        Span<PositionTextureVertex> vertexData = [
+            new PositionTextureVertex(new Vector3(-1,  1, 0), new Vector2(0, 0)),
+            new PositionTextureVertex(new Vector3( 1,  1, 0), new Vector2(4, 0)),
+            new PositionTextureVertex(new Vector3( 1, -1, 0), new Vector2(4, 4)),
+            new PositionTextureVertex(new Vector3(-1, -1, 0), new Vector2(0, 4)),
+        ];
+
+        Span<ushort> indexData = [
+            0, 1, 2,
+            0, 2, 3,
+        ];
+
+
         var resourceUploader = new ResourceUploader(GraphicsDevice);
         RectVertexBuffer = resourceUploader.CreateBuffer(
             [
@@ -271,6 +337,19 @@ public class Renderer : MoonTools.ECS.Renderer
             ],
             BufferUsageFlags.Index
         );
+
+        QuadVertexBuffer = resourceUploader.CreateBuffer(vertexData, BufferUsageFlags.Vertex);
+        QuadIndexBuffer = resourceUploader.CreateBuffer(indexData, BufferUsageFlags.Index);
+
+        QRCode = resourceUploader.CreateTexture2DFromCompressed(
+            Path.Join(
+                System.AppContext.BaseDirectory,
+                "qrcode.png"
+            ),
+            Window.SwapchainFormat,
+            TextureUsageFlags.Sampler
+        );
+
         resourceUploader.Upload();
         resourceUploader.Dispose();
     }
@@ -508,6 +587,15 @@ public class Renderer : MoonTools.ECS.Renderer
             TextBatchPool.Enqueue(textBatch);
         }
 
+        uiPass.BindGraphicsPipeline(TexturePipeline);
+        uiPass.BindVertexBuffers(QuadVertexBuffer);
+        uiPass.BindIndexBuffer(QuadIndexBuffer, IndexElementSize.Sixteen);
+        uiPass.BindFragmentSamplers(new TextureSamplerBinding(QRCode, TextureSampler));
+        var qrmodel = Matrix4x4.CreateScale(new Vector3(0.6f, 1.2f, 0f)) * Matrix4x4.CreateTranslation(new Vector3(1.25f, -1.5f, 0f));
+        var qruniforms = new TextureVertexUniform(qrmodel);
+        cmdbuf.PushVertexUniformData(qruniforms);
+        uiPass.DrawIndexedPrimitives(6, 1, 0, 0, 0);
+
         cmdbuf.EndRenderPass(uiPass);
 
         if (renderTexture.Width > renderTexture.Height)
@@ -548,5 +636,6 @@ public class Renderer : MoonTools.ECS.Renderer
                 Cycle = false
             });
         }
+
     }
 }
