@@ -10,6 +10,8 @@ public class GameState : MoonTools.ECS.System
     Filter HideFilter;
     Filter PauseFilter;
 
+    bool setHighScoreThisRun = false;
+
     public GameState(World world) : base(world)
     {
         DestroyFilter = FilterBuilder.Include<DestroyOnStartGame>().Build();
@@ -19,6 +21,7 @@ public class GameState : MoonTools.ECS.System
 
     void StartGame()
     {
+        setHighScoreThisRun = false;
         UpgradeMenuSpawner.ResetUpgrades();
 
         foreach (var entity in DestroyFilter.Entities)
@@ -474,6 +477,11 @@ public class GameState : MoonTools.ECS.System
         {
             highScore = newScore;
             Set(highScoreEntity, new HighScore(newScore));
+            if (!setHighScoreThisRun)
+            {
+                setHighScoreThisRun = true;
+                Set(CreateEntity(), new PlayOnce(Stores.SFXStorage.GetID(Content.SFX.hiscore)));
+            }
         }
 
         Set(highScoreEntity,
