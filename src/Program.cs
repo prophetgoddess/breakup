@@ -101,7 +101,7 @@ class Program : Game
             "Ball",
             1920,
             1080,
-            ScreenMode.Windowed
+            ScreenMode.Fullscreen
         );
 
 #else

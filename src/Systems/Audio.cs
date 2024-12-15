@@ -46,7 +46,7 @@ public class Audio : MoonTools.ECS.System
             var voice = GetVoice();
             var buffer = Stores.SFXStorage.Get(Get<PlayOnce>(entity).AudioID);
             voice.Reset();
-            voice.SetVolume(0.5f);
+            voice.SetVolume(0.66f);
             voice.Submit(buffer);
             voice.Play();
             if (Get<PlayOnce>(entity).RandomizePitch)

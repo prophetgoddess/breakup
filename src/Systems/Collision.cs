@@ -148,7 +148,7 @@ public class Collision : MoonTools.ECS.System
 
         if (Has<Bounce>(entity) && collision.Solid)
         {
-            if (Has<CanDealDamageToBlock>(entity) && !Has<HitBall>(other))
+            if (Has<CanDealDamageToBlock>(entity) && !Has<HitBall>(other) && !Has<CanTakeDamage>(other))
             {
                 Set(CreateEntity(), new PlayOnce(Stores.SFXStorage.GetID(Content.SFX.clink), true));
             }
