@@ -8,7 +8,7 @@
    id="svg2"
    sodipodi:docname="ingameqrcode.svg"
    inkscape:version="1.4 (e7c3feb1, 2024-10-09)"
-   inkscape:export-filename="qrcode.pdf"
+   inkscape:export-filename="../ContentSource/qrcode.png"
    inkscape:export-xdpi="96"
    inkscape:export-ydpi="96"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
@@ -35,6 +35,7 @@
      inkscape:window-y="25"
      inkscape:window-maximized="0"
      inkscape:current-layer="svg2"
+     inkscape:export-bgcolor="#ffffff00"
      inkscape:document-units="in" />
   <path
      stroke="#000000"

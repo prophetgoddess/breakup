@@ -218,6 +218,8 @@ public class Collision : MoonTools.ECS.System
 
                 Set(livesEntity, new Lives(lives.Value - 1));
 
+                Set(CreateEntity(), new PlayOnce(Stores.SFXStorage.GetID(Content.SFX.fail)));
+
                 if (Some<DamageBlocksOnLostLife>())
                 {
                     var dmg = Get<CanDealDamageToBlock>(entity).Amount;

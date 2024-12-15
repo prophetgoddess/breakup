@@ -29,8 +29,9 @@ public class Audio : MoonTools.ECS.System
         MusicVoice = new StreamingVoice(audioDevice, Content.Music.music.Format);
         Content.Music.music.Load();
         MusicVoice.Loop = true;
+        MusicVoice.SetVolume(0.5f);
         MusicVoice.Load(Content.Music.music);
-        //MusicVoice.Play();
+        MusicVoice.Play();
     }
 
     public override void Update(TimeSpan delta)
