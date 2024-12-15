@@ -254,6 +254,7 @@ public class Collision : MoonTools.ECS.System
                 {
                     Set(entity, new DamageMultiplier(2));
                 }
+                Set(CreateEntity(), new PlayOnce(Stores.SFXStorage.GetID(Content.SFX.boing)));
             }
 
             Set(entity, new Velocity(velocity));

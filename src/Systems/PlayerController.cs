@@ -47,6 +47,7 @@ public class PlayerController : MoonTools.ECS.System
                 Unrelate<HeldBy>(ball, player);
                 Unrelate<IgnoreSolidCollision>(ball, player);
                 Set(ball, new Velocity(Vector2.UnitY * -300.0f));
+                Set(CreateEntity(), new PlayOnce(Stores.SFXStorage.GetID(Content.SFX.boing)));
             }
         }
 
