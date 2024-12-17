@@ -31,7 +31,7 @@ public class Audio : MoonTools.ECS.System
         MusicVoice.Loop = true;
         MusicVoice.SetVolume(0.5f);
         MusicVoice.Load(Content.Music.music);
-        MusicVoice.Play();
+        //MusicVoice.Play();
     }
 
     public override void Update(TimeSpan delta)
