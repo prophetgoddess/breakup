@@ -175,7 +175,6 @@ public class Motion : MoonTools.ECS.System
             Insert(entity);
         }
 
-
         foreach (var entity in MotionFilter.Entities)
         {
             var position = Get<Position>(entity).Value;
