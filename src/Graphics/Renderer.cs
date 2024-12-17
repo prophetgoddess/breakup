@@ -535,7 +535,7 @@ public class Renderer : MoonTools.ECS.Renderer
             ClearColor = palette.Background,
             FlipMode = FlipMode.None,
             Filter = MoonWorks.Graphics.Filter.Linear,
-            Cycle = true
+            Cycle = false
         });
 
 
@@ -586,15 +586,6 @@ public class Renderer : MoonTools.ECS.Renderer
             textBatch.Render(uiPass, textModel * uiCameraMatrix);
             TextBatchPool.Enqueue(textBatch);
         }
-
-        uiPass.BindGraphicsPipeline(TexturePipeline);
-        uiPass.BindVertexBuffers(QuadVertexBuffer);
-        uiPass.BindIndexBuffer(QuadIndexBuffer, IndexElementSize.Sixteen);
-        uiPass.BindFragmentSamplers(new TextureSamplerBinding(QRCode, TextureSampler));
-        var qrmodel = Matrix4x4.CreateScale(new Vector3(0.6f, 1.2f, 0f)) * Matrix4x4.CreateTranslation(new Vector3(1.25f, -1.5f, 0f));
-        var qruniforms = new TextureVertexUniform(qrmodel);
-        cmdbuf.PushVertexUniformData(qruniforms);
-        uiPass.DrawIndexedPrimitives(6, 1, 0, 0, 0);
 
         cmdbuf.EndRenderPass(uiPass);
 
