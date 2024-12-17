@@ -515,7 +515,7 @@ public class Renderer : MoonTools.ECS.Renderer
 
             var textModel = Matrix4x4.CreateTranslation(position.X, position.Y, depth);
 
-            textBatch.Render(cmdbuf, gamePass, textModel * cameraMatrix);
+            textBatch.Render(gamePass, textModel * cameraMatrix);
             TextBatchPool.Enqueue(textBatch);
         }
 
@@ -583,7 +583,7 @@ public class Renderer : MoonTools.ECS.Renderer
 
             var textModel = Matrix4x4.CreateTranslation(position.X, position.Y, depth);
 
-            textBatch.Render(cmdbuf, uiPass, textModel * uiCameraMatrix);
+            textBatch.Render(uiPass, textModel * uiCameraMatrix);
             TextBatchPool.Enqueue(textBatch);
         }
 

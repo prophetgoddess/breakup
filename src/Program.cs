@@ -15,15 +15,13 @@ class Program : Game
 
     public Program(
         WindowCreateInfo windowCreateInfo,
-        FrameLimiterSettings frameLimiterSettings,
+        FramePacingSettings frameLimiterSettings,
         ShaderFormat availableShaderFormats,
-        int targetTimestep = 60,
         bool debugMode = false
     ) : base(
         windowCreateInfo,
         frameLimiterSettings,
         availableShaderFormats,
-        targetTimestep,
         debugMode
     )
     {
@@ -48,7 +46,7 @@ class Program : Game
             new PowerMeter(World),
             new Trail(World),
             new MarqueeController(World),
-            new Audio(World, AudioDevice),
+            //new Audio(World, AudioDevice),
             new Upgrade(World)
         ];
 
@@ -114,16 +112,14 @@ class Program : Game
 #endif
 
 
-        var frameLimiterSettings = new FrameLimiterSettings(
-            FrameLimiterMode.Capped,
-            144
+        var frameLimiterSettings = FramePacingSettings.CreateLatencyOptimized(
+            60
         );
 
         var game = new Program(
             windowCreateInfo,
             frameLimiterSettings,
             ShaderFormat.SPIRV | ShaderFormat.MSL,
-            60,
             debugMode
         );
 

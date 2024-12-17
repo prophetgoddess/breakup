@@ -480,7 +480,7 @@ public class GameState : MoonTools.ECS.System
             if (!setHighScoreThisRun)
             {
                 setHighScoreThisRun = true;
-                Set(CreateEntity(), new PlayOnce(Stores.SFXStorage.GetID(Content.SFX.hiscore)));
+                //Set(CreateEntity(), new PlayOnce(Stores.SFXStorage.GetID(Content.SFX.hiscore)));
             }
         }
 

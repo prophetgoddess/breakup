@@ -243,7 +243,7 @@ public class Blocks : MoonTools.ECS.System
                         Set(extraLife, new GivesExtraLife());
                     }
 
-                    Set(CreateEntity(), new PlayOnce(Stores.SFXStorage.GetID(Content.SFX.pop), true));
+                    //Set(CreateEntity(), new PlayOnce(Stores.SFXStorage.GetID(Content.SFX.pop), true));
                     Destroy(hpDisplay);
                     Destroy(block);
                     continue;

@@ -26,11 +26,11 @@ public class Audio : MoonTools.ECS.System
     {
         AudioDevice = audioDevice;
         SFXFilter = FilterBuilder.Include<PlayOnce>().Build();
-        MusicVoice = new StreamingVoice(audioDevice, Content.Music.music.Format);
-        Content.Music.music.Load();
-        MusicVoice.Loop = true;
-        MusicVoice.SetVolume(0.5f);
-        MusicVoice.Load(Content.Music.music);
+        //MusicVoice = new StreamingVoice(audioDevice, Content.Music.music.Format);
+        // Content.Music.music.Load();
+        // MusicVoice.Loop = true;
+        // MusicVoice.SetVolume(0.5f);
+        // MusicVoice.Load(Content.Music.music);
         //MusicVoice.Play();
     }
 

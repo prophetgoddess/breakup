@@ -21,7 +21,7 @@ public class XPAndLevel : Manipulator
 
         Set(GetSingletonEntity<XP>(), new XP(currentXP, targetXP));
 
-        Set(CreateEntity(), new PlayOnce(Stores.SFXStorage.GetID(Content.SFX.levelup)));
+        //Set(CreateEntity(), new PlayOnce(Stores.SFXStorage.GetID(Content.SFX.levelup)));
 
     }
 
