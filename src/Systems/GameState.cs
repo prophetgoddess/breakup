@@ -9,14 +9,20 @@ public class GameState : MoonTools.ECS.System
     Filter DestroyFilter;
     Filter HideFilter;
     Filter PauseFilter;
+    Filter BallFilter;
 
     bool setHighScoreThisRun = false;
+
+    BallSpawner BallSpawner;
 
     public GameState(World world) : base(world)
     {
         DestroyFilter = FilterBuilder.Include<DestroyOnStartGame>().Build();
         HideFilter = FilterBuilder.Include<HideOnMainMenu>().Build();
         PauseFilter = FilterBuilder.Include<Pause>().Build();
+        BallFilter = FilterBuilder.Include<CanDealDamageToBlock>().Include<HasGravity>().Include<CanBeHit>().Build();
+
+        BallSpawner = new BallSpawner(world);
     }
 
     void StartGame()
@@ -36,23 +42,10 @@ public class GameState : MoonTools.ECS.System
 
         Set(CreateEntity(), new Initialize());
 
-        var ball = CreateEntity();
-        Set(ball, new Model(Content.Models.Donut.ID));
-        Set(ball, new Scale(Vector2.One * 10.0f));
-        Set(ball, new Position(new Vector2(
+        var ball = BallSpawner.SpawnBall(new Vector2(
                     Dimensions.GameWidth * 0.5f,
                     Dimensions.GameHeight * 0.5f
-                )));
-        Set(ball, new Velocity(Vector2.Zero));
-        Set(ball, new BoundingBox(0, 0, 18, 18));
-        Set(ball, new SolidCollision());
-        Set(ball, new Bounce(0.9f));
-        Set(ball, new CanBeHit());
-        Set(ball, new HasGravity(1f));
-        Set(ball, new CameraFollows());
-        Set(ball, new DestroyOnStartGame());
-        Set(ball, new Highlight());
-        Set(ball, new CanDealDamageToBlock(1));
+                ));
 
         var player = CreateEntity();
         Set(player, new Model(Content.Models.EmptyTriangle.ID));
@@ -60,6 +53,7 @@ public class GameState : MoonTools.ECS.System
                 Dimensions.GameWidth * 0.5f,
                 Dimensions.GameHeight * 0.9f
             )));
+        Set(player, new BlocksSpawnBonusBalls());
         Set(player, new Orientation(0f));
         Set(player, new Velocity(Vector2.Zero));
         Set(player, new BoundingBox(0, 8, 55, 50));
@@ -122,7 +116,7 @@ public class GameState : MoonTools.ECS.System
         Set(bottomBound, new Position(new Vector2(Dimensions.GameWidth * 0.5f, Dimensions.GameHeight + 8)));
         Set(bottomBound, new BoundingBox(0, 0, Dimensions.GameWidth, 16));
         Set(bottomBound, new SolidCollision());
-        Set(bottomBound, new ResetBallOnHit());
+        Set(bottomBound, new DestroysBall());
         Set(bottomBound, new FollowsCamera(Dimensions.GameHeight + 8));
         Set(bottomBound, new DestroyOnStartGame());
 
@@ -435,6 +429,8 @@ public class GameState : MoonTools.ECS.System
             Set(revive, new ReviveWithOneHealth(true));
         }
 
+
+
         if ((Some<DestroyOnStartGame>() && inputState.Restart.IsPressed) ||
             (Some<MainMenu>() && inputState.Start.IsPressed))
         {
@@ -497,6 +493,20 @@ public class GameState : MoonTools.ECS.System
 
         var livesEntity = GetSingletonEntity<Lives>();
         var lives = Get<Lives>(livesEntity);
+
+        if (BallFilter.Empty)
+        {
+            Set(livesEntity, new Lives(lives.Value - 1));
+            var ball = BallSpawner.SpawnBall(new Vector2(
+                Dimensions.GameWidth * 0.5f,
+                Dimensions.GameHeight * 0.5f
+            ));
+
+            Relate(ball, GetSingletonEntity<Player>(), new HeldBy(new Vector2(0f, -32.0f)));
+            Set(ball, new Velocity(Vector2.Zero));
+            Set(CreateEntity(), new PlayOnce(Stores.SFXStorage.GetID(Content.SFX.fail)));
+
+        }
 
         Set(livesEntity,
         new Text(

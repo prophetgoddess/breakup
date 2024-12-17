@@ -18,6 +18,7 @@ public class Blocks : MoonTools.ECS.System
     System.Random Random = new System.Random();
     float LastGridOffset = -1.0f;
     GemSpawner GemSpawner;
+    BallSpawner BallSpawner;
 
     float MinBlockDensity = 0.1f;
     float MaxBlockDensity = 0.66f;
@@ -42,6 +43,7 @@ public class Blocks : MoonTools.ECS.System
         .Build();
 
         UpgradeMenuSpawner = new UpgradeMenuSpawner(world);
+        BallSpawner = new BallSpawner(world);
     }
 
     void SpawnBlock(int x, int y, bool barrier = false)
@@ -210,22 +212,7 @@ public class Blocks : MoonTools.ECS.System
 
                     if (Some<BlocksSpawnBonusBalls>() && Rando.Value < 0.2f)
                     {
-                        var ball = CreateEntity();
-                        Set(ball, new Model(Content.Models.Donut.ID));
-                        Set(ball, new Scale(Vector2.One * 10.0f));
-                        Set(ball, new Position(Get<Position>(block).Value));
-                        Set(ball, new Velocity(new Vector2(Rando.Range(-50f, 50f), Rando.Range(-100f, -10f))));
-                        Set(ball, new BoundingBox(0, 0, 18, 18));
-                        Set(ball, new SolidCollision());
-                        Set(ball, new Bounce(0.9f));
-                        Set(ball, new CanBeHit());
-                        Set(ball, new HasGravity(1f));
-                        Set(ball, new CameraFollows());
-                        Set(ball, new DestroyOnStartGame());
-                        Set(ball, new Highlight());
-                        Set(ball, new CanDealDamageToBlock(1));
-                        Set(ball, new DontLoseLife());
-                        Set(ball, new Alpha(128));
+                        BallSpawner.SpawnBall(Get<Position>(block).Value);
                     }
 
                     if (Rando.Value < 0.01f)

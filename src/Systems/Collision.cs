@@ -193,51 +193,40 @@ public class Collision : MoonTools.ECS.System
 
     void HandleDestroyBall(Entity entity, Entity other)
     {
-        if (Has<Bounce>(entity) && Has<ResetBallOnHit>(other))
+        if (Has<Bounce>(entity) && Has<DestroysBall>(other))
         {
-            if (Has<DontLoseLife>(entity))
+
+            if (Some<BarrierTakesExtraHit>() && GetSingleton<BarrierTakesExtraHit>().Active)
             {
-                Set(entity, new Timer(0f));
+                Set(GetSingletonEntity<BarrierTakesExtraHit>(), new BarrierTakesExtraHit(false));
+                return;
             }
-            else
+            else if (Some<BarrierTakesExtraHit>() && !GetSingleton<BarrierTakesExtraHit>().Active)
             {
-                if (Some<BarrierTakesExtraHit>() && GetSingleton<BarrierTakesExtraHit>().Active)
+                Set(GetSingletonEntity<BarrierTakesExtraHit>(), new BarrierTakesExtraHit(true));
+            }
+
+            var player = GetSingletonEntity<Player>();
+            Relate(entity, player, new HeldBy(new Vector2(0f, -32.0f)));
+            Set(entity, new Velocity(Vector2.Zero));
+            Unrelate<Colliding>(entity, other);
+            Relate(entity, player, new IgnoreSolidCollision());
+
+            var meterEntity = GetSingletonEntity<Power>();
+            var meter = Get<Power>(meterEntity);
+            Set(meterEntity, new Power(0f, meter.Decay, meter.Scale));
+
+            if (Some<DamageBlocksOnLostLife>())
+            {
+                var dmg = Get<CanDealDamageToBlock>(entity).Amount;
+                foreach (var block in BlocksFilter.Entities)
                 {
-                    Set(GetSingletonEntity<BarrierTakesExtraHit>(), new BarrierTakesExtraHit(false));
-                    return;
-                }
-                else if (Some<BarrierTakesExtraHit>() && !GetSingleton<BarrierTakesExtraHit>().Active)
-                {
-                    Set(GetSingletonEntity<BarrierTakesExtraHit>(), new BarrierTakesExtraHit(true));
-                }
-
-                var player = GetSingletonEntity<Player>();
-                Relate(entity, player, new HeldBy(new Vector2(0f, -32.0f)));
-                Set(entity, new Velocity(Vector2.Zero));
-                Unrelate<Colliding>(entity, other);
-                Relate(entity, player, new IgnoreSolidCollision());
-
-                var meterEntity = GetSingletonEntity<Power>();
-                var meter = Get<Power>(meterEntity);
-                Set(meterEntity, new Power(0f, meter.Decay, meter.Scale));
-
-                var livesEntity = GetSingletonEntity<Lives>();
-                var lives = Get<Lives>(livesEntity);
-
-                Set(livesEntity, new Lives(lives.Value - 1));
-
-                Set(CreateEntity(), new PlayOnce(Stores.SFXStorage.GetID(Content.SFX.fail)));
-
-                if (Some<DamageBlocksOnLostLife>())
-                {
-                    var dmg = Get<CanDealDamageToBlock>(entity).Amount;
-                    foreach (var block in BlocksFilter.Entities)
-                    {
-                        var hitPoints = Get<HitPoints>(block);
-                        Set(block, new HitPoints(hitPoints.Value - dmg, hitPoints.Max));
-                    }
+                    var hitPoints = Get<HitPoints>(block);
+                    Set(block, new HitPoints(hitPoints.Value - dmg, hitPoints.Max));
                 }
             }
+
+            Destroy(entity);
         }
     }
 
