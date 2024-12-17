@@ -9,6 +9,8 @@ public class Audio : MoonTools.ECS.System
     AudioDevice AudioDevice;
 
     StreamingVoice MusicVoice;
+    AudioDataOgg MusicData;
+
 
     Queue<PersistentVoice> Voices = new Queue<PersistentVoice>();
     Queue<PersistentVoice> Playing = new Queue<PersistentVoice>();
@@ -26,12 +28,15 @@ public class Audio : MoonTools.ECS.System
     {
         AudioDevice = audioDevice;
         SFXFilter = FilterBuilder.Include<PlayOnce>().Build();
-        //MusicVoice = new StreamingVoice(audioDevice, Content.Music.music.Format);
-        // Content.Music.music.Load();
-        // MusicVoice.Loop = true;
-        // MusicVoice.SetVolume(0.5f);
-        // MusicVoice.Load(Content.Music.music);
-        //MusicVoice.Play();
+        System.Console.WriteLine(Content.Music.music);
+        MusicData = AudioDataOgg.Create(audioDevice);
+        MusicData.Open(File.ReadAllBytes(Content.Music.music));
+
+        MusicVoice = new StreamingVoice(audioDevice, MusicData.Format);
+        MusicVoice.Loop = true;
+        MusicVoice.SetVolume(0.5f);
+        MusicVoice.Load(MusicData);
+        MusicVoice.Play();
     }
 
     public override void Update(TimeSpan delta)

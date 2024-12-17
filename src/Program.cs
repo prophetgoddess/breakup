@@ -46,7 +46,7 @@ class Program : Game
             new PowerMeter(World),
             new Trail(World),
             new MarqueeController(World),
-            //new Audio(World, AudioDevice),
+            new Audio(World, AudioDevice),
             new Upgrade(World)
         ];
 

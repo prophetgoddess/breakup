@@ -73,7 +73,7 @@ public class Collision : MoonTools.ECS.System
             Set(gemsEntity, new Gems(current, total));
 
             XPAndLevel.GiveXP(Get<GivesXP>(other).Amount);
-            //Set(CreateEntity(), new PlayOnce(Stores.SFXStorage.GetID(Content.SFX.gemcollect)));
+            Set(CreateEntity(), new PlayOnce(Stores.SFXStorage.GetID(Content.SFX.gemcollect)));
 
             Destroy(other);
         }
@@ -131,7 +131,7 @@ public class Collision : MoonTools.ECS.System
 
             if (hitPoints.Value - damage > 0)
             {
-                //Set(CreateEntity(), new PlayOnce(Stores.SFXStorage.GetID(Content.SFX.blockhit)));
+                Set(CreateEntity(), new PlayOnce(Stores.SFXStorage.GetID(Content.SFX.blockhit)));
             }
             else if (Has<ComboBuilder>(entity))
             {
@@ -150,7 +150,7 @@ public class Collision : MoonTools.ECS.System
         {
             if (Has<CanDealDamageToBlock>(entity) && !Has<HitBall>(other) && !Has<CanTakeDamage>(other))
             {
-                //Set(CreateEntity(), new PlayOnce(Stores.SFXStorage.GetID(Content.SFX.clink), true));
+                Set(CreateEntity(), new PlayOnce(Stores.SFXStorage.GetID(Content.SFX.clink), true));
             }
 
             if (Has<ComboBuilder>(other) && Has<Player>(other))
@@ -218,7 +218,7 @@ public class Collision : MoonTools.ECS.System
 
                 Set(livesEntity, new Lives(lives.Value - 1));
 
-                //Set(CreateEntity(), new PlayOnce(Stores.SFXStorage.GetID(Content.SFX.fail)));
+                Set(CreateEntity(), new PlayOnce(Stores.SFXStorage.GetID(Content.SFX.fail)));
 
                 if (Some<DamageBlocksOnLostLife>())
                 {
@@ -254,7 +254,7 @@ public class Collision : MoonTools.ECS.System
                 {
                     Set(entity, new DamageMultiplier(2));
                 }
-                //Set(CreateEntity(), new PlayOnce(Stores.SFXStorage.GetID(Content.SFX.boing)));
+                Set(CreateEntity(), new PlayOnce(Stores.SFXStorage.GetID(Content.SFX.boing)));
             }
 
             Set(entity, new Velocity(velocity));
