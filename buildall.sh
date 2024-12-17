@@ -3,6 +3,7 @@ rm -rf ./src/bin/Release
 # macos
 
 dotnet publish ./src/Ball.csproj -r:osx-arm64 -c:Release --self-contained -p:PublishTrimmed=true -p:PublishSingleFile=true
+cp -R ./moonlibs/lib64/. ./src/bin/Release/net9.0/osx-arm64/publish/
 zip -rXq breakup-macos.zip "./src/bin/Release/net9.0/osx-arm64/publish/."
 cd ./src/bin/Release/net9.0/osx-arm64/publish/
 zip -rXq breakup-macos.zip "."

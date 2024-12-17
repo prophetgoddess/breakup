@@ -9,6 +9,75 @@ public class Motion : MoonTools.ECS.System
     public Filter MotionFilter;
     public Filter ColliderFilter;
 
+    const int CellSize = 16;
+    const float CellReciprocal = 1.0f / CellSize;
+    Dictionary<(int, int), HashSet<Entity>> SpatialHash = new Dictionary<(int, int), HashSet<Entity>>();
+
+    HashSet<Entity> PossibleCollisions = new HashSet<Entity>();
+
+    public (int x, int y) Bucket(Vector2 position)
+    {
+        return (
+            (int)MathF.Floor(position.X * CellReciprocal),
+            (int)MathF.Floor(position.Y * CellReciprocal)
+        );
+    }
+
+    public void Insert(Entity e)
+    {
+        var box = Get<BoundingBox>(e);
+        var pos = Get<Position>(e).Value;
+
+        var minX = box.X + pos.X - box.Width * 0.5f;
+        var minY = box.Y + pos.Y - box.Height * 0.5f;
+        var maxX = box.X + pos.X + box.Width * 0.5f;
+        var maxY = box.Y + pos.Y + box.Height * 0.5f;
+
+        var minBucket = Bucket(new Vector2(minX, minY));
+        var maxBucket = Bucket(new Vector2(maxX, maxY));
+
+        for (int x = minBucket.x; x <= maxBucket.x; x++)
+        {
+            for (int y = minBucket.y; y <= maxBucket.y; y++)
+            {
+                var key = (x, y);
+                if (!SpatialHash.ContainsKey(key))
+                {
+                    SpatialHash.Add(key, new HashSet<Entity>());
+                }
+
+                SpatialHash[key].Add(e);
+            }
+        }
+    }
+
+    public void Retrieve(Entity e, Vector2 pos)
+    {
+        PossibleCollisions.Clear();
+        var box = Get<BoundingBox>(e);
+
+        var minX = box.X + pos.X - box.Width * 0.5f;
+        var minY = box.Y + pos.Y - box.Height * 0.5f;
+        var maxX = box.X + pos.X + box.Width * 0.5f;
+        var maxY = box.Y + pos.Y + box.Height * 0.5f;
+
+        var minBucket = Bucket(new Vector2(minX, minY));
+        var maxBucket = Bucket(new Vector2(maxX, maxY));
+
+        for (int x = minBucket.x; x <= maxBucket.x; x++)
+        {
+            for (int y = minBucket.y; y <= maxBucket.y; y++)
+            {
+                var key = (x, y);
+                if (SpatialHash.ContainsKey(key))
+                {
+                    PossibleCollisions.UnionWith(SpatialHash[key]);
+                }
+            }
+        }
+    }
+
+
     public Motion(World world) : base(world)
     {
         MotionFilter = FilterBuilder.Include<Velocity>().Include<Position>().Build();
@@ -40,7 +109,9 @@ public class Motion : MoonTools.ECS.System
         var destX = position.X + velocity.X;
         var destY = position.Y + velocity.Y;
 
-        foreach (var other in ColliderFilter.Entities)
+        Retrieve(e, new Vector2(destX, position.Y));
+
+        foreach (var other in PossibleCollisions)
         {
             var otherPos = Get<Position>(other).Value;
             var otherBox = Get<BoundingBox>(other);
@@ -51,7 +122,7 @@ public class Motion : MoonTools.ECS.System
                     !Related<IgnoreSolidCollision>(e, other) &&
                     Has<SolidCollision>(e) &&
                     Has<SolidCollision>(other)
-                     )
+                    )
                 {
                     destX = position.X;
                     Relate(e, other, new Colliding(CollisionDirection.X, true));
@@ -61,7 +132,9 @@ public class Motion : MoonTools.ECS.System
             }
         }
 
-        foreach (var other in ColliderFilter.Entities)
+        Retrieve(e, new Vector2(position.X, destY));
+
+        foreach (var other in PossibleCollisions)
         {
             var otherPos = Get<Position>(other).Value;
             var otherBox = Get<BoundingBox>(other);
@@ -87,10 +160,21 @@ public class Motion : MoonTools.ECS.System
 
     public override void Update(TimeSpan delta)
     {
+        foreach (var (k, v) in SpatialHash)
+        {
+            v.Clear();
+        }
+
         if (Some<Pause>())
             return;
 
         var dt = (float)delta.TotalSeconds;
+
+        foreach (var entity in ColliderFilter.Entities)
+        {
+            Insert(entity);
+        }
+
 
         foreach (var entity in MotionFilter.Entities)
         {

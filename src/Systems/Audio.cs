@@ -34,7 +34,7 @@ public class Audio : MoonTools.ECS.System
 
         MusicVoice = new StreamingVoice(audioDevice, MusicData.Format);
         MusicVoice.Loop = true;
-        MusicVoice.SetVolume(0.5f);
+        MusicVoice.SetVolume(0.0f);
         MusicVoice.Load(MusicData);
         MusicVoice.Play();
     }

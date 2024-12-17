@@ -356,7 +356,7 @@ public static class Content
     )
 
     for song in Path(music_out).glob("*.ogg"):
-        f.write(f"public static AudioDataOgg {Path(song).stem};\n")
+        f.write(f"public static string {Path(song).stem};\n")
 
     f.write(
         """public static void LoadMusic(AudioDevice audioDevice, string path)
@@ -365,9 +365,7 @@ public static class Content
     )
 
     for song in Path(music_out).glob("*.ogg"):
-        f.write(
-            f'{Path(song).stem} = new AudioDataOgg(audioDevice, Path.Join(path, "{Path(song).stem}.ogg"));\n'
-        )
+        f.write(f'{Path(song).stem} = Path.Join(path, "{Path(song).stem}.ogg");\n')
 
     f.write("\n}\n}\n\n")
 

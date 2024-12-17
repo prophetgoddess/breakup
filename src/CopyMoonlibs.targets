@@ -4,10 +4,11 @@
     <Target Name="Runtime ID"  AfterTargets="Build">
         <Message Text="Runtime ID: $(RuntimeIdentifier)" Importance="high"/>
     </Target>
-    <ItemGroup Condition="$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::OSX)))">
-        <Content Include="..\moonlibs\macos\**\*.*" >
-            <Link>%(RecursiveDir)%(Filename)%(Extension)</Link>
-            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-        </Content>
+
+        <ItemGroup Condition="$(Configuration)=='Debug'">
+            <Content Include="..\moonlibs\macos\**\*.*" >
+                <Link>%(RecursiveDir)%(Filename)%(Extension)</Link>
+                <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+            </Content>
     </ItemGroup>
 </Project>
