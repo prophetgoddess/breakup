@@ -70,3 +70,7 @@ public readonly record struct BlocksSpawnBonusBalls();
 public readonly record struct BonusLives();
 public readonly record struct GivesExtraLife();
 public readonly record struct MoveBackAndForth(float Min, float Max, float Speed);
+public readonly record struct Pulsate(Vector2 Scale, float Rate, float Amount);
+public readonly record struct ExpandingEchoes(float Rate, float GrowthRate, float Lifetime);
+public readonly record struct AnimationTimer(float Time);
+public readonly record struct GrowOverTime(float Rate);

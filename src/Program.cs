@@ -47,7 +47,8 @@ class Program : Game
             new Trail(World),
             new MarqueeController(World),
             new Audio(World, AudioDevice),
-            new Upgrade(World)
+            new Upgrade(World),
+            new Animations(World)
         ];
 
         Renderer = new Renderer(World, MainWindow, GraphicsDevice, Inputs);

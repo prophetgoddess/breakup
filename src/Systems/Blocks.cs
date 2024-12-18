@@ -90,6 +90,7 @@ public class Blocks : MoonTools.ECS.System
                 Set(block, new GivesUpgrade());
                 Set(block, new Highlight());
                 Set(hpDisplay, new Highlight());
+                Set(block, new Pulsate(Vector2.One * 1.9f, 3.0f, 0.2f));
                 hp *= 2;
                 Set(block, new HitPoints(hp, hp));
                 Set(hpDisplay, new Text(Fonts.BodyFont, Fonts.InfoSize, Stores.TextStorage.GetID($"{GetFormattedHP(hp)}"), MoonWorks.Graphics.Font.HorizontalAlignment.Center, MoonWorks.Graphics.Font.VerticalAlignment.Middle));

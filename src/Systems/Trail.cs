@@ -30,7 +30,6 @@ public class Trail : MoonTools.ECS.System
         return entity;
     }
 
-
     public override void Update(TimeSpan delta)
     {
         if (Some<Pause>())
@@ -45,7 +44,7 @@ public class Trail : MoonTools.ECS.System
                 Set(t, new Position(Get<Position>(entity).Value));
 
                 var timer = CreateEntity();
-                Set(timer, new Timer(0.033f));
+                Set(timer, new Timer(0.05f));
                 Relate(entity, timer, new TrailTimer());
             }
         }
