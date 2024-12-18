@@ -100,8 +100,6 @@ public class Blocks : MoonTools.ECS.System
         {
             Set(block, new Model(Content.Models.RoundSquare.ID));
         }
-
-
     }
 
     void Initialize()

@@ -385,9 +385,12 @@ public class Renderer : MoonTools.ECS.Renderer
             var color = Has<Highlight>(textEntity) ? palette.Highlight : palette.Foreground;
             var position = Get<Position>(textEntity).Value;
             var depth = Has<Depth>(textEntity) ? Get<Depth>(textEntity).Value : 0.5f;
+            color.A = Has<Alpha>(textEntity) ? Get<Alpha>(textEntity).A : (byte)255;
+
 
             if (Some<Pause>() && !Has<KeepOpacityWhenPaused>(textEntity))
                 color.A = 200;
+
             if (!Has<WordWrap>(textEntity))
             {
                 var textBatch = GetTextBatch();
@@ -447,7 +450,6 @@ public class Renderer : MoonTools.ECS.Renderer
             var color = Has<Highlight>(textEntity) ? palette.Highlight : palette.Foreground;
             var position = Get<Position>(textEntity).Value;
             var depth = Has<Depth>(textEntity) ? Get<Depth>(textEntity).Value : 0.5f;
-
 
             textBatch.Start(Stores.FontStorage.Get(text.FontID));
             textBatch.Add(Stores.TextStorage.Get(text.TextID), text.Size, color, text.HorizontalAlignment, text.VerticalAlignment);

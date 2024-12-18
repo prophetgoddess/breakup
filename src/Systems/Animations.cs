@@ -9,6 +9,7 @@ public class Animations : MoonTools.ECS.System
     Filter PulsateFilter;
     Filter ExpandingEchoesFilter;
     Filter GrowFilter;
+    Filter FadeFilter;
 
     public Animations(World world) : base(world)
     {
@@ -17,6 +18,7 @@ public class Animations : MoonTools.ECS.System
         PulsateFilter = FilterBuilder.Include<Pulsate>().Include<Model>().Build();
         ExpandingEchoesFilter = FilterBuilder.Include<ExpandingEchoes>().Include<Model>().Build();
         GrowFilter = FilterBuilder.Include<GrowOverTime>().Include<Model>().Build();
+        FadeFilter = FilterBuilder.Include<FadeOut>().Include<Model>().Include<Timer>().Build();
 
     }
 
@@ -86,6 +88,12 @@ public class Animations : MoonTools.ECS.System
                 scale.X + growth.Rate * dt,
                 scale.Y + growth.Rate * dt
             )));
+        }
+
+        foreach (var entity in FadeFilter.Entities)
+        {
+            var timer = Get<Timer>(entity);
+            Set(entity, new Alpha((byte)(timer.Remaining * 255)));
         }
     }
 }

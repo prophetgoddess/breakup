@@ -53,6 +53,7 @@ public class GameState : MoonTools.ECS.System
                 Dimensions.GameWidth * 0.5f,
                 Dimensions.GameHeight * 0.9f
             )));
+        Set(player, new Combo(0));
         Set(player, new Orientation(0f));
         Set(player, new Velocity(Vector2.Zero));
         Set(player, new BoundingBox(0, 8, 55, 50));
@@ -62,7 +63,6 @@ public class GameState : MoonTools.ECS.System
         Set(player, new Player());
         Set(player, new FollowsCamera(Dimensions.GameHeight * 0.9f));
         Set(player, new DestroyOnStartGame());
-        Set(player, new ComboBuilder());
 
         var power = CreateEntity();
         Set(power, new Model(Content.Models.Triangle.ID));

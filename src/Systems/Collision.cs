@@ -104,19 +104,18 @@ public class Collision : MoonTools.ECS.System
                 Remove<DamageMultiplier>(entity);
             }
 
+            if (Some<ComboAddedToDamage>())
+            {
+                damage += GetSingleton<Combo>().Value;
+            }
+
             if (Some<DoubleDamageOnOneLife>() && GetSingleton<Lives>().Value == 1 && Has<Bounce>(entity))
             {
                 damage *= 2;
             }
 
-            if (Has<ComboBuilder>(entity))
-            {
-                damage += Get<ComboBuilder>(entity).Combo;
-            }
-
             var hitPoints = Get<HitPoints>(other);
             Set(other, new HitPoints(hitPoints.Value - damage, hitPoints.Max));
-
 
             damageNumber = damage;
 
@@ -124,10 +123,26 @@ public class Collision : MoonTools.ECS.System
             {
                 Set(CreateEntity(), new PlayOnce(Stores.SFXStorage.GetID(Content.SFX.blockhit)));
             }
-            else if (Has<ComboBuilder>(entity))
+            else
             {
-                var combo = Get<ComboBuilder>(entity);
-                Set(entity, new ComboBuilder(combo.Combo + 1));
+                var player = GetSingletonEntity<Combo>();
+                var combo = Get<Combo>(player);
+                var newCombo = combo.Value + 1;
+                Set(player, new Combo(newCombo));
+
+                if (newCombo >= 2)
+                {
+                    var comboText = Some<ComboText>() ? GetSingletonEntity<ComboText>() : CreateEntity();
+                    Set(comboText, new Position(new Vector2(10f, Dimensions.GameHeight - Fonts.BodySize)));
+                    Set(comboText, new Depth(0.01f));
+                    Set(comboText, new Text(Fonts.HeaderFont, Fonts.UpgradeSize, Stores.TextStorage.GetID($"{newCombo}x Combo"), MoonWorks.Graphics.Font.HorizontalAlignment.Left, MoonWorks.Graphics.Font.VerticalAlignment.Middle));
+                    Set(comboText, new Highlight());
+                    Set(comboText, new FollowsCamera(Dimensions.GameHeight - Fonts.BodySize));
+                    Set(comboText, new DestroyOnStartGame());
+                    Set(comboText, new ComboText());
+                    Set(comboText, new FadeOut());
+                }
+
             }
         }
 
@@ -159,11 +174,6 @@ public class Collision : MoonTools.ECS.System
             if (Has<CanDealDamageToBlock>(entity) && !Has<HitBall>(other) && !Has<CanTakeDamage>(other))
             {
                 Set(CreateEntity(), new PlayOnce(Stores.SFXStorage.GetID(Content.SFX.clink), true));
-            }
-
-            if (Has<ComboBuilder>(other) && Has<Player>(other))
-            {
-                Set(entity, new ComboBuilder(0));
             }
 
             if (!(Some<PiercingBalls>() && Has<HitPoints>(other) && Get<HitPoints>(other).Value <= 0))
@@ -243,6 +253,13 @@ public class Collision : MoonTools.ECS.System
 
             var meterEntity = GetSingletonEntity<Power>();
             var meter = Get<Power>(meterEntity);
+
+            Set(other, new Combo(0));
+
+            if (Some<ComboText>())
+            {
+                Set(GetSingletonEntity<ComboText>(), new Timer(1f));
+            }
 
             if (HasOutRelation<Spinning>(other))
             {
