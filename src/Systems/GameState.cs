@@ -53,7 +53,6 @@ public class GameState : MoonTools.ECS.System
                 Dimensions.GameWidth * 0.5f,
                 Dimensions.GameHeight * 0.9f
             )));
-        Set(player, new BlocksSpawnBonusBalls());
         Set(player, new Orientation(0f));
         Set(player, new Velocity(Vector2.Zero));
         Set(player, new BoundingBox(0, 8, 55, 50));

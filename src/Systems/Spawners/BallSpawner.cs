@@ -11,7 +11,6 @@ public class BallSpawner : MoonTools.ECS.Manipulator
 
     public Entity SpawnBall(Vector2 position)
     {
-
         var ball = CreateEntity();
         Set(ball, new Model(Content.Models.Donut.ID));
         Set(ball, new Scale(Vector2.One * 10.0f));
