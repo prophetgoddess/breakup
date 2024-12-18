@@ -4,3 +4,6 @@
 [submodule "lib/MoonTools.ECS"]
 	path = lib/MoonTools.ECS
 	url = https://github.com/MoonsideGames/MoonTools.ECS
+[submodule "lib/Steamworks.NET.Dissent"]
+	path = lib/Steamworks.NET.Dissent
+	url = https://github.com/MoonsideGames/Steamworks.NET.Dissent

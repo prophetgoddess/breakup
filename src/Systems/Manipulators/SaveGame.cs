@@ -9,7 +9,6 @@ namespace Ball;
 internal partial class SaveDataContext : JsonSerializerContext
 {
 }
-
 public struct SaveData
 {
     public int HighScore { get; set; }
