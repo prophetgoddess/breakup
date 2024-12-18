@@ -214,8 +214,10 @@ public class GameState : MoonTools.ECS.System
         Set(highScoreLabel, new UI());
         Set(highScoreLabel, new DestroyOnStartGame());
 
+        var saveData = SaveGame.Load();
+
         var highScoreEntity = CreateEntity();
-        Set(highScoreEntity, new HighScore(0));
+        Set(highScoreEntity, new HighScore(saveData.HighScore));
         Set(highScoreEntity, new Position(new Vector2(UILayoutConstants.InfoX, UILayoutConstants.HighScoreY)));
         Set(highScoreEntity,
          new Text(
@@ -474,10 +476,10 @@ public class GameState : MoonTools.ECS.System
         {
             highScore = newScore;
             Set(highScoreEntity, new HighScore(newScore));
+            SaveGame.Save();
             if (!setHighScoreThisRun)
             {
                 setHighScoreThisRun = true;
-                SaveGame.Save();
                 Set(CreateEntity(), new PlayOnce(Stores.SFXStorage.GetID(Content.SFX.hiscore)));
             }
         }

@@ -1,6 +1,7 @@
 using MoonTools.ECS;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Security.Cryptography;
 
 namespace Ball;
 
@@ -9,13 +10,15 @@ internal partial class SaveDataContext : JsonSerializerContext
 {
 }
 
-struct SaveData
+public struct SaveData
 {
     public int HighScore { get; set; }
 }
 
 public class SaveGame : Manipulator
 {
+    static string FilePath = Path.Join(AppContext.BaseDirectory, "save");
+
     static JsonSerializerOptions saveSerializerOptions = new JsonSerializerOptions
     {
         IncludeFields = true,
@@ -37,11 +40,19 @@ public class SaveGame : Manipulator
 
         var jsonString = JsonSerializer.Serialize(saveData, typeof(SaveData), saveDataContext);
 
-        System.IO.File.WriteAllText(Path.Join(AppContext.BaseDirectory, "data.json"), jsonString);
+        File.WriteAllText(FilePath, jsonString);
     }
 
-    public void Load()
+    public SaveData Load()
     {
+        if (File.Exists(FilePath))
+        {
+            return (SaveData)JsonSerializer.Deserialize(File.ReadAllText(FilePath), typeof(SaveData), saveDataContext);
+        }
+        else
+        {
+            return new SaveData();
+        }
 
     }
 }
