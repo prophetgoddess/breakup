@@ -14,6 +14,7 @@ public class GameState : MoonTools.ECS.System
     bool setHighScoreThisRun = false;
 
     BallSpawner BallSpawner;
+    SaveGame SaveGame;
 
     public GameState(World world) : base(world)
     {
@@ -23,6 +24,7 @@ public class GameState : MoonTools.ECS.System
         BallFilter = FilterBuilder.Include<CanDealDamageToBlock>().Include<HasGravity>().Include<CanBeHit>().Build();
 
         BallSpawner = new BallSpawner(world);
+        SaveGame = new SaveGame(world);
     }
 
     void StartGame()
@@ -475,6 +477,7 @@ public class GameState : MoonTools.ECS.System
             if (!setHighScoreThisRun)
             {
                 setHighScoreThisRun = true;
+                SaveGame.Save();
                 Set(CreateEntity(), new PlayOnce(Stores.SFXStorage.GetID(Content.SFX.hiscore)));
             }
         }

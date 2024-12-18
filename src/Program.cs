@@ -98,16 +98,16 @@ class Program : Game
         debugMode = true;
         var windowCreateInfo = new WindowCreateInfo(
             "Ball",
-            1280,
-            720,
+            1600,
+            900,
             ScreenMode.Windowed
         );
 
 #else
         var windowCreateInfo = new WindowCreateInfo(
             "Ball",
-            1920,
-            1080,
+            1280,
+            720,
             ScreenMode.Windowed
         );
 #endif
