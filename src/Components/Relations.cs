@@ -22,3 +22,4 @@ public readonly record struct VerticalConnection();
 public readonly record struct SettingDisplay();
 public readonly record struct SettingControls();
 public readonly record struct Description();
+public readonly record struct CantSelectUpgrade();

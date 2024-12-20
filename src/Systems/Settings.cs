@@ -72,7 +72,7 @@ public class Settings : MoonTools.ECS.System
     {
         var inputState = GetSingleton<InputState>();
 
-        if (!Some<Setting>())
+        if (!Some<Setting>() && !Some<UpgradeOption>())
         {
             if (!Some<Player>() || Some<Pause>())
             {
