@@ -78,4 +78,6 @@ public readonly record struct ComboAddedToDamage();
 public readonly record struct ComboText();
 public readonly record struct FadeOut();
 public readonly record struct SetHighScoreThisRun();
-public readonly record struct SettingsMenu();
+public readonly record struct Setting();
+public readonly record struct SFXVolume(float Value);
+public readonly record struct MusicVolume(float Value);

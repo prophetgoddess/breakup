@@ -12,6 +12,8 @@ internal partial class SaveDataContext : JsonSerializerContext
 public struct SaveData
 {
     public int HighScore { get; set; }
+    public float MusicVolume { get; set; }
+    public float SFXVolume { get; set; }
 }
 
 public class SaveGame : Manipulator
@@ -32,9 +34,13 @@ public class SaveGame : Manipulator
 
     public void Save()
     {
+        var existing = Load();
+
         var saveData = new SaveData
         {
-            HighScore = GetSingleton<HighScore>().Value
+            HighScore = Some<HighScore>() ? GetSingleton<HighScore>().Value : existing.HighScore,
+            MusicVolume = GetSingleton<MusicVolume>().Value,
+            SFXVolume = GetSingleton<SFXVolume>().Value
         };
 
         var jsonString = JsonSerializer.Serialize(saveData, typeof(SaveData), saveDataContext);
@@ -50,7 +56,12 @@ public class SaveGame : Manipulator
         }
         else
         {
-            return new SaveData();
+            return new SaveData
+            {
+                HighScore = 0,
+                MusicVolume = 0.5f,
+                SFXVolume = 0.5f
+            };
         }
 
     }

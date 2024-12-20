@@ -115,7 +115,7 @@ public class Upgrade : MoonTools.ECS.System
 
     public override void Update(TimeSpan delta)
     {
-        if (Some<Selected>())
+        if (Some<Selected>() && Some<GivesUpgrade>())
         {
             var inputState = GetSingleton<InputState>();
 

@@ -19,4 +19,6 @@ public readonly record struct HPDisplay();
 public readonly record struct TrailTimer();
 public readonly record struct HorizontalConnection();
 public readonly record struct VerticalConnection();
+public readonly record struct SettingDisplay();
+public readonly record struct SettingControls();
 public readonly record struct Description();
