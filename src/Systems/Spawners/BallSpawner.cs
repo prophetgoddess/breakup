@@ -22,7 +22,7 @@ public class BallSpawner : MoonTools.ECS.Manipulator
         Set(ball, new CanBeHit());
         Set(ball, new HasGravity(1f));
         Set(ball, new CameraFollows());
-        Set(ball, new DestroyOnStartGame());
+        Set(ball, new DestroyOnStateTransition());
         Set(ball, new Highlight());
         Set(ball, new CanDealDamageToBlock(1));
         return ball;

@@ -21,7 +21,7 @@ public class Trail : MoonTools.ECS.System
         Set(entity, new Model(model));
         Set(entity, new Position(Vector2.Zero));
         Set(entity, new Scale(new Vector2(8, 8)));
-        Set(entity, new DestroyOnStartGame());
+        Set(entity, new DestroyOnStateTransition());
         Set(entity, new Highlight());
         Set(entity, new AngularVelocity(Rando.Range(-5f, 5f)));
         Set(entity, new Depth(0.99f));

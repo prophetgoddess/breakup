@@ -1,4 +1,3 @@
-using MoonWorks.Graphics;
 using System.Numerics;
 using Ball;
 using MoonTools.ECS;
@@ -25,6 +24,7 @@ public class UpgradeMenuSpawner : Manipulator
 {
 
     static Queue<Upgrades> AvailableUpgrades = new Queue<Upgrades>();
+    Filter DestroyFilter;
 
     public static bool UpgradesAvailable()
     {
@@ -92,7 +92,7 @@ public class UpgradeMenuSpawner : Manipulator
 
     public UpgradeMenuSpawner(World world) : base(world)
     {
-
+        DestroyFilter = FilterBuilder.Include<DestroyOnStateTransition>().Exclude<DontDestroyOnNextTransition>().Build();
     }
 
     Entity CreateUpgrade(float x, MoonWorks.Graphics.Font.HorizontalAlignment horizontalAlignment)
@@ -112,7 +112,7 @@ public class UpgradeMenuSpawner : Manipulator
         Set(upgrade, new Pause());
         Set(upgrade, new Depth(0.1f));
         Set(upgrade, new FollowsCamera(Dimensions.GameHeight * 0.45f));
-        Set(upgrade, new DestroyWhenLeavingUpgradeMenu());
+        Set(upgrade, new DestroyOnStateTransition());
 
         var description = CreateEntity();
         Set(description,
@@ -128,18 +128,21 @@ public class UpgradeMenuSpawner : Manipulator
         Set(description, new Pause());
         Set(description, new Depth(0.1f));
         Set(description, new FollowsCamera(Dimensions.GameHeight * 0.5f));
-        Set(description, new DestroyWhenLeavingUpgradeMenu());
+        Set(description, new DestroyOnStateTransition());
         Set(description, new WordWrap(100));
 
         Relate(upgrade, description, new Description());
-        Set(upgrade, new DestroyOnStartGame());
-        Set(description, new DestroyOnStartGame());
+        Set(upgrade, new DestroyOnStateTransition());
 
         return upgrade;
     }
 
     public void OpenUpgradeMenu()
     {
+        foreach (var entity in DestroyFilter.Entities)
+        {
+            Set(entity, new DontDestroyOnNextTransition());
+        }
 
         var promptEntity = CreateEntity();
         Set(promptEntity,
@@ -156,8 +159,7 @@ public class UpgradeMenuSpawner : Manipulator
         Set(promptEntity, new Depth(0.1f));
         Set(promptEntity, new Marquee(100f));
         Set(promptEntity, new FollowsCamera(Dimensions.GameHeight * 0.25f));
-        Set(promptEntity, new DestroyWhenLeavingUpgradeMenu());
-        Set(promptEntity, new DestroyOnStartGame());
+        Set(promptEntity, new DestroyOnStateTransition());
 
         var text = Get<Text>(promptEntity);
         var font = Stores.FontStorage.Get(text.FontID);
@@ -179,7 +181,7 @@ public class UpgradeMenuSpawner : Manipulator
         Set(promptDouble, new Depth(0.1f));
         Set(promptDouble, new Marquee(100f));
         Set(promptDouble, new FollowsCamera(Dimensions.GameHeight * 0.25f));
-        Set(promptDouble, new DestroyWhenLeavingUpgradeMenu());
+        Set(promptDouble, new DestroyOnStateTransition());
 
         var upgrade1 = CreateUpgrade(Dimensions.GameWidth * 0.15f, MoonWorks.Graphics.Font.HorizontalAlignment.Center);
         var upgrade2 = CreateUpgrade(Dimensions.GameWidth * 0.5f, MoonWorks.Graphics.Font.HorizontalAlignment.Center);

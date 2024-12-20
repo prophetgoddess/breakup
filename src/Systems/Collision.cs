@@ -138,7 +138,7 @@ public class Collision : MoonTools.ECS.System
                     Set(comboText, new Text(Fonts.HeaderFont, Fonts.UpgradeSize, Stores.TextStorage.GetID($"{newCombo}x Combo"), MoonWorks.Graphics.Font.HorizontalAlignment.Left, MoonWorks.Graphics.Font.VerticalAlignment.Middle));
                     Set(comboText, new Highlight());
                     Set(comboText, new FollowsCamera(Dimensions.GameHeight - Fonts.BodySize));
-                    Set(comboText, new DestroyOnStartGame());
+                    Set(comboText, new DestroyOnStateTransition());
                     Set(comboText, new ComboText());
                     Set(comboText, new FadeOut());
                 }
@@ -205,7 +205,6 @@ public class Collision : MoonTools.ECS.System
     {
         if (Has<Bounce>(entity) && Has<DestroysBall>(other))
         {
-
             if (Some<BarrierTakesExtraHit>() && GetSingleton<BarrierTakesExtraHit>().Active)
             {
                 Set(GetSingletonEntity<BarrierTakesExtraHit>(), new BarrierTakesExtraHit(false));
@@ -236,7 +235,7 @@ public class Collision : MoonTools.ECS.System
                 }
             }
 
-            Destroy(entity);
+            Set(entity, new Timer(0f));
         }
     }
 

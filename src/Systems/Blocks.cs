@@ -27,12 +27,6 @@ public class Blocks : MoonTools.ECS.System
     float MaxHP = 99;
     float MinHP = 1;
 
-    string GetFormattedHP(int amount, int length = 2)
-    {
-        return amount >= 0
-            ? amount.ToString($"D{length}")
-            : amount.ToString($"D{length - 1}");
-    }
 
     public Blocks(World world) : base(world)
     {
@@ -69,7 +63,7 @@ public class Blocks : MoonTools.ECS.System
         Set(block, new BoundingBox(0, 0, 32, 32));
         Set(block, new SolidCollision());
         Set(block, new Block(hp));
-        Set(block, new DestroyOnStartGame());
+        Set(block, new DestroyOnStateTransition());
 
         if (Rando.Value < 0.75f || barrier)
         {
@@ -80,10 +74,10 @@ public class Blocks : MoonTools.ECS.System
             var hpDisplay = CreateEntity();
             //Set(hpDisplay, new Scale(Vector2.One));
             Set(hpDisplay, new Position(new Vector2(CellSize * 0.5f + x * CellSize, CellSize * 0.5f + y * CellSize)));
-            Set(hpDisplay, new DestroyOnStartGame());
+            Set(hpDisplay, new DestroyOnStateTransition());
             //Set(hpDisplay, new Model(Content.Models.Square.ID));
             Relate(block, hpDisplay, new HPDisplay());
-            Set(hpDisplay, new Text(Fonts.BodyFont, Fonts.InfoSize, Stores.TextStorage.GetID($"{GetFormattedHP(hp)}"), MoonWorks.Graphics.Font.HorizontalAlignment.Center, MoonWorks.Graphics.Font.VerticalAlignment.Middle));
+            Set(hpDisplay, new Text(Fonts.BodyFont, Fonts.InfoSize, Stores.TextStorage.GetID($"{GameStateManager.GetFormattedNumber(hp, 2)}"), MoonWorks.Graphics.Font.HorizontalAlignment.Center, MoonWorks.Graphics.Font.VerticalAlignment.Middle));
 
             if (Rando.Value < 0.04 && UpgradeMenuSpawner.UpgradesAvailable() && !Some<GivesUpgrade>())
             {
@@ -93,7 +87,7 @@ public class Blocks : MoonTools.ECS.System
                 Set(block, new Pulsate(Vector2.One * 1.9f, 3.0f, 0.2f));
                 hp *= 2;
                 Set(block, new HitPoints(hp, hp));
-                Set(hpDisplay, new Text(Fonts.BodyFont, Fonts.InfoSize, Stores.TextStorage.GetID($"{GetFormattedHP(hp)}"), MoonWorks.Graphics.Font.HorizontalAlignment.Center, MoonWorks.Graphics.Font.VerticalAlignment.Middle));
+                Set(hpDisplay, new Text(Fonts.BodyFont, Fonts.InfoSize, Stores.TextStorage.GetID($"{GameStateManager.GetFormattedNumber(hp, 2)}"), MoonWorks.Graphics.Font.HorizontalAlignment.Center, MoonWorks.Graphics.Font.VerticalAlignment.Middle));
             }
         }
         else
@@ -156,7 +150,7 @@ public class Blocks : MoonTools.ECS.System
                 var hp = Get<HitPoints>(block);
                 var hpDisplay = OutRelationSingleton<HPDisplay>(block);
 
-                Set(hpDisplay, new Text(Fonts.BodyFont, Fonts.InfoSize, Stores.TextStorage.GetID($"{GetFormattedHP(hp.Value)}"), MoonWorks.Graphics.Font.HorizontalAlignment.Center, MoonWorks.Graphics.Font.VerticalAlignment.Middle));
+                Set(hpDisplay, new Text(Fonts.BodyFont, Fonts.InfoSize, Stores.TextStorage.GetID($"{GameStateManager.GetFormattedNumber(hp.Value, 2)}"), MoonWorks.Graphics.Font.HorizontalAlignment.Center, MoonWorks.Graphics.Font.VerticalAlignment.Middle));
 
                 if (hp.Value <= 0)
                 {
@@ -180,7 +174,7 @@ public class Blocks : MoonTools.ECS.System
                         Set(up, new Position(new Vector2(pos.X, pos.Y - CellSize)));
                         Set(up, new CanDealDamageToBlock(dmg));
                         Set(up, new BoundingBox(0, 0, 16, 16));
-                        Set(up, new DestroyOnStartGame());
+                        Set(up, new DestroyOnStateTransition());
                         Set(up, new Velocity(-Vector2.UnitY));
                         Set(up, new Timer(0.1f));
 
@@ -188,7 +182,7 @@ public class Blocks : MoonTools.ECS.System
                         Set(down, new Position(new Vector2(pos.X, pos.Y + CellSize)));
                         Set(down, new CanDealDamageToBlock());
                         Set(down, new BoundingBox(0, 0, 16, 16));
-                        Set(down, new DestroyOnStartGame());
+                        Set(down, new DestroyOnStateTransition());
                         Set(down, new Velocity(Vector2.UnitY));
                         Set(down, new Timer(0.1f));
 
@@ -196,7 +190,7 @@ public class Blocks : MoonTools.ECS.System
                         Set(left, new Position(new Vector2(pos.X - CellSize, pos.Y)));
                         Set(left, new CanDealDamageToBlock(dmg));
                         Set(left, new BoundingBox(0, 10, 16, 16));
-                        Set(left, new DestroyOnStartGame());
+                        Set(left, new DestroyOnStateTransition());
                         Set(left, new Velocity(-Vector2.UnitX));
                         Set(left, new Timer(0.1f));
 
@@ -204,7 +198,7 @@ public class Blocks : MoonTools.ECS.System
                         Set(right, new Position(new Vector2(pos.X + CellSize, pos.Y)));
                         Set(right, new CanDealDamageToBlock(dmg));
                         Set(right, new BoundingBox(0, 0, 16, 16));
-                        Set(right, new DestroyOnStartGame());
+                        Set(right, new DestroyOnStateTransition());
                         Set(right, new Velocity(Vector2.UnitX));
                         Set(right, new Timer(0.1f));
                     }
@@ -224,7 +218,7 @@ public class Blocks : MoonTools.ECS.System
                         Set(extraLife, new Velocity(new Vector2(Rando.Range(-50f, 50f), Rando.Range(-100f, -10f))));
                         Set(extraLife, new BoundingBox(0, 0, 18, 18));
                         Set(extraLife, new HasGravity(1f));
-                        Set(extraLife, new DestroyOnStartGame());
+                        Set(extraLife, new DestroyOnStateTransition());
                         Set(extraLife, new Highlight());
                         Set(extraLife, new GivesExtraLife());
                     }

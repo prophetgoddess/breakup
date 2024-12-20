@@ -31,7 +31,6 @@ class Program : Game
         {
             if (SteamAPI.RestartAppIfNecessary(AppId_t.Invalid))
             {
-                Console.WriteLine("restarting with steam...");
                 SDL.SDL_Quit();
                 return;
             }
@@ -51,7 +50,7 @@ class Program : Game
         Systems =
         [
             new Input(World, Inputs),
-            new GameState(World),
+            new GameStateManager(World),
             new Time(World),
             new Flickering(World),
             new PlayerController(World),
@@ -67,7 +66,8 @@ class Program : Game
             new MarqueeController(World),
             new Audio(World, AudioDevice),
             new Upgrade(World),
-            new Animations(World)
+            new Animations(World),
+            new Settings(World)
         ];
 
         Renderer = new Renderer(World, MainWindow, GraphicsDevice, Inputs);

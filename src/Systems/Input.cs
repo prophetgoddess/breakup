@@ -24,7 +24,9 @@ public class ControlSet
     public VirtualButton Up { get; set; } = new EmptyButton();
     public VirtualButton Down { get; set; } = new EmptyButton();
     public VirtualButton Swing { get; set; } = new EmptyButton();
+#if DEBUG
     public VirtualButton Restart { get; set; } = new EmptyButton();
+#endif
     public VirtualButton Start { get; set; }
     public VirtualButton Dash { get; set; }
     public VirtualButton Slow { get; set; }
@@ -47,7 +49,9 @@ public class Input : MoonTools.ECS.System
         Keyboard.Right = Inputs.Keyboard.Button(KeyCode.Right);
         Keyboard.Swing = Inputs.Keyboard.Button(KeyCode.Space);
         Keyboard.Start = Inputs.Keyboard.Button(KeyCode.Return);
+#if DEBUG
         Keyboard.Restart = Inputs.Keyboard.Button(KeyCode.R);
+#endif
         Keyboard.Dash = Inputs.Keyboard.Button(KeyCode.LeftControl);
         Keyboard.Slow = Inputs.Keyboard.Button(KeyCode.LeftShift);
 

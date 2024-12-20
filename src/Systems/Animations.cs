@@ -72,7 +72,7 @@ public class Animations : MoonTools.ECS.System
                 if (Has<Highlight>(entity))
                 {
                     Set(echo, new Highlight());
-                    Set(echo, new DestroyOnStartGame());
+                    Set(echo, new DestroyOnStateTransition());
                 }
             }
 

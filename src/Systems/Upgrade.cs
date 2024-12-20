@@ -11,7 +11,7 @@ public class Upgrade : MoonTools.ECS.System
 
     public Upgrade(World world) : base(world)
     {
-        CleanupFilter = FilterBuilder.Include<DestroyWhenLeavingUpgradeMenu>().Build();
+        CleanupFilter = FilterBuilder.Include<DestroyOnStateTransition>().Exclude<DontDestroyOnNextTransition>().Build();
         UpgradeMenuSpawner = new UpgradeMenuSpawner(world);
     }
 
@@ -24,7 +24,7 @@ public class Upgrade : MoonTools.ECS.System
         Set(selector, new FollowsCamera(0f));
         Set(selector, new Selector());
         Set(selector, new KeepOpacityWhenPaused());
-        Set(selector, new DestroyWhenLeavingUpgradeMenu());
+        Set(selector, new DestroyOnStateTransition());
 
         return selector;
     }
@@ -106,7 +106,7 @@ public class Upgrade : MoonTools.ECS.System
             Set(buddy, new SolidCollision());
             Set(buddy, new Scale(new Vector2(32, 4)));
             Set(buddy, new FollowsCamera(Dimensions.GameHeight * 0.75f));
-            Set(buddy, new DestroyOnStartGame());
+            Set(buddy, new DestroyOnStateTransition());
             Set(buddy, new MoveBackAndForth(64, Dimensions.GameWidth - 64, 100f));
         }
 

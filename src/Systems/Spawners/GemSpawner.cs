@@ -19,7 +19,7 @@ public class GemSpawner : Manipulator
         Set(entity, new Velocity(Rando.InsideUnitCircle() * 100.0f));
         Set(entity, new BoundingBox(0, 0, 8, 8));
         Set(entity, new Scale(new Vector2(1, 1)));
-        Set(entity, new DestroyOnStartGame());
+        Set(entity, new DestroyOnStateTransition());
         Set(entity, new MoveTowardsPlayer(500.0f, 500.0f));
         Set(entity, new FillMeter(1f / ((GetSingleton<Level>().Value + 1) * 10)));
         Set(entity, new Highlight());
