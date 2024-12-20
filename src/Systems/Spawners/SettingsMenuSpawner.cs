@@ -1,22 +1,40 @@
-using MoonWorks.Graphics;
 using System.Numerics;
 using Ball;
 using MoonTools.ECS;
-using System.Collections;
 
 public class SettingsMenuSpawner : Manipulator
 {
     MainMenuSpawner MainMenuSpawner;
-
+    Filter DestroyFilter;
+    Filter DontDestroyFilter;
 
     public SettingsMenuSpawner(World world) : base(world)
     {
         MainMenuSpawner = new MainMenuSpawner(world);
+
+        DestroyFilter = FilterBuilder.Include<DestroyOnStateTransition>().Exclude<DontDestroyOnNextTransition>().Build();
+        DontDestroyFilter = FilterBuilder.Include<DestroyOnStateTransition>().Include<DontDestroyOnNextTransition>().Build();
+
+    }
+    public void CloseSettingsMenu()
+    {
+        foreach (var entity in DestroyFilter.Entities)
+        {
+            Destroy(entity);
+        }
+
+        foreach (var entity in DontDestroyFilter.Entities)
+        {
+            Remove<DontDestroyOnNextTransition>(entity);
+        }
     }
 
     public void OpenSettingsMenu()
     {
-        MainMenuSpawner.CloseMainMenu();
+        foreach (var entity in DestroyFilter.Entities)
+        {
+            Destroy(entity);
+        }
 
         var promptEntity = CreateEntity();
         Set(promptEntity,
@@ -34,6 +52,7 @@ public class SettingsMenuSpawner : Manipulator
         Set(promptEntity, new Marquee(100f));
         Set(promptEntity, new FollowsCamera(Dimensions.GameHeight * 0.25f));
         Set(promptEntity, new DestroyOnStateTransition());
+        Set(promptEntity, new SettingsMenu());
 
         var text = Get<Text>(promptEntity);
         var font = Stores.FontStorage.Get(text.FontID);

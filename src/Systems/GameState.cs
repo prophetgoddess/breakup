@@ -4,18 +4,10 @@ using Filter = MoonTools.ECS.Filter;
 
 namespace Ball;
 
-public enum GameState
-{
-    MainMenu,
-    SettingsMenu,
-    Game,
-    PauseMenu
-}
-
 public class GameStateManager : MoonTools.ECS.System
 {
     Filter DestroyFilter;
-    Filter PauseFilter;
+    Filter DontDestroyFilter;
     Filter BallFilter;
 
     BallSpawner BallSpawner;
@@ -26,8 +18,9 @@ public class GameStateManager : MoonTools.ECS.System
 
     public GameStateManager(World world) : base(world)
     {
-        DestroyFilter = FilterBuilder.Include<DestroyOnStateTransition>().Build();
-        PauseFilter = FilterBuilder.Include<Pause>().Build();
+        DestroyFilter = FilterBuilder.Include<DestroyOnStateTransition>().Exclude<DontDestroyOnNextTransition>().Build();
+        DontDestroyFilter = FilterBuilder.Include<DestroyOnStateTransition>().Include<DontDestroyOnNextTransition>().Build();
+
         BallFilter = FilterBuilder.Include<CanDealDamageToBlock>().Include<HasGravity>().Include<CanBeHit>().Build();
 
         BallSpawner = new BallSpawner(world);
@@ -52,20 +45,19 @@ public class GameStateManager : MoonTools.ECS.System
         {
             if (Some<Pause>() && !Some<Selected>())
             {
-                foreach (var entity in PauseFilter.Entities)
+                foreach (var entity in DestroyFilter.Entities)
                 {
                     Destroy(entity);
+                }
+                foreach (var entity in DontDestroyFilter.Entities)
+                {
+                    Remove<DontDestroyOnNextTransition>(entity);
                 }
             }
             else if (!Some<MainMenu>() && !Some<Selected>())
             {
                 PauseMenuSpawner.OpenPauseMenu();
             }
-        }
-
-        if (!Some<DestroyOnStateTransition>())
-        {
-            MainMenuSpawner.OpenMainMenu();
         }
 
         if (Some<Lives>() && GetSingleton<Lives>().Value <= 0)

@@ -74,6 +74,9 @@ class Program : Game
 
         World.Set(World.CreateEntity(), Palettes.MillenialApartment);
 
+        (new MainMenuSpawner(World)).OpenMainMenu();
+
+
     }
 
     private static void HandleUnhandledException(object sender, UnhandledExceptionEventArgs args)

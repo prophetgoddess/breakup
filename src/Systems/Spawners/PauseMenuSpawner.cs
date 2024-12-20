@@ -5,12 +5,21 @@ namespace Ball;
 
 public class PauseMenuSpawner : Manipulator
 {
+    Filter DestroyFilter;
+
+
     public PauseMenuSpawner(World world) : base(world)
     {
+        DestroyFilter = FilterBuilder.Include<DestroyOnStateTransition>().Exclude<DontDestroyOnNextTransition>().Build();
     }
 
     public void OpenPauseMenu()
     {
+        foreach (var entity in DestroyFilter.Entities)
+        {
+            Set(entity, new DontDestroyOnNextTransition());
+        }
+
         var pauseEntity = CreateEntity();
         Set(pauseEntity, new Position(new Vector2(Dimensions.GameWidth * 0.5f, Dimensions.GameHeight * 0.5f)));
         Set(pauseEntity,
@@ -25,6 +34,7 @@ public class PauseMenuSpawner : Manipulator
         Set(pauseEntity, new Marquee(100f));
         Set(pauseEntity, new Depth(0.1f));
         Set(pauseEntity, new FollowsCamera(Dimensions.GameHeight * 0.5f));
+        Set(pauseEntity, new DestroyOnStateTransition());
 
         var text = Get<Text>(pauseEntity);
         var font = Stores.FontStorage.Get(text.FontID);
@@ -46,5 +56,7 @@ public class PauseMenuSpawner : Manipulator
         Set(pauseDouble, new Marquee(100f));
         Set(pauseDouble, new Depth(0.1f));
         Set(pauseDouble, new FollowsCamera(Dimensions.GameHeight * 0.5f));
+        Set(pauseDouble, new DestroyOnStateTransition());
+
     }
 }

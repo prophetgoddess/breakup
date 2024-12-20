@@ -78,3 +78,4 @@ public readonly record struct ComboAddedToDamage();
 public readonly record struct ComboText();
 public readonly record struct FadeOut();
 public readonly record struct SetHighScoreThisRun();
+public readonly record struct SettingsMenu();
