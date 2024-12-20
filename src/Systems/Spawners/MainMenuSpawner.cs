@@ -73,22 +73,22 @@ public class MainMenuSpawner : Manipulator
         Set(leftBound, new UI());
 
         var rightBound = CreateEntity();
-        Set(rightBound, new Position(new Vector2(Dimensions.WindowWidth + 8, 0)));
+        Set(rightBound, new Position(new Vector2(Dimensions.UIWidth + 8, 0)));
         Set(rightBound, new BoundingBox(0, 0, 16, 2000));
         Set(rightBound, new SolidCollision());
         Set(rightBound, new DestroyOnStateTransition());
         Set(rightBound, new UI());
 
         var bottomBound = CreateEntity();
-        Set(bottomBound, new Position(new Vector2(Dimensions.WindowWidth * 0.5f, Dimensions.WindowHeight + 8)));
-        Set(bottomBound, new BoundingBox(0, 0, Dimensions.WindowWidth, 16));
+        Set(bottomBound, new Position(new Vector2(Dimensions.UIWidth * 0.5f, Dimensions.UIHeight + 8)));
+        Set(bottomBound, new BoundingBox(0, 0, Dimensions.UIWidth, 16));
         Set(bottomBound, new SolidCollision());
         Set(bottomBound, new DestroyOnStateTransition());
         Set(bottomBound, new UI());
 
         var topBound = CreateEntity();
-        Set(topBound, new Position(new Vector2(Dimensions.WindowWidth * 0.5f, 0f)));
-        Set(topBound, new BoundingBox(0, 0, Dimensions.WindowWidth, 16));
+        Set(topBound, new Position(new Vector2(Dimensions.UIWidth * 0.5f, 0f)));
+        Set(topBound, new BoundingBox(0, 0, Dimensions.UIWidth, 16));
         Set(topBound, new SolidCollision());
         Set(topBound, new DestroyOnStateTransition());
         Set(topBound, new UI());
@@ -99,7 +99,7 @@ public class MainMenuSpawner : Manipulator
             var entity = CreateEntity();
 
             Set(entity, new Model(Content.Models.Triangle.ID));
-            Set(entity, new Position(new Vector2(Dimensions.WindowWidth * 0.5f, Dimensions.WindowHeight * 0.5f) + Rando.InsideUnitCircle() * Dimensions.WindowHeight));
+            Set(entity, new Position(new Vector2(Dimensions.UIWidth * 0.5f, Dimensions.UIHeight * 0.5f) + Rando.InsideUnitCircle() * Dimensions.UIHeight));
             Set(entity, new Orientation(Rando.Range(0f, MathF.PI * 2f)));
             Set(entity, new Velocity(Rando.OnUnitCircle() * Rando.Range(10f, 30f)));
             Set(entity, new BoundingBox(0, 0, 8, 8));

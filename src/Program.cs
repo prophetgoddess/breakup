@@ -27,6 +27,10 @@ class Program : Game
         debugMode
     )
     {
+        var saveData = new SaveGame(World).Load();
+        MainWindow.SetScreenMode(saveData.Fullscreen ? ScreenMode.Fullscreen : ScreenMode.Windowed);
+        World.Set(World.CreateEntity(), new Fullscreen(saveData.Fullscreen));
+
         if (!SteamInitialized)
         {
             if (SteamAPI.RestartAppIfNecessary(AppId_t.Invalid))
@@ -67,14 +71,14 @@ class Program : Game
             new Audio(World, AudioDevice),
             new Upgrade(World),
             new Animations(World),
-            new Settings(World)
+            new Settings(World, MainWindow)
         ];
 
         Renderer = new Renderer(World, MainWindow, GraphicsDevice, Inputs);
 
         World.Set(World.CreateEntity(), Palettes.MillenialApartment);
 
-        (new MainMenuSpawner(World)).OpenMainMenu();
+        new MainMenuSpawner(World).OpenMainMenu();
 
 
     }
@@ -89,7 +93,7 @@ class Program : Game
         SDL.SDL_ShowSimpleMessageBox(
             SDL.SDL_MessageBoxFlags.SDL_MESSAGEBOX_ERROR,
             "FLAGRANT SYSTEM ERROR",
-            e.ToString(),
+            $"Please find the error log in the game directory and report it to prophet_goddess@protonmail.com: {e}",
             IntPtr.Zero
         );
     }
@@ -114,6 +118,7 @@ class Program : Game
 
     static void Main(string[] args)
     {
+
         var debugMode = false;
 
 #if DEBUG
@@ -133,7 +138,6 @@ class Program : Game
             ScreenMode.Windowed
         );
 #endif
-
 
         var frameLimiterSettings = FramePacingSettings.CreateLatencyOptimized(
             60

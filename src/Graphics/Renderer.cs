@@ -83,7 +83,7 @@ public class Renderer : MoonTools.ECS.Renderer
                 Format = Window.SwapchainFormat,
                 Usage = TextureUsageFlags.ColorTarget | TextureUsageFlags.Sampler,
                 Height = Window.Height,
-                Width = (uint)(Window.Height * Dimensions.WindowAspectRatio),
+                Width = (uint)(Window.Height * Dimensions.UIAspectRatio),
                 SampleCount = SampleCount.One,
                 LayerCountOrDepth = 1,
                 NumLevels = 1
@@ -95,7 +95,7 @@ public class Renderer : MoonTools.ECS.Renderer
                 Format = TextureFormat.D16Unorm,
                 Usage = TextureUsageFlags.DepthStencilTarget | TextureUsageFlags.Sampler,
                 Height = Window.Height,
-                Width = (uint)(Window.Height * Dimensions.WindowAspectRatio),
+                Width = (uint)(Window.Height * Dimensions.UIAspectRatio),
                 SampleCount = SampleCount.One,
                 LayerCountOrDepth = 1,
                 NumLevels = 1
@@ -132,7 +132,7 @@ public class Renderer : MoonTools.ECS.Renderer
                 Type = TextureType.TwoDimensional,
                 Format = Window.SwapchainFormat,
                 Usage = TextureUsageFlags.ColorTarget | TextureUsageFlags.Sampler,
-                Height = (uint)(Window.Width * Dimensions.WindowAspectRatioReciprocal),
+                Height = (uint)(Window.Width * Dimensions.UIAspectRatioReciprocal),
                 Width = Window.Width,
                 SampleCount = SampleCount.One,
                 LayerCountOrDepth = 1,
@@ -144,7 +144,7 @@ public class Renderer : MoonTools.ECS.Renderer
                 Type = TextureType.TwoDimensional,
                 Format = TextureFormat.D16Unorm,
                 Usage = TextureUsageFlags.DepthStencilTarget | TextureUsageFlags.Sampler,
-                Height = (uint)(Window.Width * Dimensions.WindowAspectRatioReciprocal),
+                Height = (uint)(Window.Width * Dimensions.UIAspectRatioReciprocal),
                 Width = Window.Width,
                 SampleCount = SampleCount.One,
                 LayerCountOrDepth = 1,
@@ -356,8 +356,14 @@ public class Renderer : MoonTools.ECS.Renderer
 
     public void Draw(CommandBuffer cmdbuf, Texture renderTexture)
     {
+
         if (renderTexture == null)
             return;
+
+        if (Window.Height != UITexture.Height)
+        {
+            CreateRenderTextures();
+        }
 
         var palette = GetSingleton<Palette>();
 
@@ -386,7 +392,6 @@ public class Renderer : MoonTools.ECS.Renderer
             var position = Get<Position>(textEntity).Value;
             var depth = Has<Depth>(textEntity) ? Get<Depth>(textEntity).Value : 0.5f;
             color.A = Has<Alpha>(textEntity) ? Get<Alpha>(textEntity).A : (byte)255;
-
 
             if (Some<Pause>() && !Has<KeepOpacityWhenPaused>(textEntity))
                 color.A = 200;
@@ -551,8 +556,8 @@ public class Renderer : MoonTools.ECS.Renderer
         Matrix4x4 uiCameraMatrix =
         Matrix4x4.CreateOrthographicOffCenter(
             0,
-            Dimensions.WindowWidth,
-            Dimensions.WindowHeight,
+            Dimensions.UIWidth,
+            Dimensions.UIHeight,
             0,
             0,
             -1f

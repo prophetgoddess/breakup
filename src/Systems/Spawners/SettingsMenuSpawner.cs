@@ -136,7 +136,6 @@ public class SettingsMenuSpawner : Manipulator
         Set(sfxVolumeLabel, new Setting());
         Relate(sfxVolumeLabel, GetSingletonEntity<SFXVolume>(), new SettingControls());
 
-
         var sfxVolumeDisplay = CreateEntity();
         Set(sfxVolumeDisplay,
             new Position(new Vector2(x + 150, startY)));
@@ -155,6 +154,57 @@ public class SettingsMenuSpawner : Manipulator
         Relate(sfxVolumeLabel, sfxVolumeDisplay, new SettingDisplay());
 
         Relate(musicVolumeLabel, sfxVolumeLabel, new VerticalConnection());
+
+        startY += 30f;
+
+        var fullscreen = GetSingleton<Fullscreen>().Value;
+
+        var fullscreenLabel = CreateEntity();
+        Set(fullscreenLabel,
+            new Position(new Vector2(x, startY)));
+        Set(fullscreenLabel,
+         new Text(
+            Fonts.HeaderFont,
+            Fonts.PromptSize,
+            Stores.TextStorage.GetID("fullscreen"),
+            MoonWorks.Graphics.Font.HorizontalAlignment.Left,
+            MoonWorks.Graphics.Font.VerticalAlignment.Middle));
+        Set(fullscreenLabel, new KeepOpacityWhenPaused());
+        Set(fullscreenLabel, new Depth(0.1f));
+        Set(fullscreenLabel, new FollowsCamera(startY));
+        Set(fullscreenLabel, new DestroyOnStateTransition());
+        Set(fullscreenLabel, new Setting());
+        Relate(fullscreenLabel, GetSingletonEntity<Fullscreen>(), new SettingControls());
+
+        var fullscreenDisplay = CreateEntity();
+        Set(fullscreenDisplay,
+            new Position(new Vector2(x + 250, startY)));
+        Set(fullscreenDisplay,
+            new Text(
+                Fonts.HeaderFont,
+                Fonts.PromptSize,
+                Stores.TextStorage.GetID($"{fullscreen}"),
+                MoonWorks.Graphics.Font.HorizontalAlignment.Left,
+                MoonWorks.Graphics.Font.VerticalAlignment.Middle));
+        Set(fullscreenDisplay, new KeepOpacityWhenPaused());
+        Set(fullscreenDisplay, new Depth(0.1f));
+        Set(fullscreenDisplay, new FollowsCamera(startY));
+        Set(fullscreenDisplay, new DestroyOnStateTransition());
+
+        Relate(fullscreenLabel, fullscreenDisplay, new SettingDisplay());
+
+        Relate(sfxVolumeLabel, fullscreenLabel, new VerticalConnection());
+
+
+        // if (!Some<Player>())
+        // {
+        //     Set(promptEntity, new UI());
+        //     Set(promptDouble, new UI());
+        //     Set(musicVolumeDisplay, new UI());
+        //     Set(sfxVolumeDisplay, new UI());
+        //     Set(musicVolumeLabel, new UI());
+        //     Set(sfxVolumeLabel, new UI());
+        // }
     }
 
 }

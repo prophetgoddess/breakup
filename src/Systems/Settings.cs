@@ -1,6 +1,7 @@
 
 using System.Numerics;
 using MoonTools.ECS;
+using MoonWorks;
 
 namespace Ball;
 
@@ -10,9 +11,11 @@ public class Settings : MoonTools.ECS.System
     SettingsMenuSpawner SettingsMenuSpawner;
     MainMenuSpawner MainMenuSpawner;
     PauseMenuSpawner PauseMenuSpawner;
+    Window Window;
 
-    public Settings(World world) : base(world)
+    public Settings(World world, Window window) : base(world)
     {
+        Window = window;
         SaveGame = new SaveGame(world);
         SettingsMenuSpawner = new SettingsMenuSpawner(world);
         MainMenuSpawner = new MainMenuSpawner(world);
@@ -63,6 +66,22 @@ public class Settings : MoonTools.ECS.System
                 Stores.TextStorage.GetID(new string('|', (int)MathF.Ceiling(intVolume))),
                 MoonWorks.Graphics.Font.HorizontalAlignment.Left,
                 MoonWorks.Graphics.Font.VerticalAlignment.Middle));
+        }
+        if (Has<Fullscreen>(setting))
+        {
+            var fullscreen = GetSingleton<Fullscreen>().Value;
+            fullscreen = !fullscreen;
+            Set(GetSingletonEntity<Fullscreen>(), new Fullscreen(fullscreen));
+
+            Window.SetScreenMode(fullscreen ? ScreenMode.Fullscreen : ScreenMode.Windowed);
+
+            Set(display,
+                new Text(
+                    Fonts.HeaderFont,
+                    Fonts.PromptSize,
+                    Stores.TextStorage.GetID($"{fullscreen}"),
+                    MoonWorks.Graphics.Font.HorizontalAlignment.Left,
+                    MoonWorks.Graphics.Font.VerticalAlignment.Middle));
         }
 
         SaveGame.Save();

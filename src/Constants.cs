@@ -9,13 +9,14 @@ public static class Dimensions
     public const int GameWidth = 480;
     public const int GameHeight = 480;
     public const float GameAspectRatio = GameWidth / (float)GameHeight;
-
-    public const int WindowWidth = 1600;
-    public const int WindowHeight = 900;
-    public const float WindowAspectRatio = WindowWidth / (float)WindowHeight;
-    public const float WindowAspectRatioReciprocal = 1f / WindowAspectRatio;
-
     public static float GameAspectRatioReciprocal = 1f / GameAspectRatio;
+
+
+    public const int UIWidth = 1600;
+    public const int UIHeight = 900;
+    public const float UIAspectRatio = UIWidth / (float)UIHeight;
+    public const float UIAspectRatioReciprocal = 1f / UIAspectRatio;
+
 }
 
 public static class Fonts
@@ -34,14 +35,14 @@ public static class Fonts
 
 public static class UILayoutConstants
 {
-    public const int TitleX = (int)(Dimensions.WindowWidth * 0.5f);
-    public const int TitleY = (int)(Dimensions.WindowHeight * 0.33f);
+    public const int TitleX = (int)(Dimensions.UIWidth * 0.5f);
+    public const int TitleY = (int)(Dimensions.UIHeight * 0.33f);
     public const int PromptX = TitleX;
-    public const int PromptY = (int)(Dimensions.WindowHeight * 0.66f);
+    public const int PromptY = (int)(Dimensions.UIHeight * 0.66f);
     public const int LivesX = 120;
     public const int LivesY = 130;
     public const int LivesSpacing = 100;
-    public const int InfoX = Dimensions.WindowWidth - 340;
+    public const int InfoX = Dimensions.UIWidth - 340;
     public const int ScoreLabelY = 60;
     public const int ScoreY = 90;
     public const int HighScoreLabelY = 170;

@@ -14,6 +14,7 @@ public struct SaveData
     public int HighScore { get; set; }
     public float MusicVolume { get; set; }
     public float SFXVolume { get; set; }
+    public bool Fullscreen { get; set; }
 }
 
 public class SaveGame : Manipulator
@@ -40,7 +41,8 @@ public class SaveGame : Manipulator
         {
             HighScore = Some<HighScore>() ? GetSingleton<HighScore>().Value : existing.HighScore,
             MusicVolume = GetSingleton<MusicVolume>().Value,
-            SFXVolume = GetSingleton<SFXVolume>().Value
+            SFXVolume = GetSingleton<SFXVolume>().Value,
+            Fullscreen = GetSingleton<Fullscreen>().Value
         };
 
         var jsonString = JsonSerializer.Serialize(saveData, typeof(SaveData), saveDataContext);
@@ -60,7 +62,8 @@ public class SaveGame : Manipulator
             {
                 HighScore = 0,
                 MusicVolume = 0.5f,
-                SFXVolume = 0.5f
+                SFXVolume = 0.5f,
+                Fullscreen = false
             };
         }
 

@@ -25,7 +25,7 @@ public class Trail : MoonTools.ECS.System
         Set(entity, new Highlight());
         Set(entity, new AngularVelocity(Rando.Range(-5f, 5f)));
         Set(entity, new Depth(0.99f));
-        Set(entity, new Timer(0.1f));
+        Set(entity, new Timer(0.33f));
         Set(entity, new Alpha(128));
         return entity;
     }
