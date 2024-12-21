@@ -9,6 +9,7 @@ public class MainMenuSpawner : Manipulator
     Filter HideFilter;
     Filter PauseFilter;
     Filter BallFilter;
+    SaveGame SaveGame;
 
     public MainMenuSpawner(World world) : base(world)
     {
@@ -16,6 +17,7 @@ public class MainMenuSpawner : Manipulator
         HideFilter = FilterBuilder.Include<HideOnMainMenu>().Build();
         PauseFilter = FilterBuilder.Include<Pause>().Build();
         BallFilter = FilterBuilder.Include<CanDealDamageToBlock>().Include<HasGravity>().Include<CanBeHit>().Build();
+        SaveGame = new SaveGame(world);
 
     }
 
@@ -31,7 +33,27 @@ public class MainMenuSpawner : Manipulator
     {
         foreach (var entity in DestroyFilter.Entities)
         {
+            if (Has<Score>(entity))
+            {
+                var s = CreateEntity();
+                Set(s, new Score(Get<Score>(entity).Current));
+                Set(s, new DestroyOnStateTransition());
+            }
+            if (Has<HighScore>(entity))
+            {
+                var hs = CreateEntity();
+                Set(hs, new HighScore(Get<HighScore>(entity).Value));
+                Set(hs, new DestroyOnStateTransition());
+            }
             Destroy(entity);
+        }
+
+        if (!Some<HighScore>())
+        {
+            var saveData = SaveGame.Load();
+            var hs = CreateEntity();
+            Set(hs, new HighScore(saveData.HighScore));
+            Set(hs, new DestroyOnStateTransition());
         }
 
         foreach (var entity in HideFilter.Entities)
@@ -65,6 +87,19 @@ public class MainMenuSpawner : Manipulator
         Set(prompt, new DestroyOnStateTransition());
         Set(prompt, new MainMenu());
 
+        var scores = CreateEntity();
+        Set(scores, new Position(new Vector2(UILayoutConstants.PromptX, 10)));
+        Set(scores,
+         new Text(
+            Fonts.BodyFont,
+            Fonts.PromptSize,
+            Stores.TextStorage.GetID($"last score: {(Some<Score>() ? GetSingleton<Score>().Current.ToString() : "NONE")} / high score: {(Some<HighScore>() ? GetSingleton<HighScore>().Value.ToString() : "NONE")}"),
+            MoonWorks.Graphics.Font.HorizontalAlignment.Center,
+            MoonWorks.Graphics.Font.VerticalAlignment.Top));
+        Set(scores, new UI());
+        Set(scores, new DestroyOnStateTransition());
+        Set(scores, new MainMenu());
+
         var leftBound = CreateEntity();
         Set(leftBound, new Position(new Vector2(-8, 0)));
         Set(leftBound, new BoundingBox(0, 0, 16, 2000));
@@ -93,28 +128,5 @@ public class MainMenuSpawner : Manipulator
         Set(topBound, new DestroyOnStateTransition());
         Set(topBound, new UI());
 
-
-        for (int i = 0; i < 100; i++)
-        {
-            var entity = CreateEntity();
-
-            Set(entity, new Model(Content.Models.Triangle.ID));
-            Set(entity, new Position(new Vector2(Dimensions.UIWidth * 0.5f, Dimensions.UIHeight * 0.5f) + Rando.InsideUnitCircle() * Dimensions.UIHeight));
-            Set(entity, new Orientation(Rando.Range(0f, MathF.PI * 2f)));
-            Set(entity, new Velocity(Rando.OnUnitCircle() * Rando.Range(10f, 30f)));
-            Set(entity, new BoundingBox(0, 0, 8, 8));
-            Set(entity, new Scale(new Vector2(1, 1)));
-            Set(entity, new DestroyOnStateTransition());
-            Set(entity, new AngularVelocity(Rando.Range(-5f, 5f)));
-            Set(entity, new Depth(0.9f));
-            Set(entity, new UI());
-            Set(entity, new SolidCollision());
-            Set(entity, new Bounce(1f));
-
-            var timer = CreateEntity();
-            Set(timer, new Timer(Rando.Range(1f, 2f)));
-            Relate(entity, timer, new DontMoveTowardsPlayer());
-
-        }
     }
 }
