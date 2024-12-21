@@ -125,8 +125,8 @@ class Program : Game
         debugMode = true;
         var windowCreateInfo = new WindowCreateInfo(
             "Ball",
-            1600,
-            900,
+            1280,
+            720,
             ScreenMode.Windowed
         );
 

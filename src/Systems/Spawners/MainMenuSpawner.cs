@@ -123,7 +123,7 @@ public class MainMenuSpawner : Manipulator
          new Text(
             Fonts.BodyFont,
             Fonts.PromptSize,
-            Stores.TextStorage.GetID($"last score: {(Some<Score>() ? GetSingleton<Score>().Current.ToString() : "NONE")} / high score: {(Some<HighScore>() ? GetSingleton<HighScore>().Value.ToString() : "NONE")}"),
+            Stores.TextStorage.GetID($"last {(Some<Score>() ? GetSingleton<Score>().Current.ToString() : "NONE")} - best {(Some<HighScore>() ? GetSingleton<HighScore>().Value.ToString() : "NONE")}"),
             MoonWorks.Graphics.Font.HorizontalAlignment.Center,
             MoonWorks.Graphics.Font.VerticalAlignment.Top));
         Set(scores, new UI());
