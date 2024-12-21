@@ -61,31 +61,61 @@ public class MainMenuSpawner : Manipulator
             Set(entity, new Invisible());
         }
 
-        var gameTitle = CreateEntity();
-        Set(gameTitle, new Position(new Vector2(UILayoutConstants.TitleX, UILayoutConstants.TitleY)));
-        Set(gameTitle,
-         new Text(
-            Fonts.HeaderFont,
-            Fonts.TitleSize,
-            Stores.TextStorage.GetID("break.up"),
-            MoonWorks.Graphics.Font.HorizontalAlignment.Center,
-            MoonWorks.Graphics.Font.VerticalAlignment.Middle));
-        Set(gameTitle, new UI());
-        Set(gameTitle, new DestroyOnStateTransition());
-        Set(gameTitle, new MainMenu());
+        var font = Stores.FontStorage.Get(Fonts.HeaderFont);
+        var str = "break.up";
+        WellspringCS.Wellspring.Rectangle rect;
+        font.TextBounds(str, Fonts.TitleSize, MoonWorks.Graphics.Font.HorizontalAlignment.Center, MoonWorks.Graphics.Font.VerticalAlignment.Middle, out rect);
 
-        var prompt = CreateEntity();
-        Set(prompt, new Position(new Vector2(UILayoutConstants.PromptX, UILayoutConstants.PromptY)));
-        Set(prompt,
-         new Text(
-            Fonts.BodyFont,
-            Fonts.PromptSize,
-            Stores.TextStorage.GetID("press start"),
-            MoonWorks.Graphics.Font.HorizontalAlignment.Center,
-            MoonWorks.Graphics.Font.VerticalAlignment.Baseline));
-        Set(prompt, new UI());
-        Set(prompt, new DestroyOnStateTransition());
-        Set(prompt, new MainMenu());
+
+        var copies = 3.0f;
+        var totalWidth = Dimensions.UIWidth + rect.W;
+        totalWidth -= rect.W * copies;
+        totalWidth /= copies;
+
+        for (int i = 0; i < copies; i++)
+        {
+            var gameTitle = CreateEntity();
+            Set(gameTitle, new Position(new Vector2(i * (rect.W + totalWidth), UILayoutConstants.TitleY)));
+            Set(gameTitle,
+            new Text(
+                Fonts.HeaderFont,
+                Fonts.TitleSize,
+                Stores.TextStorage.GetID("break.up"),
+                MoonWorks.Graphics.Font.HorizontalAlignment.Center,
+                MoonWorks.Graphics.Font.VerticalAlignment.Middle));
+            Set(gameTitle, new UI());
+            Set(gameTitle, new DestroyOnStateTransition());
+            Set(gameTitle, new MainMenu());
+            Set(gameTitle, new Marquee(100f));
+        }
+
+        copies = 7.0f;
+        font = Stores.FontStorage.Get(Fonts.BodyFont);
+        str = "press start";
+        font.TextBounds(str, Fonts.PromptSize, MoonWorks.Graphics.Font.HorizontalAlignment.Center, MoonWorks.Graphics.Font.VerticalAlignment.Baseline, out rect);
+
+        totalWidth = Dimensions.UIWidth + rect.W;
+        totalWidth -= rect.W * copies;
+        totalWidth /= copies;
+
+        for (int i = 0; i < copies; i++)
+        {
+            var prompt = CreateEntity();
+            Set(prompt, new Position(new Vector2(i * (rect.W + totalWidth), UILayoutConstants.PromptY)));
+            Set(prompt,
+             new Text(
+                Fonts.BodyFont,
+                Fonts.PromptSize,
+                Stores.TextStorage.GetID("press start"),
+                MoonWorks.Graphics.Font.HorizontalAlignment.Center,
+                MoonWorks.Graphics.Font.VerticalAlignment.Baseline));
+            Set(prompt, new UI());
+            Set(prompt, new Marquee(-100f));
+            Set(prompt, new DestroyOnStateTransition());
+            Set(prompt, new MainMenu());
+        }
+
+
 
         var scores = CreateEntity();
         Set(scores, new Position(new Vector2(UILayoutConstants.PromptX, 10)));

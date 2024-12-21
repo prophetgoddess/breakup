@@ -36,9 +36,9 @@ public static class Fonts
 public static class UILayoutConstants
 {
     public const int TitleX = (int)(Dimensions.UIWidth * 0.5f);
-    public const int TitleY = (int)(Dimensions.UIHeight * 0.33f);
+    public const int TitleY = (int)(Dimensions.UIHeight * 0.45f);
     public const int PromptX = TitleX;
-    public const int PromptY = (int)(Dimensions.UIHeight * 0.66f);
+    public const int PromptY = (int)(Dimensions.UIHeight * 0.55f);
     public const int LivesX = 120;
     public const int LivesY = 130;
     public const int LivesSpacing = 100;

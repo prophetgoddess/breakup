@@ -29,9 +29,9 @@ public class MarqueeController : MoonTools.ECS.System
             var min = position.X - rect.W * 0.5f;
             if (marquee.Speed < 0 && max < 0)
             {
-                position.X = Dimensions.GameWidth + rect.W * 0.5f;
+                position.X = (Has<UI>(entity) ? Dimensions.UIWidth : Dimensions.GameWidth) + rect.W * 0.5f;
             }
-            else if (marquee.Speed > 0 && min > Dimensions.GameWidth)
+            else if (marquee.Speed > 0 && min > (Has<UI>(entity) ? Dimensions.UIWidth : Dimensions.GameWidth))
             {
                 position.X = rect.W * -0.5f;
             }
