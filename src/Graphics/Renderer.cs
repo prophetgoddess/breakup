@@ -51,6 +51,8 @@ public class Renderer : MoonTools.ECS.Renderer
 
     void CreateRenderTextures()
     {
+        var windowRatio = Window.Width / Window.Height;
+
         GameTexture = Texture.Create(GraphicsDevice, new TextureCreateInfo
         {
             Type = TextureType.TwoDimensional,
@@ -68,36 +70,60 @@ public class Renderer : MoonTools.ECS.Renderer
             Type = TextureType.TwoDimensional,
             Format = TextureFormat.D16Unorm,
             Usage = TextureUsageFlags.DepthStencilTarget | TextureUsageFlags.Sampler,
-            Height = Window.Height,
-            Width = (uint)(Window.Height * Dimensions.GameAspectRatio),
+            Height = GameTexture.Height,
+            Width = GameTexture.Width,
             SampleCount = SampleCount.One,
             LayerCountOrDepth = 1,
             NumLevels = 1
         });
 
-        UITexture = Texture.Create(GraphicsDevice, new TextureCreateInfo
+        if (windowRatio >= Dimensions.UIAspectRatio)
         {
-            Type = TextureType.TwoDimensional,
-            Format = Window.SwapchainFormat,
-            Usage = TextureUsageFlags.ColorTarget | TextureUsageFlags.Sampler,
-            Height = Window.Height,
-            Width = (uint)(Window.Height * Dimensions.UIAspectRatio),
-            SampleCount = SampleCount.One,
-            LayerCountOrDepth = 1,
-            NumLevels = 1
-        });
+            UITexture = Texture.Create(GraphicsDevice, new TextureCreateInfo
+            {
+                Type = TextureType.TwoDimensional,
+                Format = Window.SwapchainFormat,
+                Usage = TextureUsageFlags.ColorTarget | TextureUsageFlags.Sampler,
+                Height = Window.Height,
+                Width = (uint)(Window.Height * Dimensions.UIAspectRatio),
+                SampleCount = SampleCount.One,
+                LayerCountOrDepth = 1,
+                NumLevels = 1
+            });
+        }
+        else
+        {
+            UITexture = Texture.Create(GraphicsDevice, new TextureCreateInfo
+            {
+                Type = TextureType.TwoDimensional,
+                Format = Window.SwapchainFormat,
+                Usage = TextureUsageFlags.ColorTarget | TextureUsageFlags.Sampler,
+                Height = (uint)(Window.Width * Dimensions.UIAspectRatioReciprocal),
+                Width = Window.Width,
+                SampleCount = SampleCount.One,
+                LayerCountOrDepth = 1,
+                NumLevels = 1
+            });
+        }
 
         UIDepthTexture = Texture.Create(GraphicsDevice, new TextureCreateInfo
         {
             Type = TextureType.TwoDimensional,
             Format = TextureFormat.D16Unorm,
             Usage = TextureUsageFlags.DepthStencilTarget | TextureUsageFlags.Sampler,
-            Height = Window.Height,
-            Width = (uint)(Window.Height * Dimensions.UIAspectRatio),
+            Height = UITexture.Height,
+            Width = UITexture.Width,
             SampleCount = SampleCount.One,
             LayerCountOrDepth = 1,
             NumLevels = 1
         });
+
+        System.Console.WriteLine($"window: {Window.Width}x{Window.Height}");
+        System.Console.WriteLine($"gametexture: {GameTexture.Width}x{GameTexture.Height}");
+        System.Console.WriteLine($"depthtexture: {DepthTexture.Width}x{DepthTexture.Height}");
+        System.Console.WriteLine($"UItexture: {UITexture.Width}x{UITexture.Height}");
+        System.Console.WriteLine($"uidepthtexture: {UIDepthTexture.Width}x{UITexture.Height}");
+
 
     }
 
@@ -411,7 +437,7 @@ public class Renderer : MoonTools.ECS.Renderer
         }
 
         var gamePass = cmdbuf.BeginRenderPass(
-            new DepthStencilTargetInfo(DepthTexture, 1f, true),
+            new DepthStencilTargetInfo(DepthTexture, 1f, false),
             new ColorTargetInfo(GameTexture, palette.Background)
         );
 
@@ -494,7 +520,7 @@ public class Renderer : MoonTools.ECS.Renderer
 
 
         var uiPass = cmdbuf.BeginRenderPass(
-            new DepthStencilTargetInfo(UIDepthTexture, 1f, true),
+            new DepthStencilTargetInfo(UIDepthTexture, 1f, false),
             new ColorTargetInfo(UITexture, LoadOp.Load)
         );
 
@@ -550,6 +576,7 @@ public class Renderer : MoonTools.ECS.Renderer
             {
                 Texture = renderTexture,
                 X = (uint)((renderTexture.Width - UITexture.Width) * 0.5f),
+                Y = (uint)((renderTexture.Height - UITexture.Height) * 0.5f),
                 W = UITexture.Width,
                 H = UITexture.Height
             },
