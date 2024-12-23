@@ -93,7 +93,7 @@ class Program : Game
         SDL.SDL_ShowSimpleMessageBox(
             SDL.SDL_MessageBoxFlags.SDL_MESSAGEBOX_ERROR,
             "FLAGRANT SYSTEM ERROR",
-            $"Please find the error log in the game directory and report it to prophet_goddess@protonmail.com: {e}",
+            $"Please find the error log in the game directory and send it to prophet_goddess@protonmail.com: {e}",
             IntPtr.Zero
         );
     }

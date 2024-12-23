@@ -51,106 +51,53 @@ public class Renderer : MoonTools.ECS.Renderer
 
     void CreateRenderTextures()
     {
-        if (Window.Width > Window.Height)
+        GameTexture = Texture.Create(GraphicsDevice, new TextureCreateInfo
         {
-            GameTexture = Texture.Create(GraphicsDevice, new TextureCreateInfo
-            {
-                Type = TextureType.TwoDimensional,
-                Format = Window.SwapchainFormat,
-                Usage = TextureUsageFlags.ColorTarget | TextureUsageFlags.Sampler,
-                Height = Window.Height,
-                Width = (uint)(Window.Height * Dimensions.GameAspectRatio),
-                SampleCount = SampleCount.One,
-                LayerCountOrDepth = 1,
-                NumLevels = 1
-            });
+            Type = TextureType.TwoDimensional,
+            Format = Window.SwapchainFormat,
+            Usage = TextureUsageFlags.ColorTarget | TextureUsageFlags.Sampler,
+            Height = Window.Height,
+            Width = (uint)(Window.Height * Dimensions.GameAspectRatio),
+            SampleCount = SampleCount.One,
+            LayerCountOrDepth = 1,
+            NumLevels = 1
+        });
 
-            DepthTexture = Texture.Create(GraphicsDevice, new TextureCreateInfo
-            {
-                Type = TextureType.TwoDimensional,
-                Format = TextureFormat.D16Unorm,
-                Usage = TextureUsageFlags.DepthStencilTarget | TextureUsageFlags.Sampler,
-                Height = Window.Height,
-                Width = (uint)(Window.Height * Dimensions.GameAspectRatio),
-                SampleCount = SampleCount.One,
-                LayerCountOrDepth = 1,
-                NumLevels = 1
-            });
-
-            UITexture = Texture.Create(GraphicsDevice, new TextureCreateInfo
-            {
-                Type = TextureType.TwoDimensional,
-                Format = Window.SwapchainFormat,
-                Usage = TextureUsageFlags.ColorTarget | TextureUsageFlags.Sampler,
-                Height = Window.Height,
-                Width = (uint)(Window.Height * Dimensions.UIAspectRatio),
-                SampleCount = SampleCount.One,
-                LayerCountOrDepth = 1,
-                NumLevels = 1
-            });
-
-            UIDepthTexture = Texture.Create(GraphicsDevice, new TextureCreateInfo
-            {
-                Type = TextureType.TwoDimensional,
-                Format = TextureFormat.D16Unorm,
-                Usage = TextureUsageFlags.DepthStencilTarget | TextureUsageFlags.Sampler,
-                Height = Window.Height,
-                Width = (uint)(Window.Height * Dimensions.UIAspectRatio),
-                SampleCount = SampleCount.One,
-                LayerCountOrDepth = 1,
-                NumLevels = 1
-            });
-        }
-        else
+        DepthTexture = Texture.Create(GraphicsDevice, new TextureCreateInfo
         {
-            GameTexture = Texture.Create(GraphicsDevice, new TextureCreateInfo
-            {
-                Type = TextureType.TwoDimensional,
-                Format = Window.SwapchainFormat,
-                Usage = TextureUsageFlags.ColorTarget | TextureUsageFlags.Sampler,
-                Height = (uint)(Window.Width * Dimensions.GameAspectRatioReciprocal),
-                Width = Window.Width,
-                SampleCount = SampleCount.One,
-                LayerCountOrDepth = 1,
-                NumLevels = 1
-            });
+            Type = TextureType.TwoDimensional,
+            Format = TextureFormat.D16Unorm,
+            Usage = TextureUsageFlags.DepthStencilTarget | TextureUsageFlags.Sampler,
+            Height = Window.Height,
+            Width = (uint)(Window.Height * Dimensions.GameAspectRatio),
+            SampleCount = SampleCount.One,
+            LayerCountOrDepth = 1,
+            NumLevels = 1
+        });
 
-            DepthTexture = Texture.Create(GraphicsDevice, new TextureCreateInfo
-            {
-                Type = TextureType.TwoDimensional,
-                Format = TextureFormat.D16Unorm,
-                Usage = TextureUsageFlags.DepthStencilTarget | TextureUsageFlags.Sampler,
-                Height = (uint)(Window.Width * Dimensions.GameAspectRatioReciprocal),
-                Width = Window.Width,
-                SampleCount = SampleCount.One,
-                LayerCountOrDepth = 1,
-                NumLevels = 1
-            });
+        UITexture = Texture.Create(GraphicsDevice, new TextureCreateInfo
+        {
+            Type = TextureType.TwoDimensional,
+            Format = Window.SwapchainFormat,
+            Usage = TextureUsageFlags.ColorTarget | TextureUsageFlags.Sampler,
+            Height = Window.Height,
+            Width = (uint)(Window.Height * Dimensions.UIAspectRatio),
+            SampleCount = SampleCount.One,
+            LayerCountOrDepth = 1,
+            NumLevels = 1
+        });
 
-            UITexture = Texture.Create(GraphicsDevice, new TextureCreateInfo
-            {
-                Type = TextureType.TwoDimensional,
-                Format = Window.SwapchainFormat,
-                Usage = TextureUsageFlags.ColorTarget | TextureUsageFlags.Sampler,
-                Height = (uint)(Window.Width * Dimensions.UIAspectRatioReciprocal),
-                Width = Window.Width,
-                SampleCount = SampleCount.One,
-                LayerCountOrDepth = 1,
-                NumLevels = 1
-            });
-
-            UIDepthTexture = Texture.Create(GraphicsDevice, new TextureCreateInfo
-            {
-                Type = TextureType.TwoDimensional,
-                Format = TextureFormat.D16Unorm,
-                Usage = TextureUsageFlags.DepthStencilTarget | TextureUsageFlags.Sampler,
-                Height = (uint)(Window.Width * Dimensions.UIAspectRatioReciprocal),
-                Width = Window.Width,
-                SampleCount = SampleCount.One,
-                LayerCountOrDepth = 1,
-                NumLevels = 1
-            });
-        }
+        UIDepthTexture = Texture.Create(GraphicsDevice, new TextureCreateInfo
+        {
+            Type = TextureType.TwoDimensional,
+            Format = TextureFormat.D16Unorm,
+            Usage = TextureUsageFlags.DepthStencilTarget | TextureUsageFlags.Sampler,
+            Height = Window.Height,
+            Width = (uint)(Window.Height * Dimensions.UIAspectRatio),
+            SampleCount = SampleCount.One,
+            LayerCountOrDepth = 1,
+            NumLevels = 1
+        });
 
     }
 
@@ -596,44 +543,22 @@ public class Renderer : MoonTools.ECS.Renderer
 
         cmdbuf.EndRenderPass(uiPass);
 
-        if (renderTexture.Width > renderTexture.Height)
+        cmdbuf.Blit(new BlitInfo
         {
-            cmdbuf.Blit(new BlitInfo
+            Source = new BlitRegion(UITexture),
+            Destination = new BlitRegion
             {
-                Source = new BlitRegion(UITexture),
-                Destination = new BlitRegion
-                {
-                    Texture = renderTexture,
-                    X = (uint)((renderTexture.Width - UITexture.Width) * 0.5f),
-                    W = UITexture.Width,
-                    H = UITexture.Height
-                },
-                LoadOp = LoadOp.Clear,
-                ClearColor = Color.Transparent,
-                FlipMode = FlipMode.None,
-                Filter = MoonWorks.Graphics.Filter.Linear,
-                Cycle = false
-            });
-        }
-        else
-        {
-            cmdbuf.Blit(new BlitInfo
-            {
-                Source = new BlitRegion(UITexture),
-                Destination = new BlitRegion
-                {
-                    Texture = renderTexture,
-                    Y = (uint)((renderTexture.Height - UITexture.Height) * 0.5f),
-                    W = UITexture.Width,
-                    H = UITexture.Height
-                },
-                LoadOp = LoadOp.Clear,
-                ClearColor = Color.Transparent,
-                FlipMode = FlipMode.None,
-                Filter = MoonWorks.Graphics.Filter.Linear,
-                Cycle = false
-            });
-        }
+                Texture = renderTexture,
+                X = (uint)((renderTexture.Width - UITexture.Width) * 0.5f),
+                W = UITexture.Width,
+                H = UITexture.Height
+            },
+            LoadOp = LoadOp.Clear,
+            ClearColor = Color.Transparent,
+            FlipMode = FlipMode.None,
+            Filter = MoonWorks.Graphics.Filter.Linear,
+            Cycle = false
+        });
 
     }
 }

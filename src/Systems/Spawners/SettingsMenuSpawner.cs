@@ -36,47 +36,45 @@ public class SettingsMenuSpawner : Manipulator
             Destroy(entity);
         }
 
-        var promptEntity = CreateEntity();
-        Set(promptEntity,
-        new Position(new Vector2(Dimensions.GameWidth * 0.5f, Dimensions.GameHeight * 0.1f)));
-        Set(promptEntity,
-         new Text(
-            Fonts.HeaderFont,
-            Fonts.HeaderSize,
-            Stores.TextStorage.GetID("SETTINGS"),
-            MoonWorks.Graphics.Font.HorizontalAlignment.Center,
-            MoonWorks.Graphics.Font.VerticalAlignment.Middle));
-        Set(promptEntity, new KeepOpacityWhenPaused());
-        Set(promptEntity, new Pause());
-        Set(promptEntity, new Depth(0.1f));
-        Set(promptEntity, new Marquee(100f));
-        Set(promptEntity, new FollowsCamera(Dimensions.GameHeight * 0.1f));
-        Set(promptEntity, new DestroyOnStateTransition());
+        var height = Some<Player>() ? Dimensions.GameHeight : Dimensions.UIHeight;
+        var width = Some<Player>() ? Dimensions.GameWidth : Dimensions.UIWidth;
 
-        var text = Get<Text>(promptEntity);
-        var font = Stores.FontStorage.Get(text.FontID);
-        var str = Stores.TextStorage.Get(text.TextID);
+        var font = Stores.FontStorage.Get(Fonts.HeaderFont);
+        var str = "SETTINGS";
         WellspringCS.Wellspring.Rectangle rect;
-        font.TextBounds(str, text.Size, text.HorizontalAlignment, text.VerticalAlignment, out rect);
+        font.TextBounds(str, Some<Player>() ? Fonts.HeaderSize : Fonts.TitleSize, MoonWorks.Graphics.Font.HorizontalAlignment.Center, MoonWorks.Graphics.Font.VerticalAlignment.Middle, out rect);
 
-        var promptDouble = CreateEntity();
-        Set(promptDouble,
-            new Position(new Vector2(Dimensions.GameWidth * 0.5f - rect.W - text.Size, Dimensions.GameHeight * 0.1f)));
-        Set(promptDouble,
-         new Text(
-            Fonts.HeaderFont,
-            Fonts.HeaderSize,
-            Stores.TextStorage.GetID("SETTINGS"),
-            MoonWorks.Graphics.Font.HorizontalAlignment.Center,
-            MoonWorks.Graphics.Font.VerticalAlignment.Middle));
-        Set(promptDouble, new KeepOpacityWhenPaused());
-        Set(promptDouble, new Depth(0.1f));
-        Set(promptDouble, new Marquee(100f));
-        Set(promptDouble, new FollowsCamera(Dimensions.GameHeight * 0.1f));
-        Set(promptDouble, new DestroyOnStateTransition());
+        var copies = Some<Player>() ? 2.0f : 3.0f;
+        var totalWidth = width + rect.W;
+        totalWidth -= rect.W * copies;
+        totalWidth /= copies;
 
-        var startY = Dimensions.GameHeight * 0.3f;
-        var x = 20;
+        for (int i = 0; i < copies; i++)
+        {
+            var titleEntity = CreateEntity();
+            Set(titleEntity,
+            new Position(new Vector2(i * (rect.W + totalWidth), height * 0.1f)));
+            Set(titleEntity,
+             new Text(
+                Fonts.HeaderFont,
+                Some<Player>() ? Fonts.HeaderSize : Fonts.TitleSize,
+                Stores.TextStorage.GetID("SETTINGS"),
+                MoonWorks.Graphics.Font.HorizontalAlignment.Center,
+                MoonWorks.Graphics.Font.VerticalAlignment.Middle));
+            Set(titleEntity, new KeepOpacityWhenPaused());
+            Set(titleEntity, new Pause());
+            Set(titleEntity, new Depth(0.1f));
+            Set(titleEntity, new Marquee(100f));
+            Set(titleEntity, new FollowsCamera(height * 0.1f));
+            Set(titleEntity, new DestroyOnStateTransition());
+            if (!Some<Player>())
+            {
+                Set(titleEntity, new UI());
+            }
+        }
+
+        var startY = height * 0.3f;
+        var x = Some<Player>() ? 20 : 40;
 
         var musicVolume = GetSingleton<MusicVolume>().Value;
 
@@ -86,7 +84,7 @@ public class SettingsMenuSpawner : Manipulator
         Set(musicVolumeLabel,
          new Text(
             Fonts.HeaderFont,
-            Fonts.PromptSize,
+            Some<Player>() ? Fonts.PromptSize : Fonts.BodySize,
             Stores.TextStorage.GetID("music"),
             MoonWorks.Graphics.Font.HorizontalAlignment.Left,
             MoonWorks.Graphics.Font.VerticalAlignment.Middle));
@@ -96,6 +94,8 @@ public class SettingsMenuSpawner : Manipulator
         Set(musicVolumeLabel, new DestroyOnStateTransition());
         Set(musicVolumeLabel, new Setting());
         Set(musicVolumeLabel, new Selected());
+        if (!Some<Player>())
+            Set(musicVolumeLabel, new UI());
 
         var musicVolumeDisplay = CreateEntity();
         Set(musicVolumeDisplay,
@@ -103,7 +103,7 @@ public class SettingsMenuSpawner : Manipulator
         Set(musicVolumeDisplay,
          new Text(
             Fonts.HeaderFont,
-            Fonts.PromptSize,
+            Some<Player>() ? Fonts.PromptSize : Fonts.BodySize,
             Stores.TextStorage.GetID(new string('|', (int)(musicVolume * Audio.MaxVolume))),
             MoonWorks.Graphics.Font.HorizontalAlignment.Left,
             MoonWorks.Graphics.Font.VerticalAlignment.Middle));
@@ -111,11 +111,13 @@ public class SettingsMenuSpawner : Manipulator
         Set(musicVolumeDisplay, new Depth(0.1f));
         Set(musicVolumeDisplay, new FollowsCamera(startY));
         Set(musicVolumeDisplay, new DestroyOnStateTransition());
+        if (!Some<Player>())
+            Set(musicVolumeDisplay, new UI());
 
         Relate(musicVolumeLabel, musicVolumeDisplay, new SettingDisplay());
         Relate(musicVolumeLabel, GetSingletonEntity<MusicVolume>(), new SettingControls());
 
-        startY += 30f;
+        startY += Some<Player>() ? 30f : 50f;
 
         var sfxVolume = GetSingleton<SFXVolume>().Value;
 
@@ -125,7 +127,7 @@ public class SettingsMenuSpawner : Manipulator
         Set(sfxVolumeLabel,
          new Text(
             Fonts.HeaderFont,
-            Fonts.PromptSize,
+            Some<Player>() ? Fonts.PromptSize : Fonts.BodySize,
             Stores.TextStorage.GetID("sfx"),
             MoonWorks.Graphics.Font.HorizontalAlignment.Left,
             MoonWorks.Graphics.Font.VerticalAlignment.Middle));
@@ -135,6 +137,8 @@ public class SettingsMenuSpawner : Manipulator
         Set(sfxVolumeLabel, new DestroyOnStateTransition());
         Set(sfxVolumeLabel, new Setting());
         Relate(sfxVolumeLabel, GetSingletonEntity<SFXVolume>(), new SettingControls());
+        if (!Some<Player>())
+            Set(sfxVolumeLabel, new UI());
 
         var sfxVolumeDisplay = CreateEntity();
         Set(sfxVolumeDisplay,
@@ -142,7 +146,7 @@ public class SettingsMenuSpawner : Manipulator
         Set(sfxVolumeDisplay,
          new Text(
             Fonts.HeaderFont,
-            Fonts.PromptSize,
+            Some<Player>() ? Fonts.PromptSize : Fonts.BodySize,
             Stores.TextStorage.GetID(new string('|', (int)(sfxVolume * Audio.MaxVolume))),
             MoonWorks.Graphics.Font.HorizontalAlignment.Left,
             MoonWorks.Graphics.Font.VerticalAlignment.Middle));
@@ -150,12 +154,14 @@ public class SettingsMenuSpawner : Manipulator
         Set(sfxVolumeDisplay, new Depth(0.1f));
         Set(sfxVolumeDisplay, new FollowsCamera(startY));
         Set(sfxVolumeDisplay, new DestroyOnStateTransition());
+        if (!Some<Player>())
+            Set(sfxVolumeDisplay, new UI());
 
         Relate(sfxVolumeLabel, sfxVolumeDisplay, new SettingDisplay());
 
         Relate(musicVolumeLabel, sfxVolumeLabel, new VerticalConnection());
 
-        startY += 30f;
+        startY += Some<Player>() ? 30f : 50f;
 
         var fullscreen = GetSingleton<Fullscreen>().Value;
 
@@ -165,7 +171,7 @@ public class SettingsMenuSpawner : Manipulator
         Set(fullscreenLabel,
          new Text(
             Fonts.HeaderFont,
-            Fonts.PromptSize,
+            Some<Player>() ? Fonts.PromptSize : Fonts.BodySize,
             Stores.TextStorage.GetID("fullscreen"),
             MoonWorks.Graphics.Font.HorizontalAlignment.Left,
             MoonWorks.Graphics.Font.VerticalAlignment.Middle));
@@ -175,14 +181,16 @@ public class SettingsMenuSpawner : Manipulator
         Set(fullscreenLabel, new DestroyOnStateTransition());
         Set(fullscreenLabel, new Setting());
         Relate(fullscreenLabel, GetSingletonEntity<Fullscreen>(), new SettingControls());
+        if (!Some<Player>())
+            Set(fullscreenLabel, new UI());
 
         var fullscreenDisplay = CreateEntity();
         Set(fullscreenDisplay,
-            new Position(new Vector2(x + 250, startY)));
+            new Position(new Vector2(x + (Some<Player>() ? 250f : 340f), startY)));
         Set(fullscreenDisplay,
             new Text(
                 Fonts.HeaderFont,
-                Fonts.PromptSize,
+                Some<Player>() ? Fonts.PromptSize : Fonts.BodySize,
                 Stores.TextStorage.GetID($"{fullscreen}"),
                 MoonWorks.Graphics.Font.HorizontalAlignment.Left,
                 MoonWorks.Graphics.Font.VerticalAlignment.Middle));
@@ -190,21 +198,13 @@ public class SettingsMenuSpawner : Manipulator
         Set(fullscreenDisplay, new Depth(0.1f));
         Set(fullscreenDisplay, new FollowsCamera(startY));
         Set(fullscreenDisplay, new DestroyOnStateTransition());
+        if (!Some<Player>())
+            Set(fullscreenDisplay, new UI());
 
         Relate(fullscreenLabel, fullscreenDisplay, new SettingDisplay());
 
         Relate(sfxVolumeLabel, fullscreenLabel, new VerticalConnection());
 
-
-        // if (!Some<Player>())
-        // {
-        //     Set(promptEntity, new UI());
-        //     Set(promptDouble, new UI());
-        //     Set(musicVolumeDisplay, new UI());
-        //     Set(sfxVolumeDisplay, new UI());
-        //     Set(musicVolumeLabel, new UI());
-        //     Set(sfxVolumeLabel, new UI());
-        // }
     }
 
 }

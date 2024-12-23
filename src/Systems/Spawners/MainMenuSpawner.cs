@@ -66,7 +66,6 @@ public class MainMenuSpawner : Manipulator
         WellspringCS.Wellspring.Rectangle rect;
         font.TextBounds(str, Fonts.TitleSize, MoonWorks.Graphics.Font.HorizontalAlignment.Center, MoonWorks.Graphics.Font.VerticalAlignment.Middle, out rect);
 
-
         var copies = 3.0f;
         var totalWidth = Dimensions.UIWidth + rect.W;
         totalWidth -= rect.W * copies;
@@ -114,8 +113,6 @@ public class MainMenuSpawner : Manipulator
             Set(prompt, new DestroyOnStateTransition());
             Set(prompt, new MainMenu());
         }
-
-
 
         var scores = CreateEntity();
         Set(scores, new Position(new Vector2(UILayoutConstants.PromptX, 10)));

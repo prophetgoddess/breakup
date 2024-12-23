@@ -33,6 +33,11 @@ public class Settings : MoonTools.ECS.System
         Set(selector, new Selector());
         Set(selector, new KeepOpacityWhenPaused());
         Set(selector, new DestroyOnStateTransition());
+        if (!Some<Player>())
+        {
+            Set(selector, new UI());
+            Set(selector, new Scale(Vector2.One * 2.0f));
+        }
 
         return selector;
     }
@@ -62,7 +67,7 @@ public class Settings : MoonTools.ECS.System
             Set(display,
              new Text(
                 Fonts.HeaderFont,
-                Fonts.PromptSize,
+                Some<Player>() ? Fonts.PromptSize : Fonts.BodySize,
                 Stores.TextStorage.GetID(new string('|', (int)MathF.Ceiling(intVolume))),
                 MoonWorks.Graphics.Font.HorizontalAlignment.Left,
                 MoonWorks.Graphics.Font.VerticalAlignment.Middle));
@@ -78,7 +83,7 @@ public class Settings : MoonTools.ECS.System
             Set(display,
                 new Text(
                     Fonts.HeaderFont,
-                    Fonts.PromptSize,
+                    Some<Player>() ? Fonts.PromptSize : Fonts.BodySize,
                     Stores.TextStorage.GetID($"{fullscreen}"),
                     MoonWorks.Graphics.Font.HorizontalAlignment.Left,
                     MoonWorks.Graphics.Font.VerticalAlignment.Middle));
@@ -122,7 +127,7 @@ public class Settings : MoonTools.ECS.System
                 var selected = GetSingletonEntity<Selected>();
                 var selector = Some<Selector>() ? GetSingletonEntity<Selector>() : CreateSelector();
 
-                Set(selector, new Position(new Vector2(Get<Position>(selected).Value.X - 10f, Get<Position>(selected).Value.Y)));
+                Set(selector, new Position(new Vector2(Get<Position>(selected).Value.X - (Some<Player>() ? 10f : 20f), Get<Position>(selected).Value.Y)));
                 Set(selector, new FollowsCamera(Get<Position>(selected).Value.Y));
 
                 if (inputState.Down.IsPressed)
