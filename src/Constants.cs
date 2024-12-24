@@ -53,5 +53,5 @@ public static class UILayoutConstants
 
 public static class GameplaySettings
 {
-    public static float MaxCameraY = 100;
+    public static float MaxCameraY = 10000;
 }
