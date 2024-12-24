@@ -50,3 +50,8 @@ public static class UILayoutConstants
     public const int GemsLabelY = 280;
     public const int GemsY = 310;
 }
+
+public static class GameplaySettings
+{
+    public static float MaxCameraY = 100;
+}

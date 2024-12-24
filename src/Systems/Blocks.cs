@@ -1,6 +1,7 @@
 using System.Drawing;
 using System.Numerics;
 using MoonTools.ECS;
+using MoonWorks;
 using MoonWorks.Math;
 
 namespace Ball;
@@ -22,7 +23,6 @@ public class Blocks : MoonTools.ECS.System
 
     float MinBlockDensity = 0.1f;
     float MaxBlockDensity = 0.66f;
-    float MaxCameraY = 10000;
 
     float MaxHP = 99;
     float MinHP = 1;
@@ -40,19 +40,19 @@ public class Blocks : MoonTools.ECS.System
         BallSpawner = new BallSpawner(world);
     }
 
-    void SpawnBlock(int x, int y, bool barrier = false)
+    void SpawnBlock(int x, int y, bool unbreakable = false)
     {
         var cameraY = GetSingleton<CameraPosition>().Y;
 
-        int min = (int)float.Lerp(MinHP, MaxHP, cameraY / MaxCameraY);
+        int min = (int)float.Lerp(MinHP, MaxHP, cameraY / GameplaySettings.MaxCameraY);
         int max = min * 2;
 
         var hp = Rando.IntInclusive(min, max);
 
         if (Some<BlocksSpawnWithLessHealth>())
-            hp = (int)MathF.Ceiling(hp * 0.8f);
+            hp = (int)MathF.Ceiling(hp * 0.7f);
 
-        if (Rando.Value > 0.9f || barrier)
+        if (Rando.Value > 0.9f)
         {
             hp = Rando.IntInclusive(min * 2, max * 2);
         }
@@ -65,7 +65,7 @@ public class Blocks : MoonTools.ECS.System
         Set(block, new Block(hp));
         Set(block, new DestroyOnStateTransition());
 
-        if (Rando.Value < 0.75f || barrier)
+        if (Rando.Value < 0.75f && !unbreakable)
         {
             Set(block, new HitPoints(hp, hp));
             Set(block, new Model(Content.Models.RoundEmptySquare.ID));
@@ -113,7 +113,20 @@ public class Blocks : MoonTools.ECS.System
                 }
             }
         }
+
+        int maxY = -(int)(MathF.Floor(GameplaySettings.MaxCameraY + CellSize) / CellSize);
+
+        for (int x = 0; x < GridWidth; x++)
+        {
+            SpawnBlock(
+                x,
+                maxY,
+                true
+            );
+        }
+
     }
+
 
     public override void Update(TimeSpan delta)
     {
@@ -128,7 +141,7 @@ public class Blocks : MoonTools.ECS.System
 
         var cam = GetSingleton<CameraPosition>();
 
-        if (cam.Y > LastGridOffset && cam.Y > LastGridOffset + CellSize)
+        if (cam.Y > LastGridOffset && cam.Y > LastGridOffset + CellSize && cam.Y < GameplaySettings.MaxCameraY)
         {
             LastGridOffset = cam.Y;
 
@@ -136,7 +149,7 @@ public class Blocks : MoonTools.ECS.System
 
             for (int x = 0; x < GridWidth; x++)
             {
-                if (Random.NextDouble() < float.Lerp(MinBlockDensity, MaxBlockDensity, cam.Y / MaxCameraY))
+                if (Random.NextDouble() < float.Lerp(MinBlockDensity, MaxBlockDensity, cam.Y / GameplaySettings.MaxCameraY))
                 {
                     SpawnBlock(x, y);
                 }

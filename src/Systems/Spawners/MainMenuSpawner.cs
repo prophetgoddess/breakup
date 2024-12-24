@@ -10,6 +10,7 @@ public class MainMenuSpawner : Manipulator
     Filter PauseFilter;
     Filter BallFilter;
     SaveGame SaveGame;
+    MarqueeSpawner MarqueeSpawner;
 
     public MainMenuSpawner(World world) : base(world)
     {
@@ -17,6 +18,7 @@ public class MainMenuSpawner : Manipulator
         HideFilter = FilterBuilder.Include<HideOnMainMenu>().Build();
         PauseFilter = FilterBuilder.Include<Pause>().Build();
         BallFilter = FilterBuilder.Include<CanDealDamageToBlock>().Include<HasGravity>().Include<CanBeHit>().Build();
+        MarqueeSpawner = new MarqueeSpawner(world);
         SaveGame = new SaveGame(world);
 
     }
@@ -61,58 +63,9 @@ public class MainMenuSpawner : Manipulator
             Set(entity, new Invisible());
         }
 
-        var font = Stores.FontStorage.Get(Fonts.HeaderFont);
-        var str = "break.up";
-        WellspringCS.Wellspring.Rectangle rect;
-        font.TextBounds(str, Fonts.TitleSize, MoonWorks.Graphics.Font.HorizontalAlignment.Center, MoonWorks.Graphics.Font.VerticalAlignment.Middle, out rect);
+        MarqueeSpawner.SpawnMarquee("break.up", Fonts.HeaderFont, Fonts.TitleSize, 3, 100f, UILayoutConstants.TitleY);
 
-        var copies = 3.0f;
-        var totalWidth = Dimensions.UIWidth + rect.W;
-        totalWidth -= rect.W * copies;
-        totalWidth /= copies;
-
-        for (int i = 0; i < copies; i++)
-        {
-            var gameTitle = CreateEntity();
-            Set(gameTitle, new Position(new Vector2(i * (rect.W + totalWidth), UILayoutConstants.TitleY)));
-            Set(gameTitle,
-            new Text(
-                Fonts.HeaderFont,
-                Fonts.TitleSize,
-                Stores.TextStorage.GetID("break.up"),
-                MoonWorks.Graphics.Font.HorizontalAlignment.Center,
-                MoonWorks.Graphics.Font.VerticalAlignment.Middle));
-            Set(gameTitle, new UI());
-            Set(gameTitle, new DestroyOnStateTransition());
-            Set(gameTitle, new MainMenu());
-            Set(gameTitle, new Marquee(100f));
-        }
-
-        copies = 7.0f;
-        font = Stores.FontStorage.Get(Fonts.BodyFont);
-        str = "press start";
-        font.TextBounds(str, Fonts.PromptSize, MoonWorks.Graphics.Font.HorizontalAlignment.Center, MoonWorks.Graphics.Font.VerticalAlignment.Baseline, out rect);
-
-        totalWidth = Dimensions.UIWidth + rect.W;
-        totalWidth -= rect.W * copies;
-        totalWidth /= copies;
-
-        for (int i = 0; i < copies; i++)
-        {
-            var prompt = CreateEntity();
-            Set(prompt, new Position(new Vector2(i * (rect.W + totalWidth), UILayoutConstants.PromptY)));
-            Set(prompt,
-             new Text(
-                Fonts.BodyFont,
-                Fonts.PromptSize,
-                Stores.TextStorage.GetID("press start"),
-                MoonWorks.Graphics.Font.HorizontalAlignment.Center,
-                MoonWorks.Graphics.Font.VerticalAlignment.Baseline));
-            Set(prompt, new UI());
-            Set(prompt, new Marquee(-100f));
-            Set(prompt, new DestroyOnStateTransition());
-            Set(prompt, new MainMenu());
-        }
+        MarqueeSpawner.SpawnMarquee("press start", Fonts.BodyFont, Fonts.PromptSize, 7.0f, -100f, UILayoutConstants.PromptY);
 
         var scores = CreateEntity();
         Set(scores, new Position(new Vector2(UILayoutConstants.PromptX, 10)));
@@ -126,34 +79,6 @@ public class MainMenuSpawner : Manipulator
         Set(scores, new UI());
         Set(scores, new DestroyOnStateTransition());
         Set(scores, new MainMenu());
-
-        var leftBound = CreateEntity();
-        Set(leftBound, new Position(new Vector2(-8, 0)));
-        Set(leftBound, new BoundingBox(0, 0, 16, 2000));
-        Set(leftBound, new SolidCollision());
-        Set(leftBound, new DestroyOnStateTransition());
-        Set(leftBound, new UI());
-
-        var rightBound = CreateEntity();
-        Set(rightBound, new Position(new Vector2(Dimensions.UIWidth + 8, 0)));
-        Set(rightBound, new BoundingBox(0, 0, 16, 2000));
-        Set(rightBound, new SolidCollision());
-        Set(rightBound, new DestroyOnStateTransition());
-        Set(rightBound, new UI());
-
-        var bottomBound = CreateEntity();
-        Set(bottomBound, new Position(new Vector2(Dimensions.UIWidth * 0.5f, Dimensions.UIHeight + 8)));
-        Set(bottomBound, new BoundingBox(0, 0, Dimensions.UIWidth, 16));
-        Set(bottomBound, new SolidCollision());
-        Set(bottomBound, new DestroyOnStateTransition());
-        Set(bottomBound, new UI());
-
-        var topBound = CreateEntity();
-        Set(topBound, new Position(new Vector2(Dimensions.UIWidth * 0.5f, 0f)));
-        Set(topBound, new BoundingBox(0, 0, Dimensions.UIWidth, 16));
-        Set(topBound, new SolidCollision());
-        Set(topBound, new DestroyOnStateTransition());
-        Set(topBound, new UI());
 
     }
 }

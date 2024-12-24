@@ -5,6 +5,7 @@ using MoonTools.ECS;
 public class SettingsMenuSpawner : Manipulator
 {
     MainMenuSpawner MainMenuSpawner;
+    MarqueeSpawner MarqueeSpawner;
     Filter DestroyFilter;
     Filter DontDestroyFilter;
 
@@ -14,7 +15,7 @@ public class SettingsMenuSpawner : Manipulator
 
         DestroyFilter = FilterBuilder.Include<DestroyOnStateTransition>().Exclude<DontDestroyOnNextTransition>().Build();
         DontDestroyFilter = FilterBuilder.Include<DestroyOnStateTransition>().Include<DontDestroyOnNextTransition>().Build();
-
+        MarqueeSpawner = new MarqueeSpawner(world);
     }
     public void CloseSettingsMenu()
     {
@@ -37,41 +38,8 @@ public class SettingsMenuSpawner : Manipulator
         }
 
         var height = Some<Player>() ? Dimensions.GameHeight : Dimensions.UIHeight;
-        var width = Some<Player>() ? Dimensions.GameWidth : Dimensions.UIWidth;
 
-        var font = Stores.FontStorage.Get(Fonts.HeaderFont);
-        var str = "SETTINGS";
-        WellspringCS.Wellspring.Rectangle rect;
-        font.TextBounds(str, Some<Player>() ? Fonts.HeaderSize : Fonts.TitleSize, MoonWorks.Graphics.Font.HorizontalAlignment.Center, MoonWorks.Graphics.Font.VerticalAlignment.Middle, out rect);
-
-        var copies = Some<Player>() ? 2.0f : 3.0f;
-        var totalWidth = width + rect.W;
-        totalWidth -= rect.W * copies;
-        totalWidth /= copies;
-
-        for (int i = 0; i < copies; i++)
-        {
-            var titleEntity = CreateEntity();
-            Set(titleEntity,
-            new Position(new Vector2(i * (rect.W + totalWidth), height * 0.1f)));
-            Set(titleEntity,
-             new Text(
-                Fonts.HeaderFont,
-                Some<Player>() ? Fonts.HeaderSize : Fonts.TitleSize,
-                Stores.TextStorage.GetID("SETTINGS"),
-                MoonWorks.Graphics.Font.HorizontalAlignment.Center,
-                MoonWorks.Graphics.Font.VerticalAlignment.Middle));
-            Set(titleEntity, new KeepOpacityWhenPaused());
-            Set(titleEntity, new Pause());
-            Set(titleEntity, new Depth(0.1f));
-            Set(titleEntity, new Marquee(100f));
-            Set(titleEntity, new FollowsCamera(height * 0.1f));
-            Set(titleEntity, new DestroyOnStateTransition());
-            if (!Some<Player>())
-            {
-                Set(titleEntity, new UI());
-            }
-        }
+        MarqueeSpawner.SpawnMarquee("Settings", Fonts.HeaderFont, Some<Player>() ? Fonts.HeaderSize : Fonts.TitleSize, Some<Player>() ? 2 : 3, 100f, height * 0.1f);
 
         var startY = height * 0.3f;
         var x = Some<Player>() ? 20 : 40;

@@ -1,4 +1,6 @@
 
+using System.Reflection.Metadata;
+using Microsoft.VisualBasic;
 using MoonTools.ECS;
 
 namespace Ball;
@@ -37,6 +39,11 @@ public class FollowCamera : MoonTools.ECS.System
         if (highestY < -offset)
         {
             offset = -highestY;
+        }
+
+        if (offset >= GameplaySettings.MaxCameraY)
+        {
+            offset = GameplaySettings.MaxCameraY;
         }
 
         Set(camera, new CameraPosition(offset));

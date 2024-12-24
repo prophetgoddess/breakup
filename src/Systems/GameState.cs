@@ -43,7 +43,7 @@ public class GameStateManager : MoonTools.ECS.System
 
         if (inputState.Start.IsPressed)
         {
-            if (Some<Pause>() && !Some<Selected>())
+            if (Some<Pause>() && !Some<Selected>() && !Some<MainMenu>())
             {
                 foreach (var entity in DestroyFilter.Entities)
                 {
