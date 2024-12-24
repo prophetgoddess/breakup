@@ -41,6 +41,17 @@ public class GameStateManager : MoonTools.ECS.System
     {
         var inputState = GetSingleton<InputState>();
 
+
+        if (Some<EndScreen>())
+        {
+            if (inputState.Start.IsPressed)
+            {
+                MainMenuSpawner.OpenMainMenu();
+            }
+
+            return;
+        }
+
         if (inputState.Start.IsPressed)
         {
             if (Some<Pause>() && !Some<Selected>() && !Some<MainMenu>())
@@ -147,7 +158,7 @@ public class GameStateManager : MoonTools.ECS.System
         var livesEntity = GetSingletonEntity<Lives>();
         var lives = Get<Lives>(livesEntity);
 
-        if (BallFilter.Empty)
+        if (BallFilter.Empty && !Some<EndScreen>())
         {
             Set(livesEntity, new Lives(lives.Value - 1));
             var ball = BallSpawner.SpawnBall(new Vector2(
@@ -158,7 +169,6 @@ public class GameStateManager : MoonTools.ECS.System
             Relate(ball, GetSingletonEntity<Player>(), new HeldBy(new Vector2(0f, -32.0f)));
             Set(ball, new Velocity(Vector2.Zero));
             Set(CreateEntity(), new PlayOnce(Stores.SFXStorage.GetID(Content.SFX.fail)));
-
         }
 
         Set(livesEntity,
@@ -182,6 +192,9 @@ public class GameStateManager : MoonTools.ECS.System
             Stores.TextStorage.GetID(GetFormattedNumber(level.Value, 2)),
             MoonWorks.Graphics.Font.HorizontalAlignment.Left,
             MoonWorks.Graphics.Font.VerticalAlignment.Middle));
+
+        if (!Some<CanDealDamageToBlock>())
+            return;
 
         var ballEntity = GetSingletonEntity<CanDealDamageToBlock>();
         Set(ballEntity, new CanDealDamageToBlock(level.Value + 1));

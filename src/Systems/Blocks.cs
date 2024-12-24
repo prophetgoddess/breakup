@@ -75,6 +75,7 @@ public class Blocks : MoonTools.ECS.System
             //Set(hpDisplay, new Scale(Vector2.One));
             Set(hpDisplay, new Position(new Vector2(CellSize * 0.5f + x * CellSize, CellSize * 0.5f + y * CellSize)));
             Set(hpDisplay, new DestroyOnStateTransition());
+            Set(hpDisplay, new CanTakeDamage());
             //Set(hpDisplay, new Model(Content.Models.Square.ID));
             Relate(block, hpDisplay, new HPDisplay());
             Set(hpDisplay, new Text(Fonts.BodyFont, Fonts.InfoSize, Stores.TextStorage.GetID($"{GameStateManager.GetFormattedNumber(hp, 2)}"), MoonWorks.Graphics.Font.HorizontalAlignment.Center, MoonWorks.Graphics.Font.VerticalAlignment.Middle));
@@ -114,16 +115,16 @@ public class Blocks : MoonTools.ECS.System
             }
         }
 
-        int maxY = -(int)(MathF.Floor(GameplaySettings.MaxCameraY + CellSize) / CellSize);
+        // int maxY = -(int)(MathF.Floor(GameplaySettings.MaxCameraY + CellSize) / CellSize);
 
-        for (int x = 0; x < GridWidth; x++)
-        {
-            SpawnBlock(
-                x,
-                maxY,
-                true
-            );
-        }
+        // for (int x = 0; x < GridWidth; x++)
+        // {
+        //     SpawnBlock(
+        //         x,
+        //         maxY,
+        //         true
+        //     );
+        // }
 
     }
 
