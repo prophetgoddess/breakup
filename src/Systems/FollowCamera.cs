@@ -9,13 +9,11 @@ public class FollowCamera : MoonTools.ECS.System
 {
     Filter FollowFilter;
     Filter FollowsFilter;
-    EndScreenSpawner EndScreenSpawner;
 
     public FollowCamera(World world) : base(world)
     {
         FollowFilter = FilterBuilder.Include<FollowsCamera>().Include<Position>().Build();
         FollowsFilter = FilterBuilder.Include<CameraFollows>().Include<Position>().Build();
-        EndScreenSpawner = new EndScreenSpawner(world);
     }
 
     public override void Update(TimeSpan delta)
@@ -41,12 +39,6 @@ public class FollowCamera : MoonTools.ECS.System
         if (highestY < -offset)
         {
             offset = -highestY;
-        }
-
-        if (offset >= GameplaySettings.MaxCameraY)
-        {
-            offset = GameplaySettings.MaxCameraY;
-            EndScreenSpawner.OpenEndScreen();
         }
 
         Set(camera, new CameraPosition(offset));

@@ -18,7 +18,7 @@ public class MarqueeSpawner : Manipulator
         var strID = Stores.TextStorage.GetID(str);
         font.TextBounds(str, size, HorizontalAlignment.Center, VerticalAlignment.Middle, out rect);
 
-        var width = (Some<Player>() || Some<EndScreen>()) ? Dimensions.GameWidth : Dimensions.UIWidth;
+        var width = Some<Player>() ? Dimensions.GameWidth : Dimensions.UIWidth;
 
         var totalWidth = width + rect.W;
         totalWidth -= rect.W * copies;
@@ -41,13 +41,13 @@ public class MarqueeSpawner : Manipulator
             Set(entity, new Pause());
             Set(entity, new Depth(0.1f));
             Set(entity, new Marquee(speed));
-            if ((Some<Player>() || Some<EndScreen>()))
+            if (Some<Player>())
                 Set(entity, new FollowsCamera(y));
-            Set(entity, new DestroyOnStateTransition());
-            if (!(Some<Player>() || Some<EndScreen>()))
-            {
+            else
                 Set(entity, new UI());
-            }
+
+            Set(entity, new DestroyOnStateTransition());
+
         }
         return entity;
     }

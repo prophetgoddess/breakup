@@ -61,7 +61,9 @@ public class Input : MoonTools.ECS.System
         Gamepad.Right = Inputs.GetGamepad(0).DpadRight;
         Gamepad.Swing = Inputs.GetGamepad(0).A;
         Gamepad.Start = Inputs.GetGamepad(0).Start;
+#if DEBUG
         Gamepad.Restart = Inputs.GetGamepad(0).Guide;
+#endif
         Gamepad.Dash = Inputs.GetGamepad(0).RightShoulder;
         Gamepad.Slow = Inputs.GetGamepad(0).LeftShoulder;
 
@@ -87,7 +89,9 @@ public class Input : MoonTools.ECS.System
             Down = controlSet.Down.State | altControlSet.Down.State,
             Swing = controlSet.Swing.State | altControlSet.Swing.State,
             Start = controlSet.Start.State | altControlSet.Start.State,
+#if DEBUG
             Restart = controlSet.Restart.State | altControlSet.Restart.State,
+#endif
             Dash = controlSet.Dash.State | altControlSet.Dash.State,
             Slow = controlSet.Slow.State | altControlSet.Slow.State
         };

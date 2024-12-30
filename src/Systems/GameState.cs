@@ -41,17 +41,6 @@ public class GameStateManager : MoonTools.ECS.System
     {
         var inputState = GetSingleton<InputState>();
 
-
-        if (Some<EndScreen>())
-        {
-            if (inputState.Start.IsPressed)
-            {
-                MainMenuSpawner.OpenMainMenu();
-            }
-
-            return;
-        }
-
         if (inputState.Start.IsPressed)
         {
             if (Some<Pause>() && !Some<Selected>() && !Some<MainMenu>())
@@ -64,10 +53,6 @@ public class GameStateManager : MoonTools.ECS.System
                 {
                     Remove<DontDestroyOnNextTransition>(entity);
                 }
-            }
-            else if (!Some<MainMenu>() && !Some<Selected>())
-            {
-                PauseMenuSpawner.OpenPauseMenu();
             }
         }
 
@@ -158,7 +143,7 @@ public class GameStateManager : MoonTools.ECS.System
         var livesEntity = GetSingletonEntity<Lives>();
         var lives = Get<Lives>(livesEntity);
 
-        if (BallFilter.Empty && !Some<EndScreen>())
+        if (BallFilter.Empty)
         {
             Set(livesEntity, new Lives(lives.Value - 1));
             var ball = BallSpawner.SpawnBall(new Vector2(
