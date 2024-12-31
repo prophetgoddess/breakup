@@ -112,7 +112,7 @@ public class Settings : MoonTools.ECS.System
         }
         else if (Some<Setting>())
         {
-            if (inputState.Launch.IsReleased && !Some<JustQuit>())
+            if (inputState.Launch.IsReleased && !Some<JustQuit>() && !Some<QuitMeter>())
             {
                 SettingsMenuSpawner.CloseSettingsMenu();
 
@@ -125,7 +125,7 @@ public class Settings : MoonTools.ECS.System
                     PauseMenuSpawner.OpenPauseMenu();
                 }
             }
-            else if (inputState.Launch.IsReleased && Some<JustQuit>())
+            else if (inputState.Launch.IsReleased && Some<JustQuit>() && !Some<QuitMeter>())
             {
                 Destroy(GetSingletonEntity<JustQuit>());
             }

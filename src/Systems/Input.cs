@@ -23,7 +23,9 @@ public struct InputState
     public ButtonState Up { get; set; }
     public ButtonState Down { get; set; }
     public ButtonState Launch { get; set; }
+#if DEBUG
     public ButtonState Restart { get; set; }
+#endif
     public ButtonState Start { get; set; }
     public ButtonState Dash { get; set; }
 }
@@ -57,9 +59,9 @@ public class Input : MoonTools.ECS.System
             Actions.Right => throw new NotImplementedException(),
             Actions.Up => throw new NotImplementedException(),
             Actions.Down => throw new NotImplementedException(),
-            Actions.Launch => Inputs.GamepadExists(0) ? Gamepad.Launch.ToString() : Keyboard.Launch.ToString(),
+            Actions.Launch => throw new NotImplementedException(),
             Actions.Restart => throw new NotImplementedException(),
-            Actions.Start => Inputs.GamepadExists(0) ? Gamepad.Start.ToString() : Keyboard.Start.ToString(),
+            Actions.Start => throw new NotImplementedException(),
             Actions.Dash => throw new NotImplementedException(),
             _ => ""
         };

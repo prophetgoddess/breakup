@@ -78,12 +78,53 @@ public class GameStateManager : MoonTools.ECS.System
             }
         }
 
-        if (inputState.Launch.IsDown && !Some<JustQuit>())
+        if (inputState.Launch.IsDown && !Some<JustQuit>() && (Some<MainMenu>() || Some<Pause>()) && !Some<UpgradeOption>())
         {
             if (holdActivationTimer < holdActivationTime)
                 holdActivationTimer += dt;
             else
+            {
                 holdTimer += dt;
+
+                if (!Some<QuitMeter>())
+                {
+                    var quitMeter = CreateEntity();
+                    Set(quitMeter, new QuitMeter());
+                    Set(quitMeter, new Model(Content.Models.Square.ID));
+                    Set(quitMeter, new Position(new Vector2(
+                            Dimensions.GameWidth * 0.5f,
+                            Dimensions.GameHeight * 0.1f
+                        )));
+                    Set(quitMeter, new Orientation(0f));
+                    Set(quitMeter, new Velocity(Vector2.Zero));
+                    Set(quitMeter, new Scale(new Vector2(0f, 4f)));
+                    Set(quitMeter, new Power(0f, 0.01f, 2f));
+                    Set(quitMeter, new DestroyOnStateTransition());
+                    Set(quitMeter, new Highlight());
+                    Set(quitMeter, new KeepOpacityWhenPaused());
+                    Set(quitMeter, new Depth(0.01f));
+                    if (Some<Player>())
+                    {
+                        Set(quitMeter, new FollowsCamera(Dimensions.GameHeight * 0.65f));
+                    }
+                    else
+                    {
+                        Set(quitMeter, new UI());
+                        Set(quitMeter, new Position(new Vector2(
+                            Dimensions.UIWidth * 0.5f,
+                            Dimensions.UIHeight * 0.525f
+                        )));
+                    }
+                }
+                else
+                {
+                    var quitMeter = GetSingletonEntity<QuitMeter>();
+                    if (Some<Player>())
+                        Set(quitMeter, new Scale(new Vector2((holdTimer / holdTime) * Dimensions.GameWidth, 4f)));
+                    else
+                        Set(quitMeter, new Scale(new Vector2((holdTimer / holdTime) * Dimensions.UIWidth, 4f)));
+                }
+            }
 
             if (holdTimer >= holdTime)
             {
@@ -97,6 +138,11 @@ public class GameStateManager : MoonTools.ECS.System
                 {
                     MainMenuSpawner.OpenMainMenu();
                 }
+                if (Some<QuitMeter>())
+                {
+                    Destroy(GetSingletonEntity<QuitMeter>());
+                }
+
                 Set(CreateEntity(), new JustQuit());
 
             }

@@ -80,6 +80,8 @@ class Program : Game
 
         new MainMenuSpawner(World).OpenMainMenu();
 
+        SDL.SDL_SetWindowResizable(MainWindow.Handle, true);
+
     }
 
     private static void HandleUnhandledException(object sender, UnhandledExceptionEventArgs args)

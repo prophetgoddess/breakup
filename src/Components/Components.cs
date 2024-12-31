@@ -82,5 +82,5 @@ public readonly record struct Setting();
 public readonly record struct SFXVolume(float Value);
 public readonly record struct MusicVolume(float Value);
 public readonly record struct Fullscreen(bool Value);
-
+public readonly record struct QuitMeter();
 public readonly record struct JustQuit();

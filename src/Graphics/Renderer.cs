@@ -117,14 +117,6 @@ public class Renderer : MoonTools.ECS.Renderer
             LayerCountOrDepth = 1,
             NumLevels = 1
         });
-
-        System.Console.WriteLine($"window: {Window.Width}x{Window.Height}");
-        System.Console.WriteLine($"gametexture: {GameTexture.Width}x{GameTexture.Height}");
-        System.Console.WriteLine($"depthtexture: {DepthTexture.Width}x{DepthTexture.Height}");
-        System.Console.WriteLine($"UItexture: {UITexture.Width}x{UITexture.Height}");
-        System.Console.WriteLine($"uidepthtexture: {UIDepthTexture.Width}x{UITexture.Height}");
-
-
     }
 
     TextBatch GetTextBatch()
