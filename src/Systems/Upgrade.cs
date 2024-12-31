@@ -143,7 +143,7 @@ public class Upgrade : MoonTools.ECS.System
                     Set(InRelationSingleton<HorizontalConnection>(selected), new Selected());
                 }
             }
-            if (inputState.Swing.IsPressed && !HasOutRelation<CantSelectUpgrade>(selected))
+            if (inputState.Launch.IsPressed && !HasOutRelation<CantSelectUpgrade>(selected))
             {
                 if (GiveUpgrade(selected))
                 {

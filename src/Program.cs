@@ -54,7 +54,7 @@ class Program : Game
         Systems =
         [
             new Input(World, Inputs),
-            new GameStateManager(World),
+            new GameStateManager(World, this),
             new Time(World),
             new Flickering(World),
             new PlayerController(World),
@@ -79,7 +79,6 @@ class Program : Game
         World.Set(World.CreateEntity(), Palettes.MillenialApartment);
 
         new MainMenuSpawner(World).OpenMainMenu();
-
 
     }
 

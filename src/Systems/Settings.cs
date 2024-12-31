@@ -100,15 +100,19 @@ public class Settings : MoonTools.ECS.System
         {
             if (!Some<Player>() || Some<Pause>())
             {
-                if (inputState.Swing.IsPressed)
+                if (inputState.Launch.IsReleased && !Some<JustQuit>())
                 {
                     SettingsMenuSpawner.OpenSettingsMenu();
+                }
+                else if (inputState.Launch.IsReleased && Some<JustQuit>())
+                {
+                    Destroy(GetSingletonEntity<JustQuit>());
                 }
             }
         }
         else if (Some<Setting>())
         {
-            if (inputState.Swing.IsPressed)
+            if (inputState.Launch.IsReleased && !Some<JustQuit>())
             {
                 SettingsMenuSpawner.CloseSettingsMenu();
 
@@ -120,6 +124,10 @@ public class Settings : MoonTools.ECS.System
                 {
                     PauseMenuSpawner.OpenPauseMenu();
                 }
+            }
+            else if (inputState.Launch.IsReleased && Some<JustQuit>())
+            {
+                Destroy(GetSingletonEntity<JustQuit>());
             }
 
             if (Some<Selected>())

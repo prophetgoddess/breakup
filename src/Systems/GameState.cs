@@ -1,5 +1,7 @@
 using System.Numerics;
 using MoonTools.ECS;
+using MoonWorks;
+using SDL3;
 using Filter = MoonTools.ECS.Filter;
 
 namespace Ball;
@@ -13,11 +15,20 @@ public class GameStateManager : MoonTools.ECS.System
     BallSpawner BallSpawner;
     SaveGame SaveGame;
     MainMenuSpawner MainMenuSpawner;
+    SettingsMenuSpawner SettingsMenuSpawner;
     PauseMenuSpawner PauseMenuSpawner;
     GameSpawner GameSpawner;
+    Game Game;
 
-    public GameStateManager(World world) : base(world)
+    float holdActivationTime = 0.5f;
+    float holdTime = 1f;
+
+    float holdActivationTimer = 0f;
+    float holdTimer = 0f;
+
+    public GameStateManager(World world, Game game) : base(world)
     {
+        Game = game;
         DestroyFilter = FilterBuilder.Include<DestroyOnStateTransition>().Exclude<DontDestroyOnNextTransition>().Build();
         DontDestroyFilter = FilterBuilder.Include<DestroyOnStateTransition>().Include<DontDestroyOnNextTransition>().Build();
 
@@ -26,6 +37,7 @@ public class GameStateManager : MoonTools.ECS.System
         BallSpawner = new BallSpawner(world);
         SaveGame = new SaveGame(world);
         MainMenuSpawner = new MainMenuSpawner(world);
+        SettingsMenuSpawner = new SettingsMenuSpawner(world);
         PauseMenuSpawner = new PauseMenuSpawner(world);
         GameSpawner = new GameSpawner(world);
     }
@@ -40,10 +52,15 @@ public class GameStateManager : MoonTools.ECS.System
     public override void Update(TimeSpan delta)
     {
         var inputState = GetSingleton<InputState>();
+        var dt = (float)delta.TotalSeconds;
 
         if (inputState.Start.IsPressed)
         {
-            if (Some<Pause>() && !Some<Selected>() && !Some<MainMenu>())
+            if (Some<MainMenu>())
+            {
+                GameSpawner.StartGame();
+            }
+            else if (Some<Pause>() && !Some<Selected>() && !Some<MainMenu>())
             {
                 foreach (var entity in DestroyFilter.Entities)
                 {
@@ -53,7 +70,42 @@ public class GameStateManager : MoonTools.ECS.System
                 {
                     Remove<DontDestroyOnNextTransition>(entity);
                 }
+
             }
+            else if (!Some<Pause>() && !Some<Selected>() && !Some<MainMenu>())
+            {
+                PauseMenuSpawner.OpenPauseMenu();
+            }
+        }
+
+        if (inputState.Launch.IsDown && !Some<JustQuit>())
+        {
+            if (holdActivationTimer < holdActivationTime)
+                holdActivationTimer += dt;
+            else
+                holdTimer += dt;
+
+            if (holdTimer >= holdTime)
+            {
+                holdActivationTimer = 0f;
+                holdTimer = 0f;
+                if (Some<MainMenu>())
+                {
+                    Game.Quit();
+                }
+                else if (Some<Pause>() && !Some<MainMenu>())
+                {
+                    MainMenuSpawner.OpenMainMenu();
+                }
+                Set(CreateEntity(), new JustQuit());
+
+            }
+        }
+        else
+        {
+
+            holdActivationTimer = 0f;
+            holdTimer = 0f;
         }
 
         if (Some<Lives>() && GetSingleton<Lives>().Value <= 0)
@@ -76,14 +128,7 @@ public class GameStateManager : MoonTools.ECS.System
             Set(revive, new ReviveWithOneHealth(true));
         }
 
-        if (
-#if DEBUG
-            (Some<DestroyOnStateTransition>() && inputState.Restart.IsPressed) ||
-#endif
-            (Some<MainMenu>() && inputState.Start.IsPressed))
-        {
-            GameSpawner.StartGame();
-        }
+
 
         if (!Some<Gems>())
             return;

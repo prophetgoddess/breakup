@@ -35,7 +35,7 @@ public class PlayerController : MoonTools.ECS.System
             movementDelta += Vector2.UnitX;
         }
 
-        if (inputState.Swing.IsPressed && !HasOutRelation<Spinning>(player))
+        if (inputState.Launch.IsPressed && !HasOutRelation<Spinning>(player))
         {
             var timerEntity = CreateEntity();
             Set(timerEntity, new Timer(0.25f));

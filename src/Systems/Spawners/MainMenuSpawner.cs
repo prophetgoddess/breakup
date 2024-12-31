@@ -63,22 +63,17 @@ public class MainMenuSpawner : Manipulator
             Set(entity, new Invisible());
         }
 
-        MarqueeSpawner.SpawnMarquee("break.up", Fonts.HeaderFont, Fonts.TitleSize, 3, 100f, UILayoutConstants.TitleY);
+        Set(MarqueeSpawner.SpawnMarquee("break.up", Fonts.HeaderFont, Fonts.TitleSize, 3, 100f, UILayoutConstants.TitleY), new MainMenu());
 
         MarqueeSpawner.SpawnMarquee("press start", Fonts.BodyFont, Fonts.PromptSize, 7.0f, -100f, UILayoutConstants.PromptY);
 
-        var scores = CreateEntity();
-        Set(scores, new Position(new Vector2(UILayoutConstants.PromptX, 10)));
-        Set(scores,
-         new Text(
-            Fonts.BodyFont,
-            Fonts.PromptSize,
-            Stores.TextStorage.GetID($"last {(Some<Score>() ? GetSingleton<Score>().Current.ToString() : "NONE")} - best {(Some<HighScore>() ? GetSingleton<HighScore>().Value.ToString() : "NONE")}"),
-            MoonWorks.Graphics.Font.HorizontalAlignment.Center,
-            MoonWorks.Graphics.Font.VerticalAlignment.Top));
-        Set(scores, new UI());
-        Set(scores, new DestroyOnStateTransition());
-        Set(scores, new MainMenu());
+        MarqueeSpawner.SpawnMarquee(
+            $"last {(Some<Score>() ? GetSingleton<Score>().Current.ToString() : "NONE")} - best {(Some<HighScore>() ? GetSingleton<HighScore>().Value.ToString() : "NONE")}",
+             Fonts.BodyFont, Fonts.PromptSize, 4.0f, -100f, 20);
+
+
+        MarqueeSpawner.SpawnMarquee($"press X for settings - hold to quit", Fonts.BodyFont, Fonts.PromptSize, 3.0f, 100f, Dimensions.UIHeight - 20.0f);
+
 
     }
 }

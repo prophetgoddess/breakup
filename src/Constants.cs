@@ -23,6 +23,7 @@ public static class Fonts
 {
     public static int HeaderFont = Stores.FontStorage.GetID(Content.Fonts.F500Angular);
     public static int BodyFont = Stores.FontStorage.GetID(Content.Fonts.F5000);
+    public static int ButtonFont = Stores.FontStorage.GetID(Content.Fonts.promptfont);
 
     public const int TitleSize = 72;
     public const int HeaderSize = 52;

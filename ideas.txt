@@ -1,1 +1,0 @@
-- paddle should get more powerful as blocks are broken, filling up a meter, which decays over time
