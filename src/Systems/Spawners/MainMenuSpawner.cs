@@ -72,7 +72,7 @@ public class MainMenuSpawner : Manipulator
              Fonts.BodyFont, Fonts.PromptSize, 4.0f, -100f, 20);
 
 
-        MarqueeSpawner.SpawnMarquee($"press X for settings - hold to quit", Fonts.BodyFont, Fonts.PromptSize, 3.0f, 100f, Dimensions.UIHeight - 20.0f);
+        MarqueeSpawner.SpawnMarquee($"press launch for settings - hold to quit", Fonts.BodyFont, Fonts.PromptSize, 3.0f, 100f, Dimensions.UIHeight - 20.0f);
 
 
     }
