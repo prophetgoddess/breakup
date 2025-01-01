@@ -53,6 +53,9 @@ public class Renderer : MoonTools.ECS.Renderer
     {
         var windowRatio = Window.Width / Window.Height;
 
+        if (GameTexture != null)
+            GameTexture.Dispose();
+
         GameTexture = Texture.Create(GraphicsDevice, new TextureCreateInfo
         {
             Type = TextureType.TwoDimensional,
@@ -65,6 +68,9 @@ public class Renderer : MoonTools.ECS.Renderer
             NumLevels = 1
         });
 
+        if (DepthTexture != null)
+            DepthTexture.Dispose();
+
         DepthTexture = Texture.Create(GraphicsDevice, new TextureCreateInfo
         {
             Type = TextureType.TwoDimensional,
@@ -76,6 +82,12 @@ public class Renderer : MoonTools.ECS.Renderer
             LayerCountOrDepth = 1,
             NumLevels = 1
         });
+
+        if (UITexture != null)
+        {
+            UITexture.Dispose();
+        }
+
 
         if (windowRatio >= Dimensions.UIAspectRatio)
         {
@@ -104,6 +116,11 @@ public class Renderer : MoonTools.ECS.Renderer
                 LayerCountOrDepth = 1,
                 NumLevels = 1
             });
+        }
+
+        if (UIDepthTexture != null)
+        {
+            UIDepthTexture.Dispose();
         }
 
         UIDepthTexture = Texture.Create(GraphicsDevice, new TextureCreateInfo

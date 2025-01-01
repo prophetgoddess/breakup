@@ -1,6 +1,7 @@
 using System.Numerics;
 using MoonTools.ECS;
 using MoonWorks;
+using MoonWorks.Math;
 using SDL3;
 using Filter = MoonTools.ECS.Filter;
 
@@ -119,10 +120,11 @@ public class GameStateManager : MoonTools.ECS.System
                 else
                 {
                     var quitMeter = GetSingletonEntity<QuitMeter>();
+                    var t = Easing.InOutQuad(holdTimer / holdTime);
                     if (Some<Player>())
-                        Set(quitMeter, new Scale(new Vector2((holdTimer / holdTime) * Dimensions.GameWidth, 4f)));
+                        Set(quitMeter, new Scale(new Vector2(t * Dimensions.GameWidth, 4f)));
                     else
-                        Set(quitMeter, new Scale(new Vector2((holdTimer / holdTime) * Dimensions.UIWidth, 4f)));
+                        Set(quitMeter, new Scale(new Vector2(t * Dimensions.UIWidth, 4f)));
                 }
             }
 
