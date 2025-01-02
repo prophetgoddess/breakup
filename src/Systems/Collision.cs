@@ -208,11 +208,14 @@ public class Collision : MoonTools.ECS.System
             if (Some<BarrierTakesExtraHit>() && GetSingleton<BarrierTakesExtraHit>().Active)
             {
                 Set(GetSingletonEntity<BarrierTakesExtraHit>(), new BarrierTakesExtraHit(false));
+                Set(GetSingletonEntity<DestroysBall>(), new Invisible());
                 return;
             }
             else if (Some<BarrierTakesExtraHit>() && !GetSingleton<BarrierTakesExtraHit>().Active)
             {
                 Set(GetSingletonEntity<BarrierTakesExtraHit>(), new BarrierTakesExtraHit(true));
+                Remove<Invisible>(GetSingletonEntity<DestroysBall>());
+
             }
 
             var player = GetSingletonEntity<Player>();

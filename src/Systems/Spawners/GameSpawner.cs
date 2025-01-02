@@ -110,6 +110,10 @@ public class GameSpawner : Manipulator
         Set(bottomBound, new DestroysBall());
         Set(bottomBound, new FollowsCamera(Dimensions.GameHeight + 8));
         Set(bottomBound, new DestroyOnStateTransition());
+        Set(bottomBound, new Model(Content.Models.Square.ID));
+        Set(bottomBound, new Scale(new Vector2(Dimensions.GameWidth, 26.0f)));
+        Set(bottomBound, new Highlight());
+        Set(bottomBound, new Invisible());
 
         var cameraEntity = CreateEntity();
         Set(cameraEntity, new CameraPosition(0f));
