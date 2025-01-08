@@ -88,12 +88,20 @@ public class Settings : MoonTools.ECS.System
                     MoonWorks.Graphics.Font.HorizontalAlignment.Left,
                     MoonWorks.Graphics.Font.VerticalAlignment.Middle));
         }
+        if (Has<RebindControls>(setting))
+        {
+            Set(GetSingletonEntity<RebindControls>(), new RebindControls(true));
+        }
 
         SaveGame.Save();
     }
 
     public override void Update(TimeSpan delta)
     {
+        var rebinding = Some<RebindControls>() && GetSingleton<RebindControls>().Rebinding == true;
+        if (rebinding)
+            return;
+
         var inputState = GetSingleton<InputState>();
 
         if (!Some<Setting>() && !Some<UpgradeOption>())
@@ -166,7 +174,6 @@ public class Settings : MoonTools.ECS.System
                     AdjustSetting(selected, 1);
                 }
             }
-
         }
     }
 

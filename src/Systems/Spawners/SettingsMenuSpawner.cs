@@ -173,6 +173,33 @@ public class SettingsMenuSpawner : Manipulator
 
         Relate(sfxVolumeLabel, fullscreenLabel, new VerticalConnection());
 
+        startY += Some<Player>() ? 30f : 50f;
+
+        var rb = CreateEntity();
+        Set(rb, new RebindControls(false));
+
+        var rebindLabel = CreateEntity();
+        Set(rebindLabel,
+            new Position(new Vector2(x, startY)));
+        Set(rebindLabel,
+         new Text(
+            Fonts.HeaderFont,
+            Some<Player>() ? Fonts.PromptSize : Fonts.BodySize,
+            Stores.TextStorage.GetID("rebind controls"),
+            MoonWorks.Graphics.Font.HorizontalAlignment.Left,
+            MoonWorks.Graphics.Font.VerticalAlignment.Middle));
+        Set(rebindLabel, new KeepOpacityWhenPaused());
+        Set(rebindLabel, new Depth(0.1f));
+        Set(rebindLabel, new FollowsCamera(startY));
+        Set(rebindLabel, new DestroyOnStateTransition());
+        Set(rebindLabel, new Setting());
+        Relate(rebindLabel, rb, new SettingControls());
+        Relate(rebindLabel, rb, new SettingDisplay());
+        if (!Some<Player>())
+            Set(rebindLabel, new UI());
+
+        Relate(fullscreenLabel, rebindLabel, new VerticalConnection());
+
     }
 
 }
