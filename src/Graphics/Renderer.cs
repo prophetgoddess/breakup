@@ -41,8 +41,6 @@ public class Renderer : MoonTools.ECS.Renderer
     DepthUniforms DepthUniforms;
     StringBuilder StringBuilder = new StringBuilder();
 
-    Texture QRCode;
-
     public Buffer RectIndexBuffer;
     public Buffer RectVertexBuffer;
 
@@ -322,15 +320,6 @@ public class Renderer : MoonTools.ECS.Renderer
 
         QuadVertexBuffer = resourceUploader.CreateBuffer(vertexData, BufferUsageFlags.Vertex);
         QuadIndexBuffer = resourceUploader.CreateBuffer(indexData, BufferUsageFlags.Index);
-
-        QRCode = resourceUploader.CreateTexture2DFromCompressed(
-            Path.Join(
-                System.AppContext.BaseDirectory,
-                "qrcode.png"
-            ),
-            Window.SwapchainFormat,
-            TextureUsageFlags.Sampler
-        );
 
         resourceUploader.Upload();
         resourceUploader.Dispose();

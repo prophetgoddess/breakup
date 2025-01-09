@@ -6,7 +6,19 @@
     </Target>
 
         <ItemGroup Condition="$(Configuration)=='Debug'">
+            <Content Include="..\moonlibs\win64\**\*.*" >
+                <Link>%(RecursiveDir)%(Filename)%(Extension)</Link>
+                <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+            </Content>
             <Content Include="..\moonlibs\macos\**\*.*" >
+                <Link>%(RecursiveDir)%(Filename)%(Extension)</Link>
+                <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+            </Content>
+            <Content Include="..\moonlibs\win64\**\*.*" >
+                <Link>%(RecursiveDir)%(Filename)%(Extension)</Link>
+                <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+            </Content>
+            <Content Include="..\moonlibs\lib64\**\*.*" >
                 <Link>%(RecursiveDir)%(Filename)%(Extension)</Link>
                 <CopyToOutputDirectory>Always</CopyToOutputDirectory>
             </Content>
