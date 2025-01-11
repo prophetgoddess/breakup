@@ -2,14 +2,11 @@
 using MoonWorks;
 using MoonWorks.Graphics;
 using SDL3;
-using Steamworks;
 
 namespace Ball;
 
 class Program : Game
 {
-    public static bool SteamInitialized { get; private set; }
-
     World World = new World();
     Renderer Renderer;
     MoonTools.ECS.System[] Systems;
@@ -30,22 +27,6 @@ class Program : Game
         var saveData = new SaveGame(World).Load();
         MainWindow.SetScreenMode(saveData.Fullscreen ? ScreenMode.Fullscreen : ScreenMode.Windowed);
         World.Set(World.CreateEntity(), new Fullscreen(saveData.Fullscreen));
-
-        if (!SteamInitialized)
-        {
-            if (SteamAPI.RestartAppIfNecessary(AppId_t.Invalid))
-            {
-                SDL.SDL_Quit();
-                return;
-            }
-
-            SteamInitialized = SteamAPI.Init();
-
-            if (!SteamInitialized)
-            {
-                Console.WriteLine("Failed to initialize Steam API!");
-            }
-        }
 
         AppDomain.CurrentDomain.UnhandledException += HandleUnhandledException;
 

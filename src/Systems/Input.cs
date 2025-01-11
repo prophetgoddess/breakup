@@ -98,7 +98,7 @@ public class Input : MoonTools.ECS.System
                 new Text(
                     Fonts.HeaderFont,
                     Some<Player>() ? Fonts.PromptSize : Fonts.BodySize,
-                    Stores.TextStorage.GetID(RebindState.ToString()),
+                    Stores.TextStorage.GetID("Press" + RebindState.ToString()),
                     MoonWorks.Graphics.Font.HorizontalAlignment.Left,
                     MoonWorks.Graphics.Font.VerticalAlignment.Middle));
 
