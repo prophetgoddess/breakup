@@ -58,7 +58,7 @@ public class Blocks : MoonTools.ECS.System
         }
 
         var block = CreateEntity();
-        Set(block, new Scale(Vector2.One * 1.9f));
+        Set(block, new Scale(Vector2.One * 32));
         Set(block, new Position(new Vector2(CellSize * 0.5f + x * CellSize, CellSize * 0.5f + y * CellSize)));
         Set(block, new BoundingBox(0, 0, 32, 32));
         Set(block, new SolidCollision());
@@ -68,7 +68,7 @@ public class Blocks : MoonTools.ECS.System
         if (Rando.Value < 0.75f && !unbreakable)
         {
             Set(block, new HitPoints(hp, hp));
-            Set(block, new Model(Content.Models.RoundEmptySquare.ID));
+            Set(block, new SDFGraphic(Content.SDF.RoundedHollowSquare));
 
             Set(block, new CanTakeDamage());
             var hpDisplay = CreateEntity();
@@ -93,7 +93,7 @@ public class Blocks : MoonTools.ECS.System
         }
         else
         {
-            Set(block, new Model(Content.Models.RoundSquare.ID));
+            Set(block, new SDFGraphic(Content.SDF.RoundedSquare));
         }
     }
 

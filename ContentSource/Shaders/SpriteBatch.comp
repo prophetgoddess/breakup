@@ -6,6 +6,7 @@ struct SpriteComputeData
 	float rotation;
 	vec2 scale;
 	vec4 color;
+	vec4 texcoord;
 };
 
 struct SpriteVertex
@@ -67,10 +68,17 @@ void main()
 	vertexData[n*4+2].position = Model * bottomLeft;
 	vertexData[n*4+3].position = Model * bottomRight;
 
-	vertexData[n*4]  .texcoord = vec2(0, 0);
-	vertexData[n*4+1].texcoord = vec2(1, 0);
-	vertexData[n*4+2].texcoord = vec2(0, 1);
-	vertexData[n*4+3].texcoord = vec2(1, 1);
+	vertexData[n*4].texcoord = 
+	vec2(currentSpriteData.texcoord.x, currentSpriteData.texcoord.y);
+
+	vertexData[n*4+1].texcoord = 
+	vec2(currentSpriteData.texcoord.x + currentSpriteData.texcoord.z, currentSpriteData.texcoord.y);
+	
+	vertexData[n*4+2].texcoord = 
+	vec2(currentSpriteData.texcoord.x, currentSpriteData.texcoord.y + currentSpriteData.texcoord.w);
+	
+	vertexData[n*4+3].texcoord = 
+	vec2(currentSpriteData.texcoord.x + currentSpriteData.texcoord.z, currentSpriteData.texcoord.y + currentSpriteData.texcoord.w);
 
 	vertexData[n*4]  .color = currentSpriteData.color;
 	vertexData[n*4+1].color = currentSpriteData.color;

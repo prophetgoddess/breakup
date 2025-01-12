@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="16"
+   height="16"
+   viewBox="0 0 4.2333333 4.2333333"
+   version="1.1"
+   id="svg1"
+   inkscape:version="1.4 (e7c3feb1, 2024-10-09)"
+   sodipodi:docname="RoundedHollowSquare.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#000000"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="mm"
+     inkscape:zoom="57.527721"
+     inkscape:cx="5.7798222"
+     inkscape:cy="7.9092303"
+     inkscape:window-width="2304"
+     inkscape:window-height="1387"
+     inkscape:window-x="1512"
+     inkscape:window-y="25"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="layer1" />
+  <defs
+     id="defs1" />
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <path
+       style="fill:#ffffff;paint-order:stroke fill markers"
+       d="m 0.703125,-0.00195313 c -0.38721167,0 -0.70507813,0.31786646 -0.70507813,0.70507813 v 2.8261719 c 0,0.3872116 0.31786646,0.7070312 0.70507813,0.7070312 h 2.8261719 c 0.3872116,0 0.7070312,-0.3198196 0.7070312,-0.7070312 V 0.703125 c 0,-0.38721167 -0.3198196,-0.70507813 -0.7070312,-0.70507813 z m 0,0.47070313 h 2.8261719 c 0.134554,0 0.2363281,0.099821 0.2363281,0.234375 v 2.8261719 c 0,0.134554 -0.1017741,0.2363281 -0.2363281,0.2363281 H 0.703125 C 0.56857099,3.765625 0.46875,3.6638509 0.46875,3.5292969 V 0.703125 c 0,-0.13455401 0.099821,-0.234375 0.234375,-0.234375 z"
+       id="rect1" />
+  </g>
+</svg>

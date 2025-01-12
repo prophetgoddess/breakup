@@ -52,7 +52,8 @@ public class Renderer : MoonTools.ECS.Renderer
     Buffer SpriteIndexBuffer;
     const int MAX_SPRITE_COUNT = 8192;
 
-    [StructLayout(LayoutKind.Explicit, Size = 48)]
+
+    [StructLayout(LayoutKind.Explicit, Size = 64)]
     struct ComputeSpriteData
     {
         [FieldOffset(0)]
@@ -66,8 +67,10 @@ public class Renderer : MoonTools.ECS.Renderer
 
         [FieldOffset(32)]
         public Vector4 Color;
-    }
 
+        [FieldOffset(48)]
+        public Vector4 TextureRect;
+    }
 
     TransferBuffer SpriteComputeTransferBuffer;
 
@@ -265,9 +268,11 @@ public class Renderer : MoonTools.ECS.Renderer
                     new ColorTargetDescription
                     {
                         Format = Window.SwapchainFormat,
-                        BlendState = ColorTargetBlendState.NonPremultipliedAlphaBlend
+                        BlendState = ColorTargetBlendState.PremultipliedAlphaBlend
                     }
-                ]
+                ],
+                HasDepthStencilTarget = true,
+                DepthStencilFormat = TextureFormat.D16Unorm
             },
             DepthStencilState = new DepthStencilState
             {
@@ -315,19 +320,6 @@ public class Renderer : MoonTools.ECS.Renderer
         };
 
         TextPipeline = GraphicsPipeline.Create(GraphicsDevice, textPipelineCreateInfo);
-
-        Span<PositionTextureVertex> vertexData = [
-            new PositionTextureVertex(new Vector3(-1,  1, 0), new Vector2(0, 0)),
-            new PositionTextureVertex(new Vector3( 1,  1, 0), new Vector2(4, 0)),
-            new PositionTextureVertex(new Vector3( 1, -1, 0), new Vector2(4, 4)),
-            new PositionTextureVertex(new Vector3(-1, -1, 0), new Vector2(0, 4)),
-        ];
-
-        Span<ushort> indexData = [
-            0, 1, 2,
-            0, 2, 3,
-        ];
-
 
         var resourceUploader = new ResourceUploader(GraphicsDevice);
         RectVertexBuffer = resourceUploader.CreateBuffer(
@@ -525,10 +517,14 @@ public class Renderer : MoonTools.ECS.Renderer
             color.A = Has<Alpha>(entity) ? Get<Alpha>(entity).A : color.A;
             var depth = Has<Depth>(entity) ? Get<Depth>(entity).Value : 0.5f;
 
-            data[sdfIndex].Position = new Vector3(position.X, position.Y, 0);
+            if (Some<Pause>() && !Has<KeepOpacityWhenPaused>(entity))
+                color.A = 200;
+
+            data[sdfIndex].Position = new Vector3(position.X, position.Y, depth);
             data[sdfIndex].Rotation = rotation;
             data[sdfIndex].Size = scale;
             data[sdfIndex].Color = color.ToVector4();
+            data[sdfIndex].TextureRect = uv;
             sdfIndex++;
         }
         SpriteComputeTransferBuffer.Unmap();
@@ -636,7 +632,6 @@ public class Renderer : MoonTools.ECS.Renderer
             Filter = MoonWorks.Graphics.Filter.Linear,
             Cycle = false
         });
-
 
         var uiPass = cmdbuf.BeginRenderPass(
             new DepthStencilTargetInfo(UIDepthTexture, 1f, false),
