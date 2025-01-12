@@ -42,7 +42,7 @@ public class SettingsMenuSpawner : Manipulator
 
         MarqueeSpawner.SpawnMarquee("Settings", Fonts.HeaderFont, Some<Player>() ? Fonts.HeaderSize : Fonts.TitleSize, Some<Player>() ? 2 : 3, 100f, height * 0.1f);
 
-        MarqueeSpawner.SpawnMarquee($"press {Input.GetButtonName(Actions.Cancel)} to go back", Fonts.BodyFont, Some<Player>() ? Fonts.InfoSize : Fonts.PromptSize, Some<Player>() ? 3 : 4, -100f, height * 0.2f);
+        MarqueeSpawner.SpawnMarquee($"press {Input.GetButtonName(Actions.Cancel)} to go back", Fonts.BodyFont, Some<Player>() ? Fonts.InfoSize : Fonts.PromptSize, Some<Player>() ? 2 : 3, -100f, height * 0.2f);
 
 
         var startY = height * 0.3f;
