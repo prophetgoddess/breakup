@@ -38,34 +38,63 @@ public class Input : MoonTools.ECS.System
 
     Actions RebindState = (Actions)0;
 
-    static Dictionary<Actions, KeyboardButton> Keyboard = new();
-    static Dictionary<Actions, GamepadButton> Gamepad = new();
+    SaveGame SaveGame;
+
+    public static Dictionary<Actions, KeyboardButton> Keyboard;
+    public static Dictionary<Actions, GamepadButton> Gamepad;
 
     public Input(World world, Inputs inputs) : base(world)
     {
         Inputs = inputs;
 
-        Keyboard[Actions.Up] = Inputs.Keyboard.Button(KeyCode.Up);
-        Keyboard[Actions.Down] = Inputs.Keyboard.Button(KeyCode.Down);
-        Keyboard[Actions.Left] = Inputs.Keyboard.Button(KeyCode.Left);
-        Keyboard[Actions.Right] = Inputs.Keyboard.Button(KeyCode.Right);
-        Keyboard[Actions.Launch] = Inputs.Keyboard.Button(KeyCode.Space);
-        Keyboard[Actions.Start] = Inputs.Keyboard.Button(KeyCode.Return);
-#if DEBUG
-        Keyboard[Actions.Restart] = Inputs.Keyboard.Button(KeyCode.R);
-#endif
-        Keyboard[Actions.Dash] = Inputs.Keyboard.Button(KeyCode.LeftShift);
+        SaveGame = new SaveGame(world);
+        var save = SaveGame.Load();
+        Keyboard = new();
 
-        Gamepad[Actions.Up] = Inputs.GetGamepad(0).DpadUp;
-        Gamepad[Actions.Down] = Inputs.GetGamepad(0).DpadDown;
-        Gamepad[Actions.Left] = Inputs.GetGamepad(0).DpadLeft;
-        Gamepad[Actions.Right] = Inputs.GetGamepad(0).DpadRight;
-        Gamepad[Actions.Launch] = Inputs.GetGamepad(0).A;
-        Gamepad[Actions.Start] = Inputs.GetGamepad(0).Start;
+
+        if (save.Keyboard == null)
+        {
+            Keyboard[Actions.Up] = Inputs.Keyboard.Button(KeyCode.Up);
+            Keyboard[Actions.Down] = Inputs.Keyboard.Button(KeyCode.Down);
+            Keyboard[Actions.Left] = Inputs.Keyboard.Button(KeyCode.Left);
+            Keyboard[Actions.Right] = Inputs.Keyboard.Button(KeyCode.Right);
+            Keyboard[Actions.Launch] = Inputs.Keyboard.Button(KeyCode.Space);
+            Keyboard[Actions.Start] = Inputs.Keyboard.Button(KeyCode.Return);
 #if DEBUG
-        Gamepad[Actions.Restart] = Inputs.GetGamepad(0).Guide;
+            Keyboard[Actions.Restart] = Inputs.Keyboard.Button(KeyCode.R);
 #endif
-        Gamepad[Actions.Dash] = Inputs.GetGamepad(0).RightShoulder;
+            Keyboard[Actions.Dash] = Inputs.Keyboard.Button(KeyCode.LeftShift);
+        }
+        else
+        {
+            foreach (var (action, code) in save.Keyboard)
+            {
+                Keyboard[action] = Inputs.Keyboard.Button(code);
+            }
+        }
+
+        Gamepad = new();
+
+        if (save.Gamepad == null)
+        {
+            Gamepad[Actions.Up] = Inputs.GetGamepad(0).DpadUp;
+            Gamepad[Actions.Down] = Inputs.GetGamepad(0).DpadDown;
+            Gamepad[Actions.Left] = Inputs.GetGamepad(0).DpadLeft;
+            Gamepad[Actions.Right] = Inputs.GetGamepad(0).DpadRight;
+            Gamepad[Actions.Launch] = Inputs.GetGamepad(0).A;
+            Gamepad[Actions.Start] = Inputs.GetGamepad(0).Start;
+#if DEBUG
+            Gamepad[Actions.Restart] = Inputs.GetGamepad(0).Guide;
+#endif
+            Gamepad[Actions.Dash] = Inputs.GetGamepad(0).RightShoulder;
+        }
+        else
+        {
+            foreach (var (action, code) in save.Gamepad)
+            {
+                Gamepad[action] = Inputs.GetGamepad(0).Button(code);
+            }
+        }
 
         var inputEntity = CreateEntity();
         Set(inputEntity, InputState());
@@ -115,6 +144,8 @@ public class Input : MoonTools.ECS.System
                         Stores.TextStorage.GetID("rebind controls"),
                         MoonWorks.Graphics.Font.HorizontalAlignment.Left,
                         MoonWorks.Graphics.Font.VerticalAlignment.Middle));
+
+                SaveGame.Save();
             }
         }
     }
