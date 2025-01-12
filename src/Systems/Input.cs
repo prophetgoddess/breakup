@@ -12,7 +12,10 @@ public enum Actions
     Down,
     Launch,
     Start,
-    Dash
+    Dash,
+#if DEBUG
+    Restart
+#endif
 }
 
 public struct InputState
@@ -29,63 +32,48 @@ public struct InputState
     public ButtonState Dash { get; set; }
 }
 
-public class ControlSet
-{
-    public VirtualButton Left { get; set; } = new EmptyButton();
-    public VirtualButton Right { get; set; } = new EmptyButton();
-    public VirtualButton Up { get; set; } = new EmptyButton();
-    public VirtualButton Down { get; set; } = new EmptyButton();
-    public VirtualButton Launch { get; set; } = new EmptyButton();
-#if DEBUG
-    public VirtualButton Restart { get; set; } = new EmptyButton();
-#endif
-    public VirtualButton Start { get; set; } = new EmptyButton();
-    public VirtualButton Dash { get; set; } = new EmptyButton();
-}
-
 public class Input : MoonTools.ECS.System
 {
     static Inputs Inputs { get; set; }
 
-    Actions RebindState = Actions.Left;
+    Actions RebindState = (Actions)0;
 
-    static ControlSet Keyboard = new ControlSet();
-    static ControlSet Gamepad = new ControlSet();
+    static Dictionary<Actions, KeyboardButton> Keyboard = new();
+    static Dictionary<Actions, GamepadButton> Gamepad = new();
 
     public Input(World world, Inputs inputs) : base(world)
     {
         Inputs = inputs;
 
-        Keyboard.Up = Inputs.Keyboard.Button(KeyCode.Up);
-        Keyboard.Down = Inputs.Keyboard.Button(KeyCode.Down);
-        Keyboard.Left = Inputs.Keyboard.Button(KeyCode.Left);
-        Keyboard.Right = Inputs.Keyboard.Button(KeyCode.Right);
-        Keyboard.Launch = Inputs.Keyboard.Button(KeyCode.Space);
-        Keyboard.Start = Inputs.Keyboard.Button(KeyCode.Return);
+        Keyboard[Actions.Up] = Inputs.Keyboard.Button(KeyCode.Up);
+        Keyboard[Actions.Down] = Inputs.Keyboard.Button(KeyCode.Down);
+        Keyboard[Actions.Left] = Inputs.Keyboard.Button(KeyCode.Left);
+        Keyboard[Actions.Right] = Inputs.Keyboard.Button(KeyCode.Right);
+        Keyboard[Actions.Launch] = Inputs.Keyboard.Button(KeyCode.Space);
+        Keyboard[Actions.Start] = Inputs.Keyboard.Button(KeyCode.Return);
 #if DEBUG
-        Keyboard.Restart = Inputs.Keyboard.Button(KeyCode.R);
+        Keyboard[Actions.Restart] = Inputs.Keyboard.Button(KeyCode.R);
 #endif
-        Keyboard.Dash = Inputs.Keyboard.Button(KeyCode.LeftShift);
+        Keyboard[Actions.Dash] = Inputs.Keyboard.Button(KeyCode.LeftShift);
 
-        Gamepad.Up = Inputs.GetGamepad(0).DpadUp;
-        Gamepad.Down = Inputs.GetGamepad(0).DpadDown;
-        Gamepad.Left = Inputs.GetGamepad(0).DpadLeft;
-        Gamepad.Right = Inputs.GetGamepad(0).DpadRight;
-        Gamepad.Launch = Inputs.GetGamepad(0).A;
-        Gamepad.Start = Inputs.GetGamepad(0).Start;
+        Gamepad[Actions.Up] = Inputs.GetGamepad(0).DpadUp;
+        Gamepad[Actions.Down] = Inputs.GetGamepad(0).DpadDown;
+        Gamepad[Actions.Left] = Inputs.GetGamepad(0).DpadLeft;
+        Gamepad[Actions.Right] = Inputs.GetGamepad(0).DpadRight;
+        Gamepad[Actions.Launch] = Inputs.GetGamepad(0).A;
+        Gamepad[Actions.Start] = Inputs.GetGamepad(0).Start;
 #if DEBUG
-        Gamepad.Restart = Inputs.GetGamepad(0).Guide;
+        Gamepad[Actions.Restart] = Inputs.GetGamepad(0).Guide;
 #endif
-        Gamepad.Dash = Inputs.GetGamepad(0).RightShoulder;
+        Gamepad[Actions.Dash] = Inputs.GetGamepad(0).RightShoulder;
 
         var inputEntity = CreateEntity();
-        Set(inputEntity, InputState(Keyboard, Gamepad));
+        Set(inputEntity, InputState());
     }
 
     public override void Update(TimeSpan delta)
     {
-
-        InputState inputState = InputState(Keyboard, Gamepad);
+        InputState inputState = InputState();
         Set(GetSingletonEntity<InputState>(), inputState);
 
         var rebinding = Some<RebindControls>() && GetSingleton<RebindControls>().Rebinding == true;
@@ -98,96 +86,21 @@ public class Input : MoonTools.ECS.System
                 new Text(
                     Fonts.HeaderFont,
                     Some<Player>() ? Fonts.PromptSize : Fonts.BodySize,
-                    Stores.TextStorage.GetID("Press" + RebindState.ToString()),
+                    Stores.TextStorage.GetID($"Press {RebindState} (Current: {Keyboard[RebindState].KeyCode} | {Gamepad[RebindState].Code})"),
                     MoonWorks.Graphics.Font.HorizontalAlignment.Left,
                     MoonWorks.Graphics.Font.VerticalAlignment.Middle));
 
             if (Inputs.AnyPressed)
             {
-                var pressed = Inputs.AnyPressedButton;
-
-                switch (RebindState)
+                if (Inputs.Keyboard.AnyPressed)
                 {
-                    case Actions.Left:
-                        if (Inputs.GetGamepad(0).AnyPressed)
-                        {
-                            Gamepad.Left = pressed;
-                        }
-                        else if (Inputs.Keyboard.AnyPressed)
-                        {
-                            Keyboard.Left = pressed;
-                        }
-                        RebindState++;
-                        break;
-                    case Actions.Right:
-                        if (Inputs.GetGamepad(0).AnyPressed)
-                        {
-                            Gamepad.Right = pressed;
-                        }
-                        else if (Inputs.Keyboard.AnyPressed)
-                        {
-                            Keyboard.Right = pressed;
-                        }
-                        RebindState++;
-                        break;
-                    case Actions.Up:
-                        if (Inputs.GetGamepad(0).AnyPressed)
-                        {
-                            Gamepad.Up = pressed;
-                        }
-                        else if (Inputs.Keyboard.AnyPressed)
-                        {
-                            Keyboard.Up = pressed;
-                        }
-                        RebindState++;
-                        break;
-                    case Actions.Down:
-                        if (Inputs.GetGamepad(0).AnyPressed)
-                        {
-                            Gamepad.Down = pressed;
-                        }
-                        else if (Inputs.Keyboard.AnyPressed)
-                        {
-                            Keyboard.Down = pressed;
-                        }
-                        RebindState++;
-                        break;
-                    case Actions.Launch:
-                        if (Inputs.GetGamepad(0).AnyPressed)
-                        {
-                            Gamepad.Launch = pressed;
-                        }
-                        else if (Inputs.Keyboard.AnyPressed)
-                        {
-                            Keyboard.Launch = pressed;
-                        }
-                        RebindState++;
-                        break;
-                    case Actions.Start:
-                        if (Inputs.GetGamepad(0).AnyPressed)
-                        {
-                            Gamepad.Start = pressed;
-                        }
-                        else if (Inputs.Keyboard.AnyPressed)
-                        {
-                            Keyboard.Start = pressed;
-                        }
-                        RebindState++;
-                        break;
-                    case Actions.Dash:
-                        if (Inputs.GetGamepad(0).AnyPressed)
-                        {
-                            Gamepad.Dash = pressed;
-                        }
-                        else if (Inputs.Keyboard.AnyPressed)
-                        {
-                            Keyboard.Dash = pressed;
-                        }
-                        RebindState++;
-                        break;
-                    default:
-                        break;
+                    Keyboard[RebindState] = Inputs.Keyboard.AnyPressedButton;
                 }
+                if (Inputs.GetGamepad(0).AnyPressed)
+                {
+                    Gamepad[RebindState] = (GamepadButton)Inputs.GetGamepad(0).AnyPressedButton;
+                }
+                RebindState++;
             }
 
             if (RebindState > Actions.Dash)
@@ -206,20 +119,20 @@ public class Input : MoonTools.ECS.System
         }
     }
 
-    private static InputState InputState(ControlSet controlSet, ControlSet altControlSet)
+    private static InputState InputState()
     {
         return new InputState
         {
-            Left = controlSet.Left.State | altControlSet.Left.State,
-            Right = controlSet.Right.State | altControlSet.Right.State,
-            Up = controlSet.Up.State | altControlSet.Up.State,
-            Down = controlSet.Down.State | altControlSet.Down.State,
-            Launch = controlSet.Launch.State | altControlSet.Launch.State,
-            Start = controlSet.Start.State | altControlSet.Start.State,
+            Left = Keyboard[Actions.Left].State | Gamepad[Actions.Left].State,
+            Right = Keyboard[Actions.Right].State | Gamepad[Actions.Right].State,
+            Up = Keyboard[Actions.Up].State | Gamepad[Actions.Up].State,
+            Down = Keyboard[Actions.Down].State | Gamepad[Actions.Down].State,
+            Launch = Keyboard[Actions.Launch].State | Gamepad[Actions.Launch].State,
+            Start = Keyboard[Actions.Start].State | Gamepad[Actions.Start].State,
 #if DEBUG
-            Restart = controlSet.Restart.State | altControlSet.Restart.State,
+            Restart = Keyboard[Actions.Restart].State | Gamepad[Actions.Restart].State,
 #endif
-            Dash = controlSet.Dash.State | altControlSet.Dash.State,
+            Dash = Keyboard[Actions.Dash].State | Gamepad[Actions.Dash].State,
         };
     }
 }
