@@ -7,6 +7,7 @@ public readonly record struct Velocity(Vector2 Value);
 public readonly record struct Orientation(float Value);
 public readonly record struct Scale(Vector2 Value);
 public readonly record struct Model(int ID);
+public readonly record struct SDFGraphic(Vector4 UV);
 public readonly record struct BoundingBox(float X, float Y, float Width, float Height);
 public readonly record struct Circle(float Radius);
 public readonly record struct SolidCollision();

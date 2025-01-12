@@ -1,5 +1,6 @@
 using System.Numerics;
 using MoonTools.ECS;
+using MoonWorks;
 
 namespace Ball;
 
@@ -11,6 +12,7 @@ public class MainMenuSpawner : Manipulator
     Filter BallFilter;
     SaveGame SaveGame;
     MarqueeSpawner MarqueeSpawner;
+    BallSpawner BallSpawner;
 
     public MainMenuSpawner(World world) : base(world)
     {
@@ -19,6 +21,7 @@ public class MainMenuSpawner : Manipulator
         PauseFilter = FilterBuilder.Include<Pause>().Build();
         BallFilter = FilterBuilder.Include<CanDealDamageToBlock>().Include<HasGravity>().Include<CanBeHit>().Build();
         MarqueeSpawner = new MarqueeSpawner(world);
+        BallSpawner = new BallSpawner(world);
         SaveGame = new SaveGame(world);
 
     }

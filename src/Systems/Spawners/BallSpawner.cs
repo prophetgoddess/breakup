@@ -12,8 +12,8 @@ public class BallSpawner : MoonTools.ECS.Manipulator
     public Entity SpawnBall(Vector2 position)
     {
         var ball = CreateEntity();
-        Set(ball, new Model(Content.Models.Donut.ID));
-        Set(ball, new Scale(Vector2.One * 10.0f));
+        Set(ball, new SDFGraphic(Content.SDF.ball));
+        Set(ball, new Scale(Vector2.One * 24.0f));
         Set(ball, new Position(position));
         Set(ball, new Velocity(Vector2.Zero));
         Set(ball, new BoundingBox(0, 0, 18, 18));

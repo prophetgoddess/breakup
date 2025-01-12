@@ -6,6 +6,7 @@ using MoonTools.ECS;
 using MoonWorks.Graphics.Font;
 using MoonWorks.Input;
 using System.Text;
+using System.Runtime.InteropServices;
 
 namespace Ball;
 
@@ -17,11 +18,13 @@ public class Renderer : MoonTools.ECS.Renderer
     Window Window;
     GraphicsDevice GraphicsDevice;
     Inputs Inputs;
-
-    GraphicsPipeline RenderPipeline;
-    GraphicsPipeline TexturePipeline;
+    ComputePipeline ComputePipeline;
+    GraphicsPipeline ModelPipeline;
+    GraphicsPipeline SDFPipeline;
 
     MoonTools.ECS.Filter ModelFilter;
+    MoonTools.ECS.Filter SDFFilter;
+
     MoonTools.ECS.Filter UIFilter;
     MoonTools.ECS.Filter TextFilter;
     MoonTools.ECS.Filter GameTextFilter;
@@ -29,7 +32,7 @@ public class Renderer : MoonTools.ECS.Renderer
 
     Queue<TextBatch> TextBatchPool;
     Queue<(Vector2 pos, float depth, TextBatch batch)> GameTextBatchesToRender = new Queue<(Vector2 pos, float depth, TextBatch batch)>();
-    Queue<(Vector2 pos, float depth, TextBatch batchs)> UITextBatchesToRender = new Queue<(Vector2 pos, float depth, TextBatch batch)>();
+    Queue<(Vector2 pos, float depth, TextBatch batch)> UITextBatchesToRender = new Queue<(Vector2 pos, float depth, TextBatch batch)>();
     GraphicsPipeline TextPipeline;
 
     Texture GameTexture;
@@ -37,15 +40,36 @@ public class Renderer : MoonTools.ECS.Renderer
     Texture DepthTexture;
     Texture UIDepthTexture;
     Sampler DepthSampler;
-    Sampler TextureSampler;
+    Sampler SDFSampler;
     DepthUniforms DepthUniforms;
     StringBuilder StringBuilder = new StringBuilder();
 
     public Buffer RectIndexBuffer;
     public Buffer RectVertexBuffer;
 
-    private Buffer QuadVertexBuffer;
-    private Buffer QuadIndexBuffer;
+    Buffer SpriteComputeBuffer;
+    Buffer SpriteVertexBuffer;
+    Buffer SpriteIndexBuffer;
+    const int MAX_SPRITE_COUNT = 8192;
+
+    [StructLayout(LayoutKind.Explicit, Size = 48)]
+    struct ComputeSpriteData
+    {
+        [FieldOffset(0)]
+        public Vector3 Position;
+
+        [FieldOffset(12)]
+        public float Rotation;
+
+        [FieldOffset(16)]
+        public Vector2 Size;
+
+        [FieldOffset(32)]
+        public Vector4 Color;
+    }
+
+
+    TransferBuffer SpriteComputeTransferBuffer;
 
     void CreateRenderTextures()
     {
@@ -156,12 +180,13 @@ public class Renderer : MoonTools.ECS.Renderer
         DepthUniforms = new DepthUniforms(0.01f, 100f);
 
         ModelFilter = FilterBuilder.Include<Model>().Include<Position>().Exclude<UI>().Exclude<Invisible>().Build();
+        SDFFilter = FilterBuilder.Include<SDFGraphic>().Include<Position>().Exclude<UI>().Exclude<Invisible>().Build();
         UIFilter = FilterBuilder.Include<Model>().Include<Position>().Include<UI>().Exclude<Invisible>().Build();
         TextFilter = FilterBuilder.Include<Text>().Include<Position>().Include<UI>().Exclude<Invisible>().Build();
         GameTextFilter = FilterBuilder.Include<Text>().Include<Position>().Exclude<UI>().Exclude<Invisible>().Build();
         ColliderFilter = FilterBuilder.Include<Position>().Include<BoundingBox>().Build();
 
-        Shader vertShader = ShaderCross.Create(
+        Shader modelVertShader = ShaderCross.Create(
             GraphicsDevice,
             Path.Join(System.AppContext.BaseDirectory, "Shaders", "Vertex.vert.spv"),
             "main",
@@ -169,7 +194,7 @@ public class Renderer : MoonTools.ECS.Renderer
             ShaderStage.Vertex
         );
 
-        Shader fragShader = ShaderCross.Create(
+        Shader modelFragShader = ShaderCross.Create(
             GraphicsDevice,
             Path.Join(System.AppContext.BaseDirectory, "Shaders", "Fragment.frag.spv"),
             "main",
@@ -177,21 +202,29 @@ public class Renderer : MoonTools.ECS.Renderer
             ShaderStage.Fragment
         );
 
-        Shader texturedVertShader = ShaderCross.Create(
+        Shader sdfVertShader = ShaderCross.Create(
             GraphicsDevice,
-            Path.Join(System.AppContext.BaseDirectory, "Shaders", "TexturedQuad.vert.spv"),
+            Path.Join(System.AppContext.BaseDirectory, "Shaders", "TexturedQuadColorWithMatrix.vert.spv"),
             "main",
             ShaderCross.ShaderFormat.SPIRV,
             ShaderStage.Vertex
         );
 
-        Shader texturedFragShader = ShaderCross.Create(
+        Shader sdfFragShader = ShaderCross.Create(
             GraphicsDevice,
-            Path.Join(System.AppContext.BaseDirectory, "Shaders", "TexturedQuad.frag.spv"),
+            Path.Join(System.AppContext.BaseDirectory, "Shaders", "TexturedQuadColor.frag.spv"),
             "main",
             ShaderCross.ShaderFormat.SPIRV,
             ShaderStage.Fragment
         );
+
+        ComputePipeline = ShaderCross.Create(
+            GraphicsDevice,
+            Path.Join(System.AppContext.BaseDirectory, "Shaders", "SpriteBatch.comp.spv"),
+            "main",
+            ShaderCross.ShaderFormat.SPIRV
+        );
+
 
 
         var renderPipelineCreateInfo = new GraphicsPipelineCreateInfo
@@ -218,13 +251,13 @@ public class Renderer : MoonTools.ECS.Renderer
             PrimitiveType = PrimitiveType.TriangleList,
             RasterizerState = RasterizerState.CCW_CullNone,
             VertexInputState = VertexInputState.CreateSingleBinding<PositionVertex>(),
-            VertexShader = vertShader,
-            FragmentShader = fragShader
+            VertexShader = modelVertShader,
+            FragmentShader = modelFragShader
         };
 
-        RenderPipeline = GraphicsPipeline.Create(GraphicsDevice, renderPipelineCreateInfo);
+        ModelPipeline = GraphicsPipeline.Create(GraphicsDevice, renderPipelineCreateInfo);
 
-        var texturePipelineCreateInfo = new GraphicsPipelineCreateInfo
+        var sdfPipelineCreateInfo = new GraphicsPipelineCreateInfo
         {
             TargetInfo = new GraphicsPipelineTargetInfo
             {
@@ -245,13 +278,13 @@ public class Renderer : MoonTools.ECS.Renderer
             MultisampleState = MultisampleState.None,
             PrimitiveType = PrimitiveType.TriangleList,
             RasterizerState = RasterizerState.CCW_CullNone,
-            VertexInputState = VertexInputState.CreateSingleBinding<PositionTextureVertex>(),
-            VertexShader = texturedVertShader,
-            FragmentShader = texturedFragShader
+            VertexInputState = VertexInputState.CreateSingleBinding<PositionTextureColorVertex>(),
+            VertexShader = sdfVertShader,
+            FragmentShader = sdfFragShader
         };
 
-        TexturePipeline = GraphicsPipeline.Create(graphicsDevice, texturePipelineCreateInfo);
-        TextureSampler = Sampler.Create(GraphicsDevice, SamplerCreateInfo.PointClamp);
+        SDFPipeline = GraphicsPipeline.Create(graphicsDevice, sdfPipelineCreateInfo);
+        SDFSampler = Sampler.Create(GraphicsDevice, SamplerCreateInfo.LinearClamp);
 
         var textPipelineCreateInfo = new GraphicsPipelineCreateInfo
         {
@@ -318,11 +351,57 @@ public class Renderer : MoonTools.ECS.Renderer
             BufferUsageFlags.Index
         );
 
-        QuadVertexBuffer = resourceUploader.CreateBuffer(vertexData, BufferUsageFlags.Vertex);
-        QuadIndexBuffer = resourceUploader.CreateBuffer(indexData, BufferUsageFlags.Index);
-
         resourceUploader.Upload();
         resourceUploader.Dispose();
+
+        SpriteComputeTransferBuffer = TransferBuffer.Create<ComputeSpriteData>(
+            GraphicsDevice,
+            TransferBufferUsage.Upload,
+            MAX_SPRITE_COUNT
+        );
+
+        SpriteComputeBuffer = Buffer.Create<ComputeSpriteData>(
+            GraphicsDevice,
+            BufferUsageFlags.ComputeStorageRead,
+            MAX_SPRITE_COUNT
+        );
+
+        SpriteVertexBuffer = Buffer.Create<PositionTextureColorVertex>(
+            GraphicsDevice,
+            BufferUsageFlags.ComputeStorageWrite | BufferUsageFlags.Vertex,
+            MAX_SPRITE_COUNT * 4
+        );
+
+        SpriteIndexBuffer = Buffer.Create<uint>(
+            GraphicsDevice,
+            BufferUsageFlags.Index,
+            MAX_SPRITE_COUNT * 6
+        );
+
+        TransferBuffer spriteIndexTransferBuffer = TransferBuffer.Create<uint>(
+            GraphicsDevice,
+            TransferBufferUsage.Upload,
+            MAX_SPRITE_COUNT * 6
+        );
+
+        var indexSpan = spriteIndexTransferBuffer.Map<uint>(false);
+
+        for (int i = 0, j = 0; i < MAX_SPRITE_COUNT * 6; i += 6, j += 4)
+        {
+            indexSpan[i] = (uint)j;
+            indexSpan[i + 1] = (uint)j + 1;
+            indexSpan[i + 2] = (uint)j + 2;
+            indexSpan[i + 3] = (uint)j + 3;
+            indexSpan[i + 4] = (uint)j + 2;
+            indexSpan[i + 5] = (uint)j + 1;
+        }
+        spriteIndexTransferBuffer.Unmap();
+
+        var cmdbuf = GraphicsDevice.AcquireCommandBuffer();
+        var copyPass = cmdbuf.BeginCopyPass();
+        copyPass.UploadToBuffer(spriteIndexTransferBuffer, SpriteIndexBuffer, false);
+        cmdbuf.EndCopyPass(copyPass);
+        GraphicsDevice.Submit(cmdbuf);
     }
 
     public void Draw(CommandBuffer cmdbuf, Texture renderTexture)
@@ -434,12 +513,46 @@ public class Renderer : MoonTools.ECS.Renderer
             UITextBatchesToRender.Enqueue((position, depth, textBatch));
         }
 
+        var data = SpriteComputeTransferBuffer.Map<ComputeSpriteData>(true);
+        int sdfIndex = 0;
+        foreach (var entity in SDFFilter.Entities)
+        {
+            var position = Get<Position>(entity).Value;
+            var rotation = Has<Orientation>(entity) ? Get<Orientation>(entity).Value : 0.0f;
+            var uv = Get<SDFGraphic>(entity).UV;
+            var scale = Has<Scale>(entity) ? Get<Scale>(entity).Value : Vector2.One;
+            var color = Has<Highlight>(entity) ? palette.Highlight : palette.Foreground;
+            color.A = Has<Alpha>(entity) ? Get<Alpha>(entity).A : color.A;
+            var depth = Has<Depth>(entity) ? Get<Depth>(entity).Value : 0.5f;
+
+            data[sdfIndex].Position = new Vector3(position.X, position.Y, 0);
+            data[sdfIndex].Rotation = rotation;
+            data[sdfIndex].Size = scale;
+            data[sdfIndex].Color = color.ToVector4();
+            sdfIndex++;
+        }
+        SpriteComputeTransferBuffer.Unmap();
+
+        var copyPass = cmdbuf.BeginCopyPass();
+        copyPass.UploadToBuffer(SpriteComputeTransferBuffer, SpriteComputeBuffer, true);
+        cmdbuf.EndCopyPass(copyPass);
+
+        var computePass = cmdbuf.BeginComputePass(
+            new StorageBufferReadWriteBinding(SpriteVertexBuffer, true)
+        );
+
+        computePass.BindComputePipeline(ComputePipeline);
+        computePass.BindStorageBuffers(SpriteComputeBuffer);
+        computePass.Dispatch(MAX_SPRITE_COUNT / 64, 1, 1);
+
+        cmdbuf.EndComputePass(computePass);
+
         var gamePass = cmdbuf.BeginRenderPass(
             new DepthStencilTargetInfo(DepthTexture, 1f, false),
             new ColorTargetInfo(GameTexture, palette.Background)
         );
 
-        gamePass.BindGraphicsPipeline(RenderPipeline);
+        gamePass.BindGraphicsPipeline(ModelPipeline);
 
         foreach (var entity in ModelFilter.Entities)
         {
@@ -467,6 +580,14 @@ public class Renderer : MoonTools.ECS.Renderer
             gamePass.DrawIndexedPrimitives(mesh.TriangleCount * 3, 1, 0, 0, 0);
 
         }
+
+        cmdbuf.PushVertexUniformData(cameraMatrix);
+
+        gamePass.BindGraphicsPipeline(SDFPipeline);
+        gamePass.BindVertexBuffers(SpriteVertexBuffer);
+        gamePass.BindIndexBuffer(SpriteIndexBuffer, IndexElementSize.ThirtyTwo);
+        gamePass.BindFragmentSamplers(new TextureSamplerBinding(Content.SDF.Atlas, SDFSampler));
+        gamePass.DrawIndexedPrimitives((uint)SDFFilter.Count * 6, 1, 0, 0, 0);
 
         if (Inputs.Keyboard.IsHeld(KeyCode.D1))
         {
@@ -522,7 +643,7 @@ public class Renderer : MoonTools.ECS.Renderer
             new ColorTargetInfo(UITexture, LoadOp.Load)
         );
 
-        gamePass.BindGraphicsPipeline(RenderPipeline);
+        gamePass.BindGraphicsPipeline(ModelPipeline);
 
         Matrix4x4 uiCameraMatrix =
         Matrix4x4.CreateOrthographicOffCenter(
@@ -534,7 +655,7 @@ public class Renderer : MoonTools.ECS.Renderer
             -1f
         );
 
-        uiPass.BindGraphicsPipeline(RenderPipeline);
+        uiPass.BindGraphicsPipeline(ModelPipeline);
 
         foreach (var entity in UIFilter.Entities)
         {

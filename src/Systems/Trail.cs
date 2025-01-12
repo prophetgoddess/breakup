@@ -14,11 +14,11 @@ public class Trail : MoonTools.ECS.System
         BallFilter = FilterBuilder.Include<DamageMultiplier>().Build();
     }
 
-    public Entity SpawnTrail(int model)
+    public Entity SpawnTrail(Vector4 uv)
     {
         var entity = CreateEntity();
 
-        Set(entity, new Model(model));
+        Set(entity, new SDFGraphic(uv));
         Set(entity, new Position(Vector2.Zero));
         Set(entity, new Scale(new Vector2(8, 8)));
         Set(entity, new DestroyOnStateTransition());
@@ -39,7 +39,7 @@ public class Trail : MoonTools.ECS.System
         {
             if (!HasOutRelation<TrailTimer>(entity))
             {
-                var t = SpawnTrail(Get<Model>(entity).ID);
+                var t = SpawnTrail(Get<SDFGraphic>(entity).UV);
                 Set(t, new Scale(Get<Scale>(entity).Value));
                 Set(t, new Position(Get<Position>(entity).Value));
 
