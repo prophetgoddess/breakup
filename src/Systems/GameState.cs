@@ -79,7 +79,7 @@ public class GameStateManager : MoonTools.ECS.System
             }
         }
 
-        if (inputState.Launch.IsDown && !Some<JustQuit>() && (Some<MainMenu>() || Some<Pause>()) && !Some<UpgradeOption>())
+        if (inputState.Cancel.IsDown && (Some<MainMenu>() || Some<Pause>()) && !Some<UpgradeOption>())
         {
             if (holdActivationTimer < holdActivationTime)
                 holdActivationTimer += dt;
@@ -144,9 +144,6 @@ public class GameStateManager : MoonTools.ECS.System
                 {
                     Destroy(GetSingletonEntity<QuitMeter>());
                 }
-
-                Set(CreateEntity(), new JustQuit());
-
             }
         }
         else

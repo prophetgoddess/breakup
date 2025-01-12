@@ -71,9 +71,5 @@ public class MainMenuSpawner : Manipulator
             $"last {(Some<Score>() ? GetSingleton<Score>().Current.ToString() : "NONE")} - best {(Some<HighScore>() ? GetSingleton<HighScore>().Value.ToString() : "NONE")}",
              Fonts.BodyFont, Fonts.PromptSize, 4.0f, -100f, 20);
 
-
-        MarqueeSpawner.SpawnMarquee($"press launch for settings - hold to quit", Fonts.BodyFont, Fonts.PromptSize, 3.0f, 100f, Dimensions.UIHeight - 20.0f);
-
-
     }
 }

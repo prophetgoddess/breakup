@@ -11,6 +11,7 @@ public enum Actions
     Up,
     Down,
     Launch,
+    Cancel,
     Start,
     Dash,
 #if DEBUG
@@ -25,6 +26,7 @@ public struct InputState
     public ButtonState Up { get; set; }
     public ButtonState Down { get; set; }
     public ButtonState Launch { get; set; }
+    public ButtonState Cancel { get; set; }
 #if DEBUG
     public ButtonState Restart { get; set; }
 #endif
@@ -43,6 +45,18 @@ public class Input : MoonTools.ECS.System
     public static Dictionary<Actions, KeyboardButton> Keyboard;
     public static Dictionary<Actions, GamepadButton> Gamepad;
 
+    public static string GetButtonName(Actions action)
+    {
+        if (Inputs.GamepadExists(0))
+        {
+            return Gamepad[action].Code.ToString();
+        }
+        else
+        {
+            return Keyboard[action].KeyCode.ToString();
+        }
+    }
+
     public Input(World world, Inputs inputs) : base(world)
     {
         Inputs = inputs;
@@ -59,6 +73,7 @@ public class Input : MoonTools.ECS.System
             Keyboard[Actions.Left] = Inputs.Keyboard.Button(KeyCode.Left);
             Keyboard[Actions.Right] = Inputs.Keyboard.Button(KeyCode.Right);
             Keyboard[Actions.Launch] = Inputs.Keyboard.Button(KeyCode.Space);
+            Keyboard[Actions.Cancel] = Inputs.Keyboard.Button(KeyCode.Escape);
             Keyboard[Actions.Start] = Inputs.Keyboard.Button(KeyCode.Return);
 #if DEBUG
             Keyboard[Actions.Restart] = Inputs.Keyboard.Button(KeyCode.R);
@@ -82,6 +97,7 @@ public class Input : MoonTools.ECS.System
             Gamepad[Actions.Left] = Inputs.GetGamepad(0).DpadLeft;
             Gamepad[Actions.Right] = Inputs.GetGamepad(0).DpadRight;
             Gamepad[Actions.Launch] = Inputs.GetGamepad(0).A;
+            Gamepad[Actions.Cancel] = Inputs.GetGamepad(0).B;
             Gamepad[Actions.Start] = Inputs.GetGamepad(0).Start;
 #if DEBUG
             Gamepad[Actions.Restart] = Inputs.GetGamepad(0).Guide;
@@ -158,6 +174,7 @@ public class Input : MoonTools.ECS.System
             Right = Keyboard[Actions.Right].State | Gamepad[Actions.Right].State,
             Up = Keyboard[Actions.Up].State | Gamepad[Actions.Up].State,
             Down = Keyboard[Actions.Down].State | Gamepad[Actions.Down].State,
+            Cancel = Keyboard[Actions.Cancel].State | Gamepad[Actions.Cancel].State,
             Launch = Keyboard[Actions.Launch].State | Gamepad[Actions.Launch].State,
             Start = Keyboard[Actions.Start].State | Gamepad[Actions.Start].State,
 #if DEBUG
