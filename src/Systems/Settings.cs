@@ -88,7 +88,7 @@ public class Settings : MoonTools.ECS.System
                     MoonWorks.Graphics.Font.HorizontalAlignment.Left,
                     MoonWorks.Graphics.Font.VerticalAlignment.Middle));
         }
-        if (Has<RebindControls>(setting))
+        if (Has<RebindControls>(setting) && Amount == 0)
         {
             Set(GetSingletonEntity<RebindControls>(), new RebindControls(true));
         }
@@ -164,6 +164,10 @@ public class Settings : MoonTools.ECS.System
                 if (inputState.Right.IsPressed)
                 {
                     AdjustSetting(selected, 1);
+                }
+                if (inputState.Launch.IsPressed)
+                {
+                    AdjustSetting(selected, 0);
                 }
             }
         }
