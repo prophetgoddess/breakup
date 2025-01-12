@@ -30,7 +30,7 @@ class Program : Game
 
         AppDomain.CurrentDomain.UnhandledException += HandleUnhandledException;
 
-        Content.LoadAll(GraphicsDevice, AudioDevice);
+        Content.LoadAll(MainWindow.SwapchainFormat, GraphicsDevice, AudioDevice);
 
         Systems =
         [

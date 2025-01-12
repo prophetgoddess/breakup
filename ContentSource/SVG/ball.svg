@@ -23,28 +23,28 @@
      inkscape:pagecheckerboard="0"
      inkscape:deskcolor="#d1d1d1"
      inkscape:document-units="mm"
-     inkscape:zoom="45.254834"
-     inkscape:cx="7.0379222"
-     inkscape:cy="8.396893"
+     inkscape:zoom="32"
+     inkscape:cx="5.015625"
+     inkscape:cy="7.21875"
      inkscape:window-width="2304"
      inkscape:window-height="1387"
      inkscape:window-x="1512"
      inkscape:window-y="25"
      inkscape:window-maximized="0"
-     inkscape:current-layer="layer1" />
+     inkscape:current-layer="svg1" />
   <defs
      id="defs1" />
   <g
      inkscape:label="Layer 1"
      inkscape:groupmode="layer"
      id="layer1">
-    <ellipse
-       style="fill:#000000;fill-opacity:0;stroke:#ffffff;stroke-width:0.472154;stroke-dasharray:none;stroke-opacity:1;paint-order:stroke fill markers"
+    <g
        id="path1"
-       cx="2.1218836"
-       cy="2.1166668"
-       rx="1.8858066"
-       ry="1.8805897"
-       inkscape:label="path1" />
+       inkscape:label="path1">
+      <path
+         style="display:inline;fill:#ffffff;paint-order:stroke fill markers"
+         d="M 2.1210938,0 C 0.95235902,0 0,0.95062707 0,2.1171875 c 0,1.1665604 0.95235902,2.1152344 2.1210938,2.1152344 1.1687347,0 2.1230468,-0.948674 2.1230468,-2.1152344 C 4.2441406,0.95062707 3.2898285,0 2.1210938,0 Z m 0,0.47265625 c 0.9142696,0 1.6503906,0.73384965 1.6503906,1.64453125 0,0.9106816 -0.736121,1.6445313 -1.6503906,1.6445313 -0.9142697,0 -1.64843755,-0.7338497 -1.64843755,-1.6445313 0,-0.9106816 0.73416785,-1.64453125 1.64843755,-1.64453125 z"
+         id="path2" />
+    </g>
   </g>
 </svg>

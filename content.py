@@ -44,6 +44,7 @@ if not os.path.isdir(generated):
 content = os.path.join(generated, "Content.cs")
 
 shader_in = os.path.join(input, "Shaders")
+svg_in = os.path.join(input, "SVG")
 texture_in = os.path.join(input, "Textures")
 levels_in = os.path.join(input, "Levels")
 models_in = os.path.join(input, "Models")
@@ -54,6 +55,7 @@ text_in = os.path.join(input, "Text")
 
 shader_out = os.path.join(output, "Shaders")
 texture_out = os.path.join(output, "Textures")
+svg_out = os.path.join(texture_in, "SDF")
 sfx_out = os.path.join(output, "SFX")
 music_out = os.path.join(output, "Music")
 fonts_out = os.path.join(output, "Fonts")
@@ -98,6 +100,26 @@ if os.path.exists(shader_in):
             )
             hashes[shader] = digest
 
+if os.path.exists(svg_in):
+    if not os.path.isdir(texture_out):
+        os.mkdir(texture_out)
+
+    if not os.path.isdir(svg_out):
+        os.mkdir(svg_out)
+
+    for svg in Path(svg_in).glob("**/*.svg"):
+        subprocess.run(
+            [
+                "msdfgen",
+                "-svg",
+                os.path.join(svg_in, svg),
+                "-o",
+                os.path.join(svg_out, f"{Path(svg).stem}.png"),
+                "-dimensions 32 32",
+                "-autoframe",
+                "-range 1",
+            ]
+        )
 
 #
 # TEXTURE PACKING
@@ -285,9 +307,9 @@ public static class Content
         )
 
         f.write(
-            f"""public static void LoadTextures(ResourceUploader resourceUploader, string path)
+            f"""public static void LoadTextures(TextureFormat format, ResourceUploader resourceUploader, string path)
             {{
-            Atlas = resourceUploader.CreateTexture2DFromCompressed(Path.Join(path, "{Path(spritesheet).stem}.png"));
+            Atlas = resourceUploader.CreateTexture2DFromCompressed(Path.Join(path, "{Path(spritesheet).stem}.png"), format, TextureUsageFlags.Sampler);
             """
         )
 
@@ -444,7 +466,7 @@ public static class Content
     f.write("\n}\n\n")
 
     f.write(
-        """public static void LoadAll(GraphicsDevice graphicsDevice, AudioDevice audioDevice)
+        """public static void LoadAll(TextureFormat textureFormat, GraphicsDevice graphicsDevice, AudioDevice audioDevice)
         {
             var cmdbuf = graphicsDevice.AcquireCommandBuffer();
 
@@ -463,7 +485,7 @@ public static class Content
 
     for spritesheet in Path(texture_out).glob("*.json"):
         f.write(
-            f"{Path(spritesheet).stem}.LoadTextures(resourceUploader, texturesPath);"
+            f"{Path(spritesheet).stem}.LoadTextures(textureFormat, resourceUploader, texturesPath);"
         )
 
     f.write(
