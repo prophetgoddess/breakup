@@ -25,22 +25,9 @@ class Program : Game
         debugMode
     )
     {
-        if (SteamAPI.RestartAppIfNecessary((AppId_t)3397340))
-        {
-            SDL.SDL_Quit();
-            return;
-        }
-
-        if (!SteamAPI.Init())
-        {
-            Console.WriteLine("Failed to initialize Steam API!");
-        }
-
         var saveData = new SaveGame(World).Load();
         MainWindow.SetScreenMode(saveData.Fullscreen ? ScreenMode.Fullscreen : ScreenMode.Windowed);
         World.Set(World.CreateEntity(), new Fullscreen(saveData.Fullscreen));
-
-        AppDomain.CurrentDomain.UnhandledException += HandleUnhandledException;
 
         Content.LoadAll(MainWindow.SwapchainFormat, GraphicsDevice, AudioDevice);
 
@@ -112,6 +99,23 @@ class Program : Game
 
     static void Main(string[] args)
     {
+        AppDomain.CurrentDomain.UnhandledException += HandleUnhandledException;
+
+        if (SteamAPI.RestartAppIfNecessary((AppId_t)3397340))
+        {
+            var outFile = Path.Combine(AppContext.BaseDirectory, $"restart-{DateTimeOffset.UtcNow.ToUnixTimeSeconds()}.txt");
+            File.WriteAllText(outFile, "Restarting");
+            Console.WriteLine("Restarting...");
+            return;
+        }
+
+        if (!SteamAPI.Init())
+        {
+            var outFile = Path.Combine(AppContext.BaseDirectory, $"error-{DateTimeOffset.UtcNow.ToUnixTimeSeconds()}.txt");
+            File.WriteAllText(outFile, "Failed to initialize Steam API!");
+            Console.WriteLine("Failed to initialize Steam API!");
+            return;
+        }
 
         var debugMode = false;
 
