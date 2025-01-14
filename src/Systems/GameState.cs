@@ -241,7 +241,7 @@ public class GameStateManager : MoonTools.ECS.System
                 Dimensions.GameHeight * 0.5f
             ));
 
-            Relate(ball, GetSingletonEntity<Player>(), new HeldBy(new Vector2(0f, -32.0f)));
+            Relate(ball, GetSingletonEntity<Player>(), new HeldBy(new Vector2(0f, -42.0f)));
             Set(ball, new Velocity(Vector2.Zero));
             Set(CreateEntity(), new PlayOnce(Stores.SFXStorage.GetID(Content.SFX.fail)));
         }

@@ -228,8 +228,6 @@ public class Renderer : MoonTools.ECS.Renderer
             ShaderCross.ShaderFormat.SPIRV
         );
 
-
-
         var renderPipelineCreateInfo = new GraphicsPipelineCreateInfo
         {
             TargetInfo = new GraphicsPipelineTargetInfo
@@ -585,14 +583,18 @@ public class Renderer : MoonTools.ECS.Renderer
         gamePass.BindFragmentSamplers(new TextureSamplerBinding(Content.SDF.Atlas, SDFSampler));
         gamePass.DrawIndexedPrimitives((uint)SDFFilter.Count * 6, 1, 0, 0, 0);
 
-        if (Inputs.Keyboard.IsHeld(KeyCode.D1))
+        gamePass.BindGraphicsPipeline(ModelPipeline);
+
+        if (Inputs.Keyboard.IsHeld(KeyCode.F1))
         {
             foreach (var entity in ColliderFilter.Entities)
             {
                 var position = Get<Position>(entity).Value;
                 var box = Get<BoundingBox>(entity);
 
-                Matrix4x4 model = Matrix4x4.CreateScale(new Vector3(box.Width, box.Height, 0)) * Matrix4x4.CreateTranslation(new Vector3(position + new Vector2(box.X, box.Y), 0)) * cameraMatrix;
+                Matrix4x4 model =
+                Matrix4x4.CreateScale(new Vector3(box.Width, box.Height, 0))
+                * Matrix4x4.CreateTranslation(new Vector3(position + new Vector2(box.X, box.Y), 0f)) * cameraMatrix;
                 var uniforms = new TransformVertexUniform(model, Color.Red * 0.5f);
 
                 gamePass.BindVertexBuffers(RectVertexBuffer);

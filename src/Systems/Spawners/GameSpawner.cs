@@ -9,8 +9,6 @@ public class GameSpawner : Manipulator
     Filter DestroyFilter;
     BallSpawner BallSpawner;
 
-
-
     public GameSpawner(World world) : base(world)
     {
         SaveGame = new SaveGame(world);
@@ -36,11 +34,11 @@ public class GameSpawner : Manipulator
 
         var ball = BallSpawner.SpawnBall(new Vector2(
                     Dimensions.GameWidth * 0.5f,
-                    Dimensions.GameHeight * 0.5f
+                    Dimensions.GameHeight * 0.6f
                 ));
 
         var player = CreateEntity();
-        Set(player, new Model(Content.Models.EmptyTriangle.ID));
+        Set(player, new SDFGraphic(Content.SDF.EmptyTriangle));
         Set(player, new Position(new Vector2(
                 Dimensions.GameWidth * 0.5f,
                 Dimensions.GameHeight * 0.9f
@@ -48,13 +46,16 @@ public class GameSpawner : Manipulator
         Set(player, new Combo(0));
         Set(player, new Orientation(0f));
         Set(player, new Velocity(Vector2.Zero));
-        Set(player, new BoundingBox(0, 8, 55, 50));
+        Set(player, new BoundingBox(0, 0, 50, 50));
         Set(player, new SolidCollision());
         Set(player, new HitBall());
-        Set(player, new Scale(new Vector2(4, 4)));
+        Set(player, new Scale(new Vector2(50, 50)));
         Set(player, new Player());
         Set(player, new FollowsCamera(Dimensions.GameHeight * 0.9f));
         Set(player, new DestroyOnStateTransition());
+
+        Relate(ball, player, new HeldBy(new Vector2(0f, -42.0f)));
+        Set(ball, new Velocity(Vector2.Zero));
 
         var power = CreateEntity();
         Set(power, new Model(Content.Models.Triangle.ID));
@@ -70,8 +71,7 @@ public class GameSpawner : Manipulator
         Set(power, new Highlight());
         Relate(power, player, new ChildOf(new Vector2(0f, 0f)));
 
-        Relate(ball, player, new HeldBy(new Vector2(0f, -32.0f)));
-        Set(ball, new Velocity(Vector2.Zero));
+
 
         var leftBound = CreateEntity();
         Set(leftBound, new Position(new Vector2(-8, 0)));

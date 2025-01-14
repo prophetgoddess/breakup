@@ -76,29 +76,23 @@ if not os.path.exists(output):
 # SHADER COMPILE
 #
 
-shadersDirty = False
-
 if os.path.exists(shader_in):
     if not os.path.isdir(shader_out):
         os.mkdir(shader_out)
 
     for shader in Path(shader_in).glob("**/*.*"):
-        digest = get_digest(shader)
+        subprocess.run(
+            [
+                "glslc",
+                shader,
+                "-o",
+                f"{os.path.join(shader_out, os.path.basename(shader))}.spv",
+            ]
+        )
 
-        # if a shader just got recompiled we don't need to do new codegen
-        if not shader in hashes:
-            shadersDirty = True
-
-        if not shader in hashes or hashes[shader] != digest or args.force:
-            subprocess.run(
-                [
-                    "glslc",
-                    shader,
-                    "-o",
-                    f"{os.path.join(shader_out, os.path.basename(shader))}.spv",
-                ]
-            )
-            hashes[shader] = digest
+#
+# SDF RENDER
+#
 
 if os.path.exists(svg_in):
     if not os.path.isdir(texture_out):
@@ -115,7 +109,7 @@ if os.path.exists(svg_in):
                 os.path.join(svg_in, svg),
                 "-o",
                 os.path.join(svg_out, f"{Path(svg).stem}.png"),
-                "-dimensions 32 32",
+                "-dimensions 16 16",
                 "-autoframe",
                 "-range 1",
             ]
@@ -125,22 +119,13 @@ if os.path.exists(svg_in):
 # TEXTURE PACKING
 #
 
-texturesDirty = False
 
 if os.path.exists(texture_in):
     if not os.path.isdir(texture_out):
         os.mkdir(texture_out)
 
-    for texture in Path(texture_in).glob("**/*.png"):
-        digest = get_digest(texture)
-
-        if not texture in hashes or hashes[texture] != digest:
-            texturesDirty = True
-            hashes[texture] = digest
-
-    if texturesDirty or args.force:
-        for dir in os.listdir(texture_in):
-            subprocess.run(["cramcli", os.path.join(texture_in, dir), texture_out, dir])
+    for dir in os.listdir(texture_in):
+        subprocess.run(["cramcli", os.path.join(texture_in, dir), texture_out, dir])
 
 #
 # SFX

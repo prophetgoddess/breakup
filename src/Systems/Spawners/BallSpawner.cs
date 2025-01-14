@@ -14,7 +14,7 @@ public class BallSpawner : MoonTools.ECS.Manipulator
         var ball = CreateEntity();
         Set(ball, new SDFGraphic(Content.SDF.ball));
         Set(ball, new Scale(Vector2.One * 24.0f));
-        Set(ball, new Position(position - new Vector2(128.0f, 25f)));
+        Set(ball, new Position(position));
         Set(ball, new Velocity(Vector2.Zero));
         Set(ball, new BoundingBox(0, 0, 18, 18));
         Set(ball, new SolidCollision());
@@ -26,22 +26,6 @@ public class BallSpawner : MoonTools.ECS.Manipulator
         Set(ball, new Highlight());
         Set(ball, new CanDealDamageToBlock(1));
 
-        // ball = CreateEntity();
-        // Set(ball, new Model(Content.Models.Donut.ID));
-        // Set(ball, new Scale(Vector2.One * 50.0f));
-        // Set(ball, new Position(position + new Vector2(128.0f, -25f)));
-        // Set(ball, new Velocity(Vector2.Zero));
-        // Set(ball, new BoundingBox(0, 0, 18, 18));
-        // Set(ball, new SolidCollision());
-        // Set(ball, new Bounce(0.9f));
-        // Set(ball, new CanBeHit());
-        // Set(ball, new HasGravity(0f));
-        // Set(ball, new CameraFollows());
-        // Set(ball, new DestroyOnStateTransition());
-        // Set(ball, new Highlight());
-        // Set(ball, new CanDealDamageToBlock(1));
-
-        // ball = CreateEntity();
         return ball;
     }
 }

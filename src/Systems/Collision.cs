@@ -218,12 +218,6 @@ public class Collision : MoonTools.ECS.System
 
             }
 
-            var player = GetSingletonEntity<Player>();
-            Relate(entity, player, new HeldBy(new Vector2(0f, -32.0f)));
-            Set(entity, new Velocity(Vector2.Zero));
-            Unrelate<Colliding>(entity, other);
-            Relate(entity, player, new IgnoreSolidCollision());
-
             var meterEntity = GetSingletonEntity<Power>();
             var meter = Get<Power>(meterEntity);
             Set(meterEntity, new Power(0f, meter.Decay, meter.Scale));
