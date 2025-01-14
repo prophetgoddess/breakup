@@ -46,10 +46,10 @@ public class GameSpawner : Manipulator
         Set(player, new Combo(0));
         Set(player, new Orientation(0f));
         Set(player, new Velocity(Vector2.Zero));
-        Set(player, new BoundingBox(0, 0, 50, 50));
+        Set(player, new BoundingBox(0, 0, 55, 50));
         Set(player, new SolidCollision());
         Set(player, new HitBall());
-        Set(player, new Scale(new Vector2(50, 50)));
+        Set(player, new Scale(new Vector2(55, 50)));
         Set(player, new Player());
         Set(player, new FollowsCamera(Dimensions.GameHeight * 0.9f));
         Set(player, new DestroyOnStateTransition());
