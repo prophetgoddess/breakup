@@ -15,6 +15,9 @@
     <ProjectReference Include="../lib/MoonTools.ECS/MoonTools.ECS.csproj">
         <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
     </ProjectReference>
+        <ProjectReference Include="../lib/Steamworks.NET.Dissent/Steamworks.NET.Dissent.csproj">
+        <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+    </ProjectReference>
    </ItemGroup>
 
    <ItemGroup>

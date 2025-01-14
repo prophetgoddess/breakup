@@ -1,7 +1,7 @@
 using MoonTools.ECS;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using System.Security.Cryptography;
+using Steamworks;
 using MoonWorks.Input;
 
 namespace Ball;
@@ -22,8 +22,6 @@ public struct SaveData
 
 public class SaveGame : Manipulator
 {
-    static string FilePath = Path.Join(AppContext.BaseDirectory, "save");
-
     static JsonSerializerOptions saveSerializerOptions = new JsonSerializerOptions
     {
         IncludeFields = true,
@@ -42,7 +40,6 @@ public class SaveGame : Manipulator
     public void Save()
     {
         var existing = Load();
-
 
         Keyboard.Clear();
         foreach (var (action, button) in Input.Keyboard)
@@ -68,14 +65,14 @@ public class SaveGame : Manipulator
 
         var jsonString = JsonSerializer.Serialize(saveData, typeof(SaveData), saveDataContext);
 
-        File.WriteAllText(FilePath, jsonString);
+        File.WriteAllText(Path.Join(AppContext.BaseDirectory, $"{SteamUser.GetSteamID()}.save"), jsonString);
     }
 
     public SaveData Load()
     {
-        if (File.Exists(FilePath))
+        if (File.Exists(Path.Join(AppContext.BaseDirectory, $"{SteamUser.GetSteamID()}.save")))
         {
-            return (SaveData)JsonSerializer.Deserialize(File.ReadAllText(FilePath), typeof(SaveData), saveDataContext);
+            return (SaveData)JsonSerializer.Deserialize(File.ReadAllText(Path.Join(AppContext.BaseDirectory, $"{SteamUser.GetSteamID()}.save")), typeof(SaveData), saveDataContext);
         }
         else
         {

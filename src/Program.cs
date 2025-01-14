@@ -2,6 +2,7 @@
 using MoonWorks;
 using MoonWorks.Graphics;
 using SDL3;
+using Steamworks;
 
 namespace Ball;
 
@@ -24,6 +25,17 @@ class Program : Game
         debugMode
     )
     {
+        if (SteamAPI.RestartAppIfNecessary((AppId_t)3397340))
+        {
+            SDL.SDL_Quit();
+            return;
+        }
+
+        if (!SteamAPI.Init())
+        {
+            Console.WriteLine("Failed to initialize Steam API!");
+        }
+
         var saveData = new SaveGame(World).Load();
         MainWindow.SetScreenMode(saveData.Fullscreen ? ScreenMode.Fullscreen : ScreenMode.Windowed);
         World.Set(World.CreateEntity(), new Fullscreen(saveData.Fullscreen));
