@@ -65,6 +65,9 @@ public class Renderer : MoonTools.ECS.Renderer
         [FieldOffset(16)]
         public Vector2 Size;
 
+        [FieldOffset(24)]
+        public Vector2 Origin;
+
         [FieldOffset(32)]
         public Vector4 Color;
 
@@ -287,7 +290,7 @@ public class Renderer : MoonTools.ECS.Renderer
         };
 
         SDFPipeline = GraphicsPipeline.Create(graphicsDevice, sdfPipelineCreateInfo);
-        SDFSampler = Sampler.Create(GraphicsDevice, SamplerCreateInfo.LinearClamp);
+        SDFSampler = Sampler.Create(GraphicsDevice, SamplerCreateInfo.LinearWrap);
 
         var textPipelineCreateInfo = new GraphicsPipelineCreateInfo
         {
@@ -523,6 +526,7 @@ public class Renderer : MoonTools.ECS.Renderer
             data[sdfIndex].Size = scale;
             data[sdfIndex].Color = color.ToVector4();
             data[sdfIndex].TextureRect = uv;
+            data[sdfIndex].Origin = Has<Origin>(entity) ? Get<Origin>(entity).Value : Vector2.One * 0.5f;
             sdfIndex++;
         }
         SpriteComputeTransferBuffer.Unmap();

@@ -46,7 +46,8 @@ public class GameSpawner : Manipulator
         Set(player, new Combo(0));
         Set(player, new Orientation(0f));
         Set(player, new Velocity(Vector2.Zero));
-        Set(player, new BoundingBox(0, 0, 55, 50));
+        Set(player, new BoundingBox(0, 0, 50, 30));
+        Set(player, new Origin(new Vector2(0.5f, 0.4f)));
         Set(player, new SolidCollision());
         Set(player, new HitBall());
         Set(player, new Scale(new Vector2(55, 50)));
@@ -58,20 +59,19 @@ public class GameSpawner : Manipulator
         Set(ball, new Velocity(Vector2.Zero));
 
         var power = CreateEntity();
-        Set(power, new Model(Content.Models.Triangle.ID));
+        Set(power, new SDFGraphic(Content.SDF.Triangle));
         Set(power, new Position(new Vector2(
                 Dimensions.GameWidth * 0.5f,
                 Dimensions.GameHeight * 0.9f
             )));
+        Set(power, new Origin(new Vector2(0.5f, 0.4f)));
         Set(power, new Orientation(0f));
         Set(power, new Velocity(Vector2.Zero));
-        Set(power, new Scale(new Vector2(0f, 0.5f)));
-        Set(power, new Power(0f, 0.01f, 2f));
+        Set(power, new Scale(new Vector2(0f, 0f)));
+        Set(power, new Power(0f, 0.01f, 25f));
         Set(power, new DestroyOnStateTransition());
         Set(power, new Highlight());
         Relate(power, player, new ChildOf(new Vector2(0f, 0f)));
-
-
 
         var leftBound = CreateEntity();
         Set(leftBound, new Position(new Vector2(-8, 0)));

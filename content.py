@@ -109,9 +109,10 @@ if os.path.exists(svg_in):
                 os.path.join(svg_in, svg),
                 "-o",
                 os.path.join(svg_out, f"{Path(svg).stem}.png"),
-                "-dimensions 16 16",
+                "-dimensions",
+                "32",
+                "32",
                 "-autoframe",
-                "-range 1",
             ]
         )
 
@@ -125,7 +126,17 @@ if os.path.exists(texture_in):
         os.mkdir(texture_out)
 
     for dir in os.listdir(texture_in):
-        subprocess.run(["cramcli", os.path.join(texture_in, dir), texture_out, dir])
+        subprocess.run(
+            [
+                "cramcli",
+                os.path.join(texture_in, dir),
+                texture_out,
+                dir,
+                "--padding",
+                "4",
+                "--premultiply",
+            ]
+        )
 
 #
 # SFX
