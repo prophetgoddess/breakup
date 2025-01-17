@@ -5,8 +5,11 @@ namespace Ball;
 
 public class BallSpawner : MoonTools.ECS.Manipulator
 {
+    GemSpawner GemSpawner;
+
     public BallSpawner(World world) : base(world)
     {
+        GemSpawner = new GemSpawner(world);
     }
 
     public Entity SpawnBall(Vector2 position)
@@ -25,6 +28,8 @@ public class BallSpawner : MoonTools.ECS.Manipulator
         Set(ball, new DestroyOnStateTransition());
         Set(ball, new Highlight());
         Set(ball, new CanDealDamageToBlock(1));
+
+        GemSpawner.SpawnGems(5, position);
 
         return ball;
     }

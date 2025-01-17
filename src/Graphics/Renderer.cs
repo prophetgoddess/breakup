@@ -31,9 +31,8 @@ public class Renderer : MoonTools.ECS.Renderer
     MoonTools.ECS.Filter ColliderFilter;
     List<Entity> SDFSort = new();
 
-    Queue<TextBatch> TextBatchPool;
-    Queue<(Vector2 pos, float depth, TextBatch batch)> GameTextBatchesToRender = new Queue<(Vector2 pos, float depth, TextBatch batch)>();
-    Queue<(Vector2 pos, float depth, TextBatch batch)> UITextBatchesToRender = new Queue<(Vector2 pos, float depth, TextBatch batch)>();
+    TextBatch GameTextBatch;
+    TextBatch UITextBatch;
     GraphicsPipeline TextPipeline;
 
     Texture GameTexture;
@@ -164,21 +163,14 @@ public class Renderer : MoonTools.ECS.Renderer
         });
     }
 
-    TextBatch GetTextBatch()
-    {
-        if (TextBatchPool.Count > 0)
-            return TextBatchPool.Dequeue();
-
-        return new TextBatch(GraphicsDevice);
-    }
-
     public Renderer(World world, Window window, GraphicsDevice graphicsDevice, Inputs inputs) : base(world)
     {
         GraphicsDevice = graphicsDevice;
         Window = window;
         Inputs = inputs;
 
-        TextBatchPool = new Queue<TextBatch>();
+        GameTextBatch = new TextBatch(GraphicsDevice);
+        UITextBatch = new TextBatch(GraphicsDevice);
 
         CreateRenderTextures();
 
@@ -425,6 +417,8 @@ public class Renderer : MoonTools.ECS.Renderer
             -1f
         );
 
+        GameTextBatch.Start();
+
         foreach (var textEntity in GameTextFilter.Entities)
         {
             if (Has<Invisible>(textEntity))
@@ -441,69 +435,79 @@ public class Renderer : MoonTools.ECS.Renderer
 
             if (!Has<WordWrap>(textEntity))
             {
-                var textBatch = GetTextBatch();
-                textBatch.Start(Stores.FontStorage.Get(text.FontID));
-                textBatch.Add(Stores.TextStorage.Get(text.TextID), text.Size, color, text.HorizontalAlignment, text.VerticalAlignment);
-                textBatch.UploadBufferData(cmdbuf);
-
-                GameTextBatchesToRender.Enqueue((position, depth, textBatch));
+                GameTextBatch.Add(
+                    Stores.FontStorage.Get(text.FontID),
+                    Stores.TextStorage.Get(text.TextID),
+                    text.Size,
+                    Matrix4x4.CreateTranslation(new Vector3(position.X, position.Y, depth)),
+                    color,
+                    text.HorizontalAlignment,
+                    text.VerticalAlignment
+                );
             }
-            else
-            {
-                TextBatch textBatch;
-                var max = Get<WordWrap>(textEntity).Max;
-                var font = Stores.FontStorage.Get(text.FontID);
-                var str = Stores.TextStorage.Get(text.TextID);
-                var words = str.Split(' ');
-                StringBuilder.Clear();
-                var y = position.Y;
-                var current = "";
-                WellspringCS.Wellspring.Rectangle rect;
+            // else
+            // {
+            //     TextBatch textBatch;
+            //     var max = Get<WordWrap>(textEntity).Max;
+            //     var font = Stores.FontStorage.Get(text.FontID);
+            //     var str = Stores.TextStorage.Get(text.TextID);
+            //     var words = str.Split(' ');
+            //     StringBuilder.Clear();
+            //     var y = position.Y;
+            //     var current = "";
+            //     WellspringCS.Wellspring.Rectangle rect;
 
-                foreach (var word in words)
-                {
-                    StringBuilder.Append(word);
-                    StringBuilder.Append(" ");
-                    font.TextBounds(StringBuilder.ToString(), text.Size, text.HorizontalAlignment, text.VerticalAlignment, out rect);
-                    if (rect.W >= max)
-                    {
-                        textBatch = GetTextBatch();
-                        textBatch.Start(font);
-                        textBatch.Add(current, text.Size, color, text.HorizontalAlignment, text.VerticalAlignment);
-                        textBatch.UploadBufferData(cmdbuf);
-                        GameTextBatchesToRender.Enqueue((new Vector2(position.X, y), depth, textBatch));
-                        y += rect.H + 2;
-                        StringBuilder.Clear();
-                        StringBuilder.Append(word);
-                        StringBuilder.Append(" ");
-                    }
-                    current = StringBuilder.ToString();
-                }
+            //     foreach (var word in words)
+            //     {
+            //         StringBuilder.Append(word);
+            //         StringBuilder.Append(" ");
+            //         font.TextBounds(StringBuilder.ToString(), text.Size, text.HorizontalAlignment, text.VerticalAlignment, out rect);
+            //         if (rect.W >= max)
+            //         {
+            //             textBatch = GetTextBatch();
+            //             textBatch.Start(font);
+            //             textBatch.Add(current, text.Size, color, text.HorizontalAlignment, text.VerticalAlignment);
+            //             textBatch.UploadBufferData(cmdbuf);
+            //             GameTextBatchesToRender.Enqueue((new Vector2(position.X, y), depth, textBatch));
+            //             y += rect.H + 2;
+            //             StringBuilder.Clear();
+            //             StringBuilder.Append(word);
+            //             StringBuilder.Append(" ");
+            //         }
+            //         current = StringBuilder.ToString();
+            //     }
 
-                textBatch = GetTextBatch();
-                textBatch.Start(Stores.FontStorage.Get(text.FontID));
-                textBatch.Add(StringBuilder.ToString(), text.Size, color, text.HorizontalAlignment, text.VerticalAlignment);
-                textBatch.UploadBufferData(cmdbuf);
-                GameTextBatchesToRender.Enqueue((new Vector2(position.X, y), depth, textBatch));
-            }
+            //     textBatch = GetTextBatch();
+            //     textBatch.Start(Stores.FontStorage.Get(text.FontID));
+            //     textBatch.Add(StringBuilder.ToString(), text.Size, color, text.HorizontalAlignment, text.VerticalAlignment);
+            //     textBatch.UploadBufferData(cmdbuf);
+            //     GameTextBatchesToRender.Enqueue((new Vector2(position.X, y), depth, textBatch));
+            // }
         }
 
+        int count = 0;
+        UITextBatch.Start();
         foreach (var textEntity in TextFilter.Entities)
         {
             if (Has<Invisible>(textEntity))
                 continue;
 
-            var textBatch = GetTextBatch();
             var text = Get<Text>(textEntity);
             var color = Has<Highlight>(textEntity) ? palette.Highlight : palette.Foreground;
             var position = Get<Position>(textEntity).Value;
             var depth = Has<Depth>(textEntity) ? Get<Depth>(textEntity).Value : 0.5f;
 
-            textBatch.Start(Stores.FontStorage.Get(text.FontID));
-            textBatch.Add(Stores.TextStorage.Get(text.TextID), text.Size, color, text.HorizontalAlignment, text.VerticalAlignment);
-            textBatch.UploadBufferData(cmdbuf);
+            UITextBatch.Add(
+                Stores.FontStorage.Get(text.FontID),
+                Stores.TextStorage.Get(text.TextID),
+                text.Size,
+                Matrix4x4.CreateTranslation(new Vector3(position.X, position.Y, depth)),
+                color,
+                text.HorizontalAlignment,
+                text.VerticalAlignment
+            );
 
-            UITextBatchesToRender.Enqueue((position, depth, textBatch));
+            count++;
         }
 
         var data = SpriteComputeTransferBuffer.Map<ComputeSpriteData>(true);
@@ -583,13 +587,16 @@ public class Renderer : MoonTools.ECS.Renderer
 
         }
 
-        cmdbuf.PushVertexUniformData(cameraMatrix);
+        if (SDFFilter.Count > 0)
+        {
+            cmdbuf.PushVertexUniformData(cameraMatrix);
 
-        gamePass.BindGraphicsPipeline(SDFPipeline);
-        gamePass.BindVertexBuffers(SpriteVertexBuffer);
-        gamePass.BindIndexBuffer(SpriteIndexBuffer, IndexElementSize.ThirtyTwo);
-        gamePass.BindFragmentSamplers(new TextureSamplerBinding(Content.SDF.Atlas, SDFSampler));
-        gamePass.DrawIndexedPrimitives((uint)SDFFilter.Count * 6, 1, 0, 0, 0);
+            gamePass.BindGraphicsPipeline(SDFPipeline);
+            gamePass.BindVertexBuffers(SpriteVertexBuffer);
+            gamePass.BindIndexBuffer(SpriteIndexBuffer, IndexElementSize.ThirtyTwo);
+            gamePass.BindFragmentSamplers(new TextureSamplerBinding(Content.SDF.Atlas, SDFSampler));
+            gamePass.DrawIndexedPrimitives((uint)SDFFilter.Count * 6, 1, 0, 0, 0);
+        }
 
         gamePass.BindGraphicsPipeline(ModelPipeline);
 
@@ -614,15 +621,9 @@ public class Renderer : MoonTools.ECS.Renderer
 
         gamePass.BindGraphicsPipeline(TextPipeline);
 
-        while (GameTextBatchesToRender.Count > 0)
-        {
-            var (position, depth, textBatch) = GameTextBatchesToRender.Dequeue();
-
-            var textModel = Matrix4x4.CreateTranslation(position.X, position.Y, depth);
-
-            textBatch.Render(gamePass, textModel * cameraMatrix);
-            TextBatchPool.Enqueue(textBatch);
-        }
+        Console.WriteLine("game text batch render");
+        if (GameTextBatch.VertexCount > 0)
+            GameTextBatch.Render(gamePass, cameraMatrix);
 
         cmdbuf.EndRenderPass(gamePass);
 
@@ -681,15 +682,9 @@ public class Renderer : MoonTools.ECS.Renderer
 
         uiPass.BindGraphicsPipeline(TextPipeline);
 
-        while (UITextBatchesToRender.Count > 0)
-        {
-            var (position, depth, textBatch) = UITextBatchesToRender.Dequeue();
-
-            var textModel = Matrix4x4.CreateTranslation(position.X, position.Y, depth);
-
-            textBatch.Render(uiPass, textModel * uiCameraMatrix);
-            TextBatchPool.Enqueue(textBatch);
-        }
+        Console.WriteLine("ui text batch render");
+        if (UITextBatch.VertexCount > 0)
+            UITextBatch.Render(uiPass, uiCameraMatrix);
 
         cmdbuf.EndRenderPass(uiPass);
 
