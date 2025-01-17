@@ -29,6 +29,7 @@ public class Renderer : MoonTools.ECS.Renderer
     MoonTools.ECS.Filter TextFilter;
     MoonTools.ECS.Filter GameTextFilter;
     MoonTools.ECS.Filter ColliderFilter;
+    List<Entity> SDFSort = new();
 
     Queue<TextBatch> TextBatchPool;
     Queue<(Vector2 pos, float depth, TextBatch batch)> GameTextBatchesToRender = new Queue<(Vector2 pos, float depth, TextBatch batch)>();
@@ -51,7 +52,6 @@ public class Renderer : MoonTools.ECS.Renderer
     Buffer SpriteVertexBuffer;
     Buffer SpriteIndexBuffer;
     const int MAX_SPRITE_COUNT = 8192;
-
 
     [StructLayout(LayoutKind.Explicit, Size = 64)]
     struct ComputeSpriteData
@@ -290,7 +290,7 @@ public class Renderer : MoonTools.ECS.Renderer
         };
 
         SDFPipeline = GraphicsPipeline.Create(graphicsDevice, sdfPipelineCreateInfo);
-        SDFSampler = Sampler.Create(GraphicsDevice, SamplerCreateInfo.LinearWrap);
+        SDFSampler = Sampler.Create(GraphicsDevice, SamplerCreateInfo.LinearClamp);
 
         var textPipelineCreateInfo = new GraphicsPipelineCreateInfo
         {
@@ -508,6 +508,7 @@ public class Renderer : MoonTools.ECS.Renderer
 
         var data = SpriteComputeTransferBuffer.Map<ComputeSpriteData>(true);
         int sdfIndex = 0;
+
         foreach (var entity in SDFFilter.Entities)
         {
             var position = Get<Position>(entity).Value;
@@ -528,6 +529,9 @@ public class Renderer : MoonTools.ECS.Renderer
             data[sdfIndex].TextureRect = uv;
             data[sdfIndex].Origin = Has<Origin>(entity) ? Get<Origin>(entity).Value : Vector2.One * 0.5f;
             sdfIndex++;
+
+            if (sdfIndex >= data.Length)
+                break;
         }
         SpriteComputeTransferBuffer.Unmap();
 

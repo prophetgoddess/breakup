@@ -50,7 +50,7 @@ public class GameSpawner : Manipulator
         Set(player, new Origin(new Vector2(0.5f, 0.4f)));
         Set(player, new SolidCollision());
         Set(player, new HitBall());
-        Set(player, new Scale(new Vector2(55, 50)));
+        Set(player, new Scale(new Vector2(50, 50)));
         Set(player, new Player());
         Set(player, new FollowsCamera(Dimensions.GameHeight * 0.9f));
         Set(player, new DestroyOnStateTransition());
