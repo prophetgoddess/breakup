@@ -40,7 +40,7 @@ public class PlayerAttractor : MoonTools.ECS.System
                 if (!Has<MovingTowardsPlayer>(entity))
                 {
                     var timerEntity = CreateEntity();
-                    Set(timerEntity, new Timer(Rando.Range(1.0f, 3.0f)));
+                    Set(timerEntity, new Timer(Rando.Range(0.5f, 1.0f)));
                     Relate(entity, timerEntity, new MoveTowardsPlayerTimer());
                     Set(entity, new MovingTowardsPlayer(Get<Position>(entity).Value));
                     Remove<Velocity>(entity);
