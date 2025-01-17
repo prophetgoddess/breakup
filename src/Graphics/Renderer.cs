@@ -485,6 +485,7 @@ public class Renderer : MoonTools.ECS.Renderer
             // }
         }
 
+        GameTextBatch.UploadBufferData(cmdbuf);
         int count = 0;
         UITextBatch.Start();
         foreach (var textEntity in TextFilter.Entities)
@@ -509,6 +510,7 @@ public class Renderer : MoonTools.ECS.Renderer
 
             count++;
         }
+        UITextBatch.UploadBufferData(cmdbuf);
 
         var data = SpriteComputeTransferBuffer.Map<ComputeSpriteData>(true);
         int sdfIndex = 0;
@@ -682,7 +684,6 @@ public class Renderer : MoonTools.ECS.Renderer
 
         uiPass.BindGraphicsPipeline(TextPipeline);
 
-        Console.WriteLine("ui text batch render");
         if (UITextBatch.VertexCount > 0)
             UITextBatch.Render(uiPass, uiCameraMatrix);
 
