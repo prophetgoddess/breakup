@@ -35,6 +35,8 @@ public class Renderer : MoonTools.ECS.Renderer
     TextBatch UITextBatch;
     GraphicsPipeline TextPipeline;
 
+    PriorityQueue<Entity, float> DrawPriority = new();
+
     Texture GameTexture;
     Texture UITexture;
     Texture DepthTexture;
@@ -418,9 +420,16 @@ public class Renderer : MoonTools.ECS.Renderer
         );
 
         GameTextBatch.Start();
+        DrawPriority.Clear();
 
         foreach (var textEntity in GameTextFilter.Entities)
         {
+            DrawPriority.Enqueue(textEntity, 1.0f - (Has<Depth>(textEntity) ? Get<Depth>(textEntity).Value : 0.5f));
+        }
+
+        while (DrawPriority.Count > 0)
+        {
+            var textEntity = DrawPriority.Dequeue();
             if (Has<Invisible>(textEntity))
                 continue;
 
@@ -486,6 +495,8 @@ public class Renderer : MoonTools.ECS.Renderer
         }
 
         GameTextBatch.UploadBufferData(cmdbuf);
+
+
         int count = 0;
         UITextBatch.Start();
         foreach (var textEntity in TextFilter.Entities)
@@ -515,8 +526,16 @@ public class Renderer : MoonTools.ECS.Renderer
         var data = SpriteComputeTransferBuffer.Map<ComputeSpriteData>(true);
         int sdfIndex = 0;
 
+        DrawPriority.Clear();
+
         foreach (var entity in SDFFilter.Entities)
         {
+            DrawPriority.Enqueue(entity, 1.0f - (Has<Depth>(entity) ? Get<Depth>(entity).Value : 0.5f));
+        }
+
+        while (DrawPriority.Count > 0)
+        {
+            var entity = DrawPriority.Dequeue();
             var position = Get<Position>(entity).Value;
             var rotation = Has<Orientation>(entity) ? Get<Orientation>(entity).Value : 0.0f;
             var uv = Get<SDFGraphic>(entity).UV;
