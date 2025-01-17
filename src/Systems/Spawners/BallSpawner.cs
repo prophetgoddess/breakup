@@ -29,8 +29,6 @@ public class BallSpawner : MoonTools.ECS.Manipulator
         Set(ball, new Highlight());
         Set(ball, new CanDealDamageToBlock(1));
 
-        GemSpawner.SpawnGems(5, position);
-
         return ball;
     }
 }
