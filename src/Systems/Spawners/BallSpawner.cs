@@ -28,7 +28,6 @@ public class BallSpawner : MoonTools.ECS.Manipulator
         Set(ball, new DestroyOnStateTransition());
         Set(ball, new Highlight());
         Set(ball, new CanDealDamageToBlock(1));
-
         return ball;
     }
 }

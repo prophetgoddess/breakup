@@ -642,7 +642,6 @@ public class Renderer : MoonTools.ECS.Renderer
 
         gamePass.BindGraphicsPipeline(TextPipeline);
 
-        Console.WriteLine("game text batch render");
         if (GameTextBatch.VertexCount > 0)
             GameTextBatch.Render(gamePass, cameraMatrix);
 
