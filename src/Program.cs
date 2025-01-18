@@ -122,7 +122,7 @@ class Program : Game
 #if DEBUG
         debugMode = true;
         var windowCreateInfo = new WindowCreateInfo(
-            "Ball",
+            "break.up",
             1280,
             720,
             ScreenMode.Windowed
@@ -130,7 +130,7 @@ class Program : Game
 
 #else
         var windowCreateInfo = new WindowCreateInfo(
-            "Ball",
+            "break.up",
             1280,
             720,
             ScreenMode.Windowed

@@ -73,7 +73,6 @@ public class PlayerAttractor : MoonTools.ECS.System
 
             var timer = Get<Timer>(OutRelationSingleton<MoveTowardsPlayerTimer>(entity));
             var t = Easing.InQuad(1.0f - timer.Remaining);
-            Console.WriteLine("t: " + t);
 
             Set(entity, new Position(Vector2.Lerp(Get<MovingTowardsPlayer>(entity).startPosition, playerPosition, t)));
         }

@@ -173,8 +173,6 @@ public class GameStateManager : MoonTools.ECS.System
             Set(revive, new ReviveWithOneHealth(true));
         }
 
-
-
         if (!Some<Gems>())
             return;
 
