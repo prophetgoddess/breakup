@@ -80,7 +80,7 @@ public class Blocks : MoonTools.ECS.System
             Relate(block, hpDisplay, new HPDisplay());
             Set(hpDisplay, new Text(Fonts.BodyFont, Fonts.InfoSize, Stores.TextStorage.GetID($"{GameStateManager.GetFormattedNumber(hp, 2)}"), MoonWorks.Graphics.Font.HorizontalAlignment.Center, MoonWorks.Graphics.Font.VerticalAlignment.Middle));
 
-            if (Rando.Value < 1.0f && UpgradeMenuSpawner.UpgradesAvailable() && !Some<GivesUpgrade>())
+            if (Rando.Value < 0.04f && UpgradeMenuSpawner.UpgradesAvailable() && !Some<GivesUpgrade>())
             {
                 Set(block, new GivesUpgrade());
                 Set(block, new Highlight());
