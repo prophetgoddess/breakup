@@ -454,44 +454,36 @@ public class Renderer : MoonTools.ECS.Renderer
                     text.VerticalAlignment
                 );
             }
-            // else
-            // {
-            //     TextBatch textBatch;
-            //     var max = Get<WordWrap>(textEntity).Max;
-            //     var font = Stores.FontStorage.Get(text.FontID);
-            //     var str = Stores.TextStorage.Get(text.TextID);
-            //     var words = str.Split(' ');
-            //     StringBuilder.Clear();
-            //     var y = position.Y;
-            //     var current = "";
-            //     WellspringCS.Wellspring.Rectangle rect;
+            else
+            {
+                var max = Get<WordWrap>(textEntity).Max;
+                var font = Stores.FontStorage.Get(text.FontID);
+                var str = Stores.TextStorage.Get(text.TextID);
+                var words = str.Split(' ');
+                StringBuilder.Clear();
+                var y = position.Y;
+                var current = "";
+                WellspringCS.Wellspring.Rectangle rect;
 
-            //     foreach (var word in words)
-            //     {
-            //         StringBuilder.Append(word);
-            //         StringBuilder.Append(" ");
-            //         font.TextBounds(StringBuilder.ToString(), text.Size, text.HorizontalAlignment, text.VerticalAlignment, out rect);
-            //         if (rect.W >= max)
-            //         {
-            //             textBatch = GetTextBatch();
-            //             textBatch.Start(font);
-            //             textBatch.Add(current, text.Size, color, text.HorizontalAlignment, text.VerticalAlignment);
-            //             textBatch.UploadBufferData(cmdbuf);
-            //             GameTextBatchesToRender.Enqueue((new Vector2(position.X, y), depth, textBatch));
-            //             y += rect.H + 2;
-            //             StringBuilder.Clear();
-            //             StringBuilder.Append(word);
-            //             StringBuilder.Append(" ");
-            //         }
-            //         current = StringBuilder.ToString();
-            //     }
+                foreach (var word in words)
+                {
+                    StringBuilder.Append(word);
+                    StringBuilder.Append(" ");
+                    font.TextBounds(StringBuilder.ToString(), text.Size, text.HorizontalAlignment, text.VerticalAlignment, out rect);
+                    if (rect.W >= max)
+                    {
+                        GameTextBatch.Add(font, current, text.Size, Matrix4x4.CreateTranslation(new Vector3(position.X, y, depth)), color, text.HorizontalAlignment, text.VerticalAlignment);
+                        y += rect.H + 2;
+                        StringBuilder.Clear();
+                        StringBuilder.Append(word);
+                        StringBuilder.Append(" ");
+                    }
+                    current = StringBuilder.ToString();
+                }
 
-            //     textBatch = GetTextBatch();
-            //     textBatch.Start(Stores.FontStorage.Get(text.FontID));
-            //     textBatch.Add(StringBuilder.ToString(), text.Size, color, text.HorizontalAlignment, text.VerticalAlignment);
-            //     textBatch.UploadBufferData(cmdbuf);
-            //     GameTextBatchesToRender.Enqueue((new Vector2(position.X, y), depth, textBatch));
-            // }
+                GameTextBatch.Add(font, current, text.Size, Matrix4x4.CreateTranslation(new Vector3(position.X, y, depth)), color, text.HorizontalAlignment, text.VerticalAlignment);
+
+            }
         }
 
         GameTextBatch.UploadBufferData(cmdbuf);
