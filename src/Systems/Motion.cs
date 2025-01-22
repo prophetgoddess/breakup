@@ -109,9 +109,7 @@ public class Motion : MoonTools.ECS.System
         var destX = position.X + velocity.X;
         var destY = position.Y + velocity.Y;
 
-        Retrieve(e, new Vector2(destX, position.Y));
-
-        foreach (var other in PossibleCollisions)
+        foreach (var other in ColliderFilter.Entities)
         {
             var otherPos = Get<Position>(other).Value;
             var otherBox = Get<BoundingBox>(other);
@@ -134,7 +132,7 @@ public class Motion : MoonTools.ECS.System
 
         Retrieve(e, new Vector2(position.X, destY));
 
-        foreach (var other in PossibleCollisions)
+        foreach (var other in ColliderFilter.Entities)
         {
             var otherPos = Get<Position>(other).Value;
             var otherBox = Get<BoundingBox>(other);
@@ -160,20 +158,11 @@ public class Motion : MoonTools.ECS.System
 
     public override void Update(TimeSpan delta)
     {
-        foreach (var (k, v) in SpatialHash)
-        {
-            v.Clear();
-        }
 
         if (Some<Pause>())
             return;
 
         var dt = (float)delta.TotalSeconds;
-
-        foreach (var entity in ColliderFilter.Entities)
-        {
-            Insert(entity);
-        }
 
         foreach (var entity in MotionFilter.Entities)
         {
