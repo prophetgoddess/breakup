@@ -251,9 +251,5 @@ public class GameSpawner : Manipulator
         Set(gemsEntity, new UI());
         Set(gemsEntity, new DestroyOnStateTransition());
 
-        GiveUpgrade.Upgrade(Upgrades.Bonus);
-        GiveUpgrade.Upgrade(Upgrades.Safety);
-
-
     }
 }
