@@ -9,12 +9,14 @@ public class GameSpawner : Manipulator
     SaveGame SaveGame;
     Filter DestroyFilter;
     BallSpawner BallSpawner;
+    GiveUpgrade GiveUpgrade;
 
     public GameSpawner(World world) : base(world)
     {
         SaveGame = new SaveGame(world);
         DestroyFilter = FilterBuilder.Include<DestroyOnStateTransition>().Build();
         BallSpawner = new BallSpawner(world);
+        GiveUpgrade = new GiveUpgrade(world);
 
     }
 
@@ -56,7 +58,7 @@ public class GameSpawner : Manipulator
         Set(player, new FollowsCamera(Dimensions.GameHeight * 0.9f));
         Set(player, new DestroyOnStateTransition());
 
-        Relate(ball, player, new HeldBy(new Vector2(0f, -42.0f)));
+        Relate(ball, player, new HeldBy(new Vector2(0f, -36.0f)));
         Set(ball, new Velocity(Vector2.Zero));
 
         var power = CreateEntity();
@@ -248,6 +250,9 @@ public class GameSpawner : Manipulator
         Set(gemsEntity, new Position(new Vector2(UILayoutConstants.InfoX, UILayoutConstants.GemsY)));
         Set(gemsEntity, new UI());
         Set(gemsEntity, new DestroyOnStateTransition());
+
+        GiveUpgrade.Upgrade(Upgrades.Bonus);
+        GiveUpgrade.Upgrade(Upgrades.Safety);
 
 
     }

@@ -9,11 +9,14 @@ public class Collision : MoonTools.ECS.System
 {
     Filter CollidingFilter;
     Filter BlocksFilter;
+    Filter BallFilter;
+
 
     XPAndLevel XPAndLevel;
 
     public Collision(World world) : base(world)
     {
+        BallFilter = FilterBuilder.Include<CanDealDamageToBlock>().Include<HasGravity>().Include<CanBeHit>().Build();
         CollidingFilter = FilterBuilder.Include<Position>().Include<BoundingBox>().Build();
         XPAndLevel = new XPAndLevel(world);
         BlocksFilter = FilterBuilder
@@ -211,11 +214,10 @@ public class Collision : MoonTools.ECS.System
                 Set(GetSingletonEntity<DestroysBall>(), new Invisible());
                 return;
             }
-            else if (Some<BarrierTakesExtraHit>() && !GetSingleton<BarrierTakesExtraHit>().Active)
+            else if (Some<BarrierTakesExtraHit>() && !GetSingleton<BarrierTakesExtraHit>().Active && BallFilter.Count == 1)
             {
                 Set(GetSingletonEntity<BarrierTakesExtraHit>(), new BarrierTakesExtraHit(true));
                 Remove<Invisible>(GetSingletonEntity<DestroysBall>());
-
             }
 
             var meterEntity = GetSingletonEntity<Power>();

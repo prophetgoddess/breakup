@@ -613,24 +613,22 @@ public class Renderer : MoonTools.ECS.Renderer
 
         gamePass.BindGraphicsPipeline(ModelPipeline);
 
-        if (Inputs.Keyboard.IsHeld(KeyCode.F1))
-        {
-            foreach (var entity in ColliderFilter.Entities)
-            {
-                var position = Get<Position>(entity).Value;
-                var box = Get<BoundingBox>(entity);
 
-                Matrix4x4 model =
-                Matrix4x4.CreateScale(new Vector3(box.Width, box.Height, 0))
-                * Matrix4x4.CreateTranslation(new Vector3(position + new Vector2(box.X, box.Y), 0f)) * cameraMatrix;
-                var uniforms = new TransformVertexUniform(model, Color.Red * 0.5f);
+        // foreach (var entity in ColliderFilter.Entities)
+        // {
+        //     var position = Get<Position>(entity).Value;
+        //     var box = Get<BoundingBox>(entity);
 
-                gamePass.BindVertexBuffers(RectVertexBuffer);
-                gamePass.BindIndexBuffer(RectIndexBuffer, IndexElementSize.ThirtyTwo);
-                cmdbuf.PushVertexUniformData(uniforms);
-                gamePass.DrawIndexedPrimitives(6, 1, 0, 0, 0);
-            }
-        }
+        //     Matrix4x4 model =
+        //     Matrix4x4.CreateScale(new Vector3(box.Width, box.Height, 0))
+        //     * Matrix4x4.CreateTranslation(new Vector3(position + new Vector2(box.X, box.Y), 0f)) * cameraMatrix;
+        //     var uniforms = new TransformVertexUniform(model, Color.Red * 0.5f);
+
+        //     gamePass.BindVertexBuffers(RectVertexBuffer);
+        //     gamePass.BindIndexBuffer(RectIndexBuffer, IndexElementSize.ThirtyTwo);
+        //     cmdbuf.PushVertexUniformData(uniforms);
+        //     gamePass.DrawIndexedPrimitives(6, 1, 0, 0, 0);
+        // }
 
         gamePass.BindGraphicsPipeline(TextPipeline);
 
