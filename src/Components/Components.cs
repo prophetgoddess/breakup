@@ -87,3 +87,5 @@ public readonly record struct MusicVolume(float Value);
 public readonly record struct Fullscreen(bool Value);
 public readonly record struct RebindControls(bool Rebinding);
 public readonly record struct QuitMeter();
+public readonly record struct LivesLabel();
+public readonly record struct HighlightFlicker(float Rate);

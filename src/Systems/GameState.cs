@@ -161,6 +161,8 @@ public class GameStateManager : MoonTools.ECS.System
                 Set(revive, new ReviveWithOneHealth(false));
                 var l = GetSingletonEntity<Lives>();
                 Set(l, new Lives(1));
+                Remove<Flicker>(GetSingletonEntity<LivesLabel>());
+                Remove<Highlight>(GetSingletonEntity<LivesLabel>());
             }
             else
             {
@@ -171,6 +173,7 @@ public class GameStateManager : MoonTools.ECS.System
         {
             var revive = GetSingletonEntity<ReviveWithOneHealth>();
             Set(revive, new ReviveWithOneHealth(true));
+            Set(GetSingletonEntity<LivesLabel>(), new Flicker(0.33f));
         }
 
         if (!Some<Gems>())

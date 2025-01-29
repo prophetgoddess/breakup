@@ -130,6 +130,7 @@ public class GameSpawner : Manipulator
             Fonts.HeaderSize,
             Stores.TextStorage.GetID("LIVES")));
         Set(livesLabel, new UI());
+        Set(livesLabel, new LivesLabel());
         Set(livesLabel, new DestroyOnStateTransition());
 
         var livesEntity = CreateEntity();
@@ -250,6 +251,8 @@ public class GameSpawner : Manipulator
         Set(gemsEntity, new Position(new Vector2(UILayoutConstants.InfoX, UILayoutConstants.GemsY)));
         Set(gemsEntity, new UI());
         Set(gemsEntity, new DestroyOnStateTransition());
+
+        GiveUpgrade.Upgrade(Upgrades.Invictus);
 
     }
 }

@@ -19,13 +19,27 @@ public class Flickering : MoonTools.ECS.System
             var flicker = Get<Flicker>(entity);
             if (!HasOutRelation<FlickerTimer>(entity))
             {
-                if (!Has<Invisible>(entity))
+                if (!Has<HighlightFlicker>(entity))
                 {
-                    Set(entity, new Invisible());
+                    if (!Has<Invisible>(entity))
+                    {
+                        Set(entity, new Invisible());
+                    }
+                    else
+                    {
+                        Remove<Invisible>(entity);
+                    }
                 }
                 else
                 {
-                    Remove<Invisible>(entity);
+                    if (!Has<Highlight>(entity))
+                    {
+                        Set(entity, new Highlight());
+                    }
+                    else
+                    {
+                        Remove<Highlight>(entity);
+                    }
                 }
 
                 var timer = CreateEntity();

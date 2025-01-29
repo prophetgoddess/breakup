@@ -35,6 +35,9 @@ public class GiveUpgrade : Manipulator
         else if (type == Upgrades.Invictus)
         {
             Set(GetSingletonEntity<Player>(), new ReviveWithOneHealth(true));
+            Set(GetSingletonEntity<LivesLabel>(), new HighlightFlicker());
+            Set(GetSingletonEntity<LivesLabel>(), new Flicker(0.33f));
+
         }
         else if (type == Upgrades.MedSchool)
         {
