@@ -89,3 +89,4 @@ public readonly record struct RebindControls(bool Rebinding);
 public readonly record struct QuitMeter();
 public readonly record struct LivesLabel();
 public readonly record struct HighlightFlicker(float Rate);
+public readonly record struct SongChanged();

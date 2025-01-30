@@ -179,6 +179,50 @@ public class SettingsMenuSpawner : Manipulator
 
         startY += Some<Player>() ? 30f : 50f;
 
+        var playingSong = GetSingleton<Song>();
+
+        var songLabel = CreateEntity();
+        Set(songLabel,
+            new Position(new Vector2(x, startY)));
+        Set(songLabel,
+         new Text(
+            Fonts.HeaderFont,
+            Some<Player>() ? Fonts.PromptSize : Fonts.BodySize,
+            Stores.TextStorage.GetID("song"),
+            MoonWorks.Graphics.Font.HorizontalAlignment.Left,
+            MoonWorks.Graphics.Font.VerticalAlignment.Middle));
+        Set(songLabel, new KeepOpacityWhenPaused());
+        Set(songLabel, new Depth(0.1f));
+        Set(songLabel, new FollowsCamera(startY));
+        Set(songLabel, new DestroyOnStateTransition());
+        Set(songLabel, new Setting());
+        Relate(songLabel, GetSingletonEntity<Song>(), new SettingControls());
+        if (!Some<Player>())
+            Set(songLabel, new UI());
+
+        var songDisplay = CreateEntity();
+        Set(songDisplay,
+            new Position(new Vector2(x + (Some<Player>() ? 100f : 200f), startY)));
+        Set(songDisplay,
+            new Text(
+                Fonts.HeaderFont,
+                Some<Player>() ? Fonts.PromptSize : Fonts.BodySize,
+                playingSong.NameID,
+                MoonWorks.Graphics.Font.HorizontalAlignment.Left,
+                MoonWorks.Graphics.Font.VerticalAlignment.Middle));
+        Set(songDisplay, new KeepOpacityWhenPaused());
+        Set(songDisplay, new Depth(0.1f));
+        Set(songDisplay, new FollowsCamera(startY));
+        Set(songDisplay, new DestroyOnStateTransition());
+        if (!Some<Player>())
+            Set(songDisplay, new UI());
+
+        Relate(songLabel, songDisplay, new SettingDisplay());
+
+        Relate(fullscreenLabel, songLabel, new VerticalConnection());
+
+        startY += Some<Player>() ? 30f : 50f;
+
         var rb = CreateEntity();
         Set(rb, new RebindControls(false));
 
@@ -202,7 +246,7 @@ public class SettingsMenuSpawner : Manipulator
         if (!Some<Player>())
             Set(rebindLabel, new UI());
 
-        Relate(fullscreenLabel, rebindLabel, new VerticalConnection());
+        Relate(songLabel, rebindLabel, new VerticalConnection());
 
     }
 

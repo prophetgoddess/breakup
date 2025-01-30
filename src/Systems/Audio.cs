@@ -18,6 +18,8 @@ public class Audio : MoonTools.ECS.System
     Queue<PersistentVoice> Voices = new Queue<PersistentVoice>();
     Queue<PersistentVoice> Playing = new Queue<PersistentVoice>();
 
+    Filter PlaySongFilter;
+
     PersistentVoice GetVoice()
     {
         if (Voices.Count > 0)
@@ -38,24 +40,53 @@ public class Audio : MoonTools.ECS.System
 
         AudioDevice = audioDevice;
         SFXFilter = FilterBuilder.Include<PlayOnce>().Build();
-        MusicData = AudioDataOgg.Create(audioDevice);
-        MusicData.Open(File.ReadAllBytes(Stores.TextStorage.Get(Music.Songs.GetRandomItem().PathID)));
+        PlaySongFilter = FilterBuilder.Include<Song>().Include<SongChanged>().Build();
 
-        MusicVoice = new StreamingVoice(audioDevice, MusicData.Format);
-        MusicVoice.Loop = true;
-        MusicVoice.SetVolume(Easing.InExpo(saveData.MusicVolume));
-        MusicVoice.Load(MusicData);
-        MusicVoice.Play();
+        var songEntity = CreateEntity();
+        Set(songEntity, Music.Songs[0]);
+        Set(songEntity, new SongChanged());
     }
 
     public override void Update(TimeSpan delta)
     {
+        if (PlaySongFilter.Count > 0)
+        {
+            var newSongEntity = PlaySongFilter.NthEntity(0);
+            var song = Get<Song>(newSongEntity);
+
+            var path = Stores.TextStorage.Get(song.PathID);
+
+            if (MusicData != null)
+            {
+                MusicData.Close();
+                MusicData.Dispose();
+            }
+
+            MusicData = AudioDataOgg.Create(AudioDevice);
+
+            MusicData.Open(File.ReadAllBytes(path));
+
+            if (MusicVoice != null)
+            {
+                MusicVoice.Dispose();
+            }
+
+            MusicVoice = new StreamingVoice(AudioDevice, MusicData.Format);
+            MusicVoice.Loop = true;
+
+            MusicVoice.Load(MusicData);
+
+            MusicVoice.Play();
+            Remove<SongChanged>(newSongEntity);
+        }
+
         while (Playing.Count > 0 && Playing.Peek().State != SoundState.Playing)
         {
             Voices.Enqueue(Playing.Dequeue());
         }
 
-        MusicVoice.SetVolume(Easing.InExpo(GetSingleton<MusicVolume>().Value));
+        if (MusicVoice != null)
+            MusicVoice.SetVolume(Easing.InExpo(GetSingleton<MusicVolume>().Value));
 
         foreach (var entity in SFXFilter.Entities)
         {

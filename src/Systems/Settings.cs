@@ -92,6 +92,28 @@ public class Settings : MoonTools.ECS.System
         {
             Set(GetSingletonEntity<RebindControls>(), new RebindControls(true));
         }
+        if (Has<Song>(setting))
+        {
+            var songEntity = GetSingletonEntity<Song>();
+            var song = Get<Song>(songEntity);
+            var songIndex = Array.IndexOf(Music.Songs, song);
+            songIndex = (songIndex + Amount);
+            if (songIndex < 0)
+                songIndex = Music.Songs.Length + songIndex;
+            else if (songIndex >= Music.Songs.Length)
+                songIndex = Music.Songs.Length - songIndex;
+
+            Set(songEntity, Music.Songs[songIndex]);
+            Set(songEntity, new SongChanged());
+
+            Set(display,
+                new Text(
+                    Fonts.HeaderFont,
+                    Some<Player>() ? Fonts.PromptSize : Fonts.BodySize,
+                    Music.Songs[songIndex].NameID,
+                    MoonWorks.Graphics.Font.HorizontalAlignment.Left,
+                    MoonWorks.Graphics.Font.VerticalAlignment.Middle));
+        }
 
         SaveGame.Save();
     }
