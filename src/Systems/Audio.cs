@@ -8,14 +8,12 @@ public class Audio : MoonTools.ECS.System
 {
     public const int MaxVolume = 10;
 
-
     Filter SFXFilter;
     AudioDevice AudioDevice;
 
     StreamingVoice MusicVoice;
     AudioDataOgg MusicData;
     SaveGame SaveGame;
-
 
     Queue<PersistentVoice> Voices = new Queue<PersistentVoice>();
     Queue<PersistentVoice> Playing = new Queue<PersistentVoice>();
@@ -41,7 +39,7 @@ public class Audio : MoonTools.ECS.System
         AudioDevice = audioDevice;
         SFXFilter = FilterBuilder.Include<PlayOnce>().Build();
         MusicData = AudioDataOgg.Create(audioDevice);
-        MusicData.Open(File.ReadAllBytes(Content.Music.music));
+        MusicData.Open(File.ReadAllBytes(Stores.TextStorage.Get(Music.Songs.GetRandomItem().PathID)));
 
         MusicVoice = new StreamingVoice(audioDevice, MusicData.Format);
         MusicVoice.Loop = true;

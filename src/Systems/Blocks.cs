@@ -131,9 +131,6 @@ public class Blocks : MoonTools.ECS.System
 
     public override void Update(TimeSpan delta)
     {
-        System.Console.WriteLine($"{GridWidth} * {GridHeight}");
-
-
         if (Some<Pause>())
             return;
 
