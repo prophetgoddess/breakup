@@ -129,6 +129,42 @@ public class Settings : MoonTools.ECS.System
                     MoonWorks.Graphics.Font.HorizontalAlignment.Left,
                     MoonWorks.Graphics.Font.VerticalAlignment.Middle));
         }
+        if (Has<Palette>(setting))
+        {
+            var paletteEntity = GetSingletonEntity<Palette>();
+            var palette = Get<Palette>(paletteEntity);
+            var paletteIndex = Array.IndexOf(ColorPalettes.Palettes, palette);
+            paletteIndex = (paletteIndex + Amount);
+
+            if (paletteIndex < 0)
+                paletteIndex = ColorPalettes.Palettes.Length + paletteIndex;
+            else if (paletteIndex >= ColorPalettes.Palettes.Length)
+                paletteIndex = ColorPalettes.Palettes.Length - paletteIndex;
+
+            var newPalette = ColorPalettes.Palettes[paletteIndex];
+
+            while (!newPalette.Unlocked)
+            {
+                paletteIndex = paletteIndex + Amount;
+
+                if (paletteIndex < 0)
+                    paletteIndex = ColorPalettes.Palettes.Length + paletteIndex;
+                else if (paletteIndex >= ColorPalettes.Palettes.Length)
+                    paletteIndex = ColorPalettes.Palettes.Length - paletteIndex;
+
+                newPalette = ColorPalettes.Palettes[paletteIndex];
+            }
+
+            Set(paletteEntity, newPalette);
+
+            Set(display,
+                new Text(
+                    Fonts.HeaderFont,
+                    Some<Player>() ? Fonts.PromptSize : Fonts.BodySize,
+                    ColorPalettes.Palettes[paletteIndex].NameID,
+                    MoonWorks.Graphics.Font.HorizontalAlignment.Left,
+                    MoonWorks.Graphics.Font.VerticalAlignment.Middle));
+        }
 
         SaveGame.Save();
     }

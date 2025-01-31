@@ -82,6 +82,7 @@ public class SettingsMenuSpawner : Manipulator
         Set(musicVolumeDisplay, new KeepOpacityWhenPaused());
         Set(musicVolumeDisplay, new Depth(0.1f));
         Set(musicVolumeDisplay, new FollowsCamera(startY));
+        Set(musicVolumeDisplay, new Highlight());
         Set(musicVolumeDisplay, new DestroyOnStateTransition());
         if (!Some<Player>())
             Set(musicVolumeDisplay, new UI());
@@ -126,6 +127,7 @@ public class SettingsMenuSpawner : Manipulator
         Set(sfxVolumeDisplay, new Depth(0.1f));
         Set(sfxVolumeDisplay, new FollowsCamera(startY));
         Set(sfxVolumeDisplay, new DestroyOnStateTransition());
+        Set(sfxVolumeDisplay, new Highlight());
         if (!Some<Player>())
             Set(sfxVolumeDisplay, new UI());
 
@@ -170,6 +172,7 @@ public class SettingsMenuSpawner : Manipulator
         Set(fullscreenDisplay, new Depth(0.1f));
         Set(fullscreenDisplay, new FollowsCamera(startY));
         Set(fullscreenDisplay, new DestroyOnStateTransition());
+        Set(fullscreenDisplay, new Highlight());
         if (!Some<Player>())
             Set(fullscreenDisplay, new UI());
 
@@ -203,6 +206,7 @@ public class SettingsMenuSpawner : Manipulator
         var songDisplay = CreateEntity();
         Set(songDisplay,
             new Position(new Vector2(x + (Some<Player>() ? 100f : 200f), startY)));
+        Set(songDisplay, new Highlight());
         Set(songDisplay,
             new Text(
                 Fonts.HeaderFont,
@@ -220,6 +224,51 @@ public class SettingsMenuSpawner : Manipulator
         Relate(songLabel, songDisplay, new SettingDisplay());
 
         Relate(fullscreenLabel, songLabel, new VerticalConnection());
+
+        startY += Some<Player>() ? 30f : 50f;
+
+        var currentPalette = GetSingleton<Palette>();
+
+        var paletteLabel = CreateEntity();
+        Set(paletteLabel,
+            new Position(new Vector2(x, startY)));
+        Set(paletteLabel,
+         new Text(
+            Fonts.HeaderFont,
+            Some<Player>() ? Fonts.PromptSize : Fonts.BodySize,
+            Stores.TextStorage.GetID("palette"),
+            MoonWorks.Graphics.Font.HorizontalAlignment.Left,
+            MoonWorks.Graphics.Font.VerticalAlignment.Middle));
+        Set(paletteLabel, new KeepOpacityWhenPaused());
+        Set(paletteLabel, new Depth(0.1f));
+        Set(paletteLabel, new FollowsCamera(startY));
+        Set(paletteLabel, new DestroyOnStateTransition());
+        Set(paletteLabel, new Setting());
+        Relate(paletteLabel, GetSingletonEntity<Palette>(), new SettingControls());
+        if (!Some<Player>())
+            Set(paletteLabel, new UI());
+
+        var paletteDisplay = CreateEntity();
+        Set(paletteDisplay,
+            new Position(new Vector2(x + (Some<Player>() ? 150f : 250f), startY)));
+        Set(paletteDisplay, new Highlight());
+        Set(paletteDisplay,
+            new Text(
+                Fonts.HeaderFont,
+                Some<Player>() ? Fonts.PromptSize : Fonts.BodySize,
+                currentPalette.NameID,
+                MoonWorks.Graphics.Font.HorizontalAlignment.Left,
+                MoonWorks.Graphics.Font.VerticalAlignment.Middle));
+        Set(paletteDisplay, new KeepOpacityWhenPaused());
+        Set(paletteDisplay, new Depth(0.1f));
+        Set(paletteDisplay, new FollowsCamera(startY));
+        Set(paletteDisplay, new DestroyOnStateTransition());
+        if (!Some<Player>())
+            Set(paletteDisplay, new UI());
+
+        Relate(paletteLabel, paletteDisplay, new SettingDisplay());
+
+        Relate(songLabel, paletteLabel, new VerticalConnection());
 
         startY += Some<Player>() ? 30f : 50f;
 

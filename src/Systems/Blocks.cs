@@ -171,8 +171,8 @@ public class Blocks : MoonTools.ECS.System
 
                 if (hp.Value <= 0)
                 {
-                    // var index = Music.UnlockSong();
-                    // SaveGame.Save();
+                    var index = ColorPalettes.Unlock();
+                    SaveGame.Save();
 
                     if (Has<GivesUpgrade>(block))
                     {

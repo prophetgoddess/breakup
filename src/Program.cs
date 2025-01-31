@@ -57,7 +57,7 @@ class Program : Game
 
         Renderer = new Renderer(World, MainWindow, GraphicsDevice, Inputs);
 
-        World.Set(World.CreateEntity(), ColorPalettes.Palettes[1]);
+        World.Set(World.CreateEntity(), ColorPalettes.Palettes[0]);
 
         new MainMenuSpawner(World).OpenMainMenu();
 
