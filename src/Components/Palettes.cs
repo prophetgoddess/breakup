@@ -9,14 +9,14 @@ public static class ColorPalettes
     public static Palette[] Palettes =
     {
         new Palette(
-                Stores.TextStorage.GetID("Default Purple"),
+                Stores.TextStorage.GetID("Default"),
                 Color.Azure,
                 new Color(172, 189, 186),
                 new Color(165, 153, 181),
                 true
             ),
         new Palette(
-            Stores.TextStorage.GetID("Burnt Offering"),
+            Stores.TextStorage.GetID("Burnt"),
             new Color(7, 16, 19),
             new Color(255, 255, 255),
             new Color(235, 81, 96),

@@ -205,7 +205,7 @@ public class SettingsMenuSpawner : Manipulator
 
         var songDisplay = CreateEntity();
         Set(songDisplay,
-            new Position(new Vector2(x + (Some<Player>() ? 100f : 200f), startY)));
+            new Position(new Vector2(x + (Some<Player>() ? 150f : 200f), startY)));
         Set(songDisplay, new Highlight());
         Set(songDisplay,
             new Text(
@@ -250,7 +250,7 @@ public class SettingsMenuSpawner : Manipulator
 
         var paletteDisplay = CreateEntity();
         Set(paletteDisplay,
-            new Position(new Vector2(x + (Some<Player>() ? 150f : 250f), startY)));
+            new Position(new Vector2(x + (Some<Player>() ? 200f : 250f), startY)));
         Set(paletteDisplay, new Highlight());
         Set(paletteDisplay,
             new Text(
