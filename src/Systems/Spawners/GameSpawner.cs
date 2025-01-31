@@ -90,6 +90,7 @@ public class GameSpawner : Manipulator
         Set(leftBoundSprite, new DestroyOnStateTransition());
         Set(leftBoundSprite, new FollowsCamera(0));
         Set(leftBoundSprite, new KeepOpacityWhenPaused());
+        Set(leftBoundSprite, new Depth(0f));
 
         var rightBound = CreateEntity();
         Set(rightBound, new Position(new Vector2(Dimensions.GameWidth + 8, 0)));
@@ -105,6 +106,7 @@ public class GameSpawner : Manipulator
         Set(rightBoundSprite, new DestroyOnStateTransition());
         Set(rightBoundSprite, new FollowsCamera(0));
         Set(rightBoundSprite, new KeepOpacityWhenPaused());
+        Set(rightBoundSprite, new Depth(0f));
 
         var bottomBound = CreateEntity();
         Set(bottomBound, new Position(new Vector2(Dimensions.GameWidth * 0.5f, Dimensions.GameHeight + 8)));
