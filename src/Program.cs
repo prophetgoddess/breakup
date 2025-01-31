@@ -25,11 +25,12 @@ class Program : Game
         debugMode
     )
     {
+        Content.LoadAll(MainWindow.SwapchainFormat, GraphicsDevice, AudioDevice);
+
         var saveData = new SaveGame(World).Load();
         MainWindow.SetScreenMode(saveData.Fullscreen ? ScreenMode.Fullscreen : ScreenMode.Windowed);
         World.Set(World.CreateEntity(), new Fullscreen(saveData.Fullscreen));
 
-        Content.LoadAll(MainWindow.SwapchainFormat, GraphicsDevice, AudioDevice);
 
         Systems =
         [

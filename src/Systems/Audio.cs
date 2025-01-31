@@ -56,6 +56,11 @@ public class Audio : MoonTools.ECS.System
 
             var path = Stores.TextStorage.Get(song.PathID);
 
+            if (MusicVoice != null)
+            {
+                MusicVoice.Stop();
+            }
+
             if (MusicData != null)
             {
                 MusicData.Close();

@@ -16,6 +16,7 @@ public struct SaveData
     public float MusicVolume { get; set; }
     public float SFXVolume { get; set; }
     public bool Fullscreen { get; set; }
+    public bool[] SongUnlocks;
     public Dictionary<Actions, KeyCode> Keyboard { get; set; }
     public Dictionary<Actions, GamepadButtonCode> Gamepad { get; set; }
 }
@@ -59,6 +60,7 @@ public class SaveGame : Manipulator
             MusicVolume = GetSingleton<MusicVolume>().Value,
             SFXVolume = GetSingleton<SFXVolume>().Value,
             Fullscreen = GetSingleton<Fullscreen>().Value,
+            SongUnlocks = Music.Unlocked(),
             Keyboard = Keyboard,
             Gamepad = Gamepad
         };
@@ -72,7 +74,9 @@ public class SaveGame : Manipulator
     {
         if (File.Exists(Path.Join(AppContext.BaseDirectory, $"{SteamUser.GetSteamID()}.save")))
         {
-            return (SaveData)JsonSerializer.Deserialize(File.ReadAllText(Path.Join(AppContext.BaseDirectory, $"{SteamUser.GetSteamID()}.save")), typeof(SaveData), saveDataContext);
+            var data = (SaveData)JsonSerializer.Deserialize(File.ReadAllText(Path.Join(AppContext.BaseDirectory, $"{SteamUser.GetSteamID()}.save")), typeof(SaveData), saveDataContext);
+            Music.LoadSongUnlocks(data);
+            return data;
         }
         else
         {

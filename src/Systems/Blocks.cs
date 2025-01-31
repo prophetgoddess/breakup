@@ -14,6 +14,7 @@ public class Blocks : MoonTools.ECS.System
     int GridWidth { get { return Dimensions.GameWidth / CellSize; } }
     int GridHeight { get { return Dimensions.GameHeight / CellSize; } }
     UpgradeMenuSpawner UpgradeMenuSpawner;
+    SaveGame SaveGame;
 
 
     System.Random Random = new System.Random();
@@ -38,6 +39,8 @@ public class Blocks : MoonTools.ECS.System
 
         UpgradeMenuSpawner = new UpgradeMenuSpawner(world);
         BallSpawner = new BallSpawner(world);
+
+        SaveGame = new SaveGame(world);
     }
 
     void SpawnBlock(int x, int y, bool unbreakable = false)
@@ -168,9 +171,13 @@ public class Blocks : MoonTools.ECS.System
 
                 if (hp.Value <= 0)
                 {
+                    var index = Music.UnlockSong();
+                    SaveGame.Save();
+                    Console.WriteLine("unlocked: " + Stores.TextStorage.Get(Music.Songs[index].NameID));
 
                     if (Has<GivesUpgrade>(block))
                     {
+
                         UpgradeMenuSpawner.OpenUpgradeMenu();
                     }
                     else

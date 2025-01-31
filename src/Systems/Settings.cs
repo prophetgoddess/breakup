@@ -98,10 +98,25 @@ public class Settings : MoonTools.ECS.System
             var song = Get<Song>(songEntity);
             var songIndex = Array.IndexOf(Music.Songs, song);
             songIndex = (songIndex + Amount);
+
             if (songIndex < 0)
                 songIndex = Music.Songs.Length + songIndex;
             else if (songIndex >= Music.Songs.Length)
                 songIndex = Music.Songs.Length - songIndex;
+
+            var newSong = Music.Songs[songIndex];
+
+            while (!newSong.unlocked)
+            {
+                songIndex = songIndex + Amount;
+
+                if (songIndex < 0)
+                    songIndex = Music.Songs.Length + songIndex;
+                else if (songIndex >= Music.Songs.Length)
+                    songIndex = Music.Songs.Length - songIndex;
+
+                newSong = Music.Songs[songIndex];
+            }
 
             Set(songEntity, Music.Songs[songIndex]);
             Set(songEntity, new SongChanged());
