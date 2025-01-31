@@ -433,14 +433,15 @@ public class Renderer : MoonTools.ECS.Renderer
             if (Has<Invisible>(textEntity))
                 continue;
 
+            if (Some<Pause>() && !Has<KeepOpacityWhenPaused>(textEntity))
+                continue;
+
             var text = Get<Text>(textEntity);
             var color = Has<Highlight>(textEntity) ? palette.Highlight : palette.Foreground;
             var position = Get<Position>(textEntity).Value;
             var depth = Has<Depth>(textEntity) ? Get<Depth>(textEntity).Value : 0.5f;
             color.A = Has<Alpha>(textEntity) ? Get<Alpha>(textEntity).A : (byte)255;
 
-            if (Some<Pause>() && !Has<KeepOpacityWhenPaused>(textEntity))
-                color.A = 200;
 
             if (!Has<WordWrap>(textEntity))
             {

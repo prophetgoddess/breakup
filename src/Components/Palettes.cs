@@ -22,6 +22,27 @@ public static class ColorPalettes
             new Color(235, 81, 96),
             false
         ),
+        new Palette(
+            Stores.TextStorage.GetID("Wipeout"),
+            new Color(227, 237, 237),
+            new Color(21, 50, 84),
+            new Color(255, 96, 0),
+            false
+        ),
+        new Palette(
+            Stores.TextStorage.GetID("Moshi"),
+            new Color(220, 42, 104),
+            new Color(255, 255, 255),
+            new Color(205, 210, 48),
+            false
+        ),
+        new Palette(
+            Stores.TextStorage.GetID("Safty"),
+            new Color(194, 192, 193),
+            new Color(255, 255, 255),
+            new Color(255, 91, 6),
+            false
+        )
     };
 
     private static bool PaletteUnlocksLoaded = false;
@@ -31,7 +52,7 @@ public static class ColorPalettes
         {
             PaletteUnlocksLoaded = true;
 
-            for (int i = 0; i < Palettes.Length; i++)
+            for (int i = 0; i < data.PaletteUnlocks.Length; i++)
             {
                 var palette = Palettes[i];
                 Palettes[i] = new Palette(palette.NameID, palette.Background, palette.Foreground, palette.Highlight, data.PaletteUnlocks[i]);
