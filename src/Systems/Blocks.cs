@@ -1,7 +1,10 @@
 using System.Drawing;
 using System.Numerics;
+using System.Reflection.Metadata;
+using Microsoft.VisualBasic;
 using MoonTools.ECS;
 using MoonWorks;
+using MoonWorks.Graphics.Font;
 using MoonWorks.Math;
 
 namespace Ball;
@@ -14,6 +17,7 @@ public class Blocks : MoonTools.ECS.System
     int GridWidth { get { return Dimensions.GameWidth / CellSize; } }
     int GridHeight { get { return Dimensions.GameHeight / CellSize; } }
     UpgradeMenuSpawner UpgradeMenuSpawner;
+    MarqueeSpawner MarqueeSpawner;
     SaveGame SaveGame;
 
 
@@ -39,6 +43,7 @@ public class Blocks : MoonTools.ECS.System
 
         UpgradeMenuSpawner = new UpgradeMenuSpawner(world);
         BallSpawner = new BallSpawner(world);
+        MarqueeSpawner = new MarqueeSpawner(world);
 
         SaveGame = new SaveGame(world);
     }
@@ -75,13 +80,10 @@ public class Blocks : MoonTools.ECS.System
 
             Set(block, new CanTakeDamage());
             var hpDisplay = CreateEntity();
-            //Set(hpDisplay, new Scale(Vector2.One));
             Set(hpDisplay, new Position(new Vector2(CellSize * 0.5f + x * CellSize, CellSize * 0.5f + y * CellSize)));
             Set(hpDisplay, new DestroyOnStateTransition());
             Set(hpDisplay, new CanTakeDamage());
-            //Set(hpDisplay, new Model(Content.Models.Square.ID));
             Relate(block, hpDisplay, new HPDisplay());
-            Set(hpDisplay, new Text(Fonts.BodyFont, Fonts.InfoSize, Stores.TextStorage.GetID($"{GameStateManager.GetFormattedNumber(hp, 2)}"), MoonWorks.Graphics.Font.HorizontalAlignment.Center, MoonWorks.Graphics.Font.VerticalAlignment.Middle));
 
             if (Rando.Value < 0.04f && UpgradeMenuSpawner.UpgradesAvailable() && !Some<GivesUpgrade>())
             {
@@ -91,6 +93,21 @@ public class Blocks : MoonTools.ECS.System
                 Set(block, new Pulsate(Vector2.One * 1.9f, 3.0f, 0.2f));
                 hp *= 2;
                 Set(block, new HitPoints(hp, hp));
+                Set(hpDisplay, new Text(Fonts.BodyFont, Fonts.InfoSize, Stores.TextStorage.GetID($"{GameStateManager.GetFormattedNumber(hp, 2)}"), MoonWorks.Graphics.Font.HorizontalAlignment.Center, MoonWorks.Graphics.Font.VerticalAlignment.Middle));
+            }
+            else if (Rando.Value < 0.01f && Some<SetHighScoreThisRun>())
+            {
+                Set(block, new GivesUnlock());
+                Set(block, new Highlight());
+                Set(block, new Block(0));
+                Set(hpDisplay, new Scale(Vector2.One * 20));
+                Set(block, new HitPoints(1, 1));
+                Set(block, new Pulsate(Vector2.One * 1.9f, 3.0f, 0.2f));
+                Set(hpDisplay, new Highlight());
+                Set(hpDisplay, new SDFGraphic(Content.SDF.Unlock));
+            }
+            else
+            {
                 Set(hpDisplay, new Text(Fonts.BodyFont, Fonts.InfoSize, Stores.TextStorage.GetID($"{GameStateManager.GetFormattedNumber(hp, 2)}"), MoonWorks.Graphics.Font.HorizontalAlignment.Center, MoonWorks.Graphics.Font.VerticalAlignment.Middle));
             }
         }
@@ -167,17 +184,72 @@ public class Blocks : MoonTools.ECS.System
                 var hp = Get<HitPoints>(block);
                 var hpDisplay = OutRelationSingleton<HPDisplay>(block);
 
-                Set(hpDisplay, new Text(Fonts.BodyFont, Fonts.InfoSize, Stores.TextStorage.GetID($"{GameStateManager.GetFormattedNumber(hp.Value, 2)}"), MoonWorks.Graphics.Font.HorizontalAlignment.Center, MoonWorks.Graphics.Font.VerticalAlignment.Middle));
+                if (Has<Text>(hpDisplay))
+                    Set(hpDisplay, new Text(Fonts.BodyFont, Fonts.InfoSize, Stores.TextStorage.GetID($"{GameStateManager.GetFormattedNumber(hp.Value, 2)}"), MoonWorks.Graphics.Font.HorizontalAlignment.Center, MoonWorks.Graphics.Font.VerticalAlignment.Middle));
 
                 if (hp.Value <= 0)
                 {
-                    var index = ColorPalettes.Unlock();
-                    SaveGame.Save();
-
                     if (Has<GivesUpgrade>(block))
                     {
-
                         UpgradeMenuSpawner.OpenUpgradeMenu();
+                    }
+                    else if (Has<GivesUnlock>(block))
+                    {
+                        var value = Rando.Value;
+                        var index = -1;
+                        if (value < 0.5f)
+                        {
+                            index = Music.UnlockSong();
+
+                            if (index >= 0)
+                            {
+
+                                var name = Stores.TextStorage.Get(Music.Songs[index].NameID);
+
+                                var entity = CreateEntity();
+                                Set(entity, new Timer(10f));
+                                Set(entity, new Position(new Vector2(Dimensions.GameWidth, 10f)));
+                                Set(entity, new Highlight());
+                                Set(entity,
+                                 new Text(
+                                    Fonts.BodyFont,
+                                    Fonts.PromptSize,
+                                    Stores.TextStorage.GetID($"new song: {name}"),
+                                    HorizontalAlignment.Left,
+                                    VerticalAlignment.Top));
+                                Set(entity, new Depth(0.1f));
+                                Set(entity, new Velocity(new Vector2(-200f, 0f)));
+                                Set(entity, new FollowsCamera(5f));
+                                Set(entity, new DestroyOnStateTransition());
+                            }
+                        }
+                        if (value >= 0.5f || index == -1)
+                        {
+                            index = ColorPalettes.Unlock();
+
+                            if (index >= 0)
+                            {
+                                var name = Stores.TextStorage.Get(ColorPalettes.Palettes[index].NameID);
+
+                                var entity = CreateEntity();
+                                Set(entity, new Timer(10f));
+                                Set(entity, new Position(new Vector2(Dimensions.GameWidth, 10f)));
+                                Set(entity, new Highlight());
+                                Set(entity,
+                                 new Text(
+                                    Fonts.BodyFont,
+                                    Fonts.PromptSize,
+                                    Stores.TextStorage.GetID($"new palette: {name}"),
+                                    HorizontalAlignment.Left,
+                                    VerticalAlignment.Top));
+                                Set(entity, new Depth(0.1f));
+                                Set(entity, new Velocity(new Vector2(-200f, 0f)));
+                                Set(entity, new FollowsCamera(5f));
+                                Set(entity, new DestroyOnStateTransition());
+
+                            }
+                        }
+                        SaveGame.Save();
                     }
                     else
                     {

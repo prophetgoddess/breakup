@@ -48,14 +48,17 @@ public static class ColorPalettes
     private static bool PaletteUnlocksLoaded = false;
     public static void LoadSongUnlocks(SaveData data)
     {
-        if (!PaletteUnlocksLoaded)
+        if (!PaletteUnlocksLoaded && data.PaletteUnlocks != null)
         {
             PaletteUnlocksLoaded = true;
 
             for (int i = 0; i < data.PaletteUnlocks.Length; i++)
             {
                 var palette = Palettes[i];
-                Palettes[i] = new Palette(palette.NameID, palette.Background, palette.Foreground, palette.Highlight, data.PaletteUnlocks[i]);
+                if (data.PaletteUnlocks.Length > i)
+                {
+                    Palettes[i] = new Palette(palette.NameID, palette.Background, palette.Foreground, palette.Highlight, data.PaletteUnlocks[i]);
+                }
             }
 
         }

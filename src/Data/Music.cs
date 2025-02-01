@@ -14,14 +14,17 @@ public static class Music
     private static bool SongUnlocksLoaded = false;
     public static void LoadSongUnlocks(SaveData data)
     {
-        if (!SongUnlocksLoaded)
+        if (!SongUnlocksLoaded && data.SongUnlocks != null)
         {
             SongUnlocksLoaded = true;
 
             for (int i = 0; i < Songs.Length; i++)
             {
                 var song = Songs[i];
-                Songs[i] = new Song(song.PathID, song.NameID, data.SongUnlocks[i]);
+                if (data.SongUnlocks != null && data.SongUnlocks.Length > i)
+                {
+                    Songs[i] = new Song(song.PathID, song.NameID, data.SongUnlocks[i]);
+                }
             }
 
         }

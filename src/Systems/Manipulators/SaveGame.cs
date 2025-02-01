@@ -27,7 +27,8 @@ public class SaveGame : Manipulator
     static JsonSerializerOptions saveSerializerOptions = new JsonSerializerOptions
     {
         IncludeFields = true,
-        WriteIndented = true
+        WriteIndented = true,
+        AllowTrailingCommas = true,
     };
 
     Dictionary<Actions, KeyCode> Keyboard = new();

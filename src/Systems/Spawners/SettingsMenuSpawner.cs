@@ -40,7 +40,7 @@ public class SettingsMenuSpawner : Manipulator
 
         var height = Some<Player>() ? Dimensions.GameHeight : Dimensions.UIHeight;
 
-        MarqueeSpawner.SpawnMarquee("Settings", Fonts.HeaderFont, Some<Player>() ? Fonts.HeaderSize : Fonts.TitleSize, Some<Player>() ? 2 : 3, 100f, height * 0.1f);
+        Set(MarqueeSpawner.SpawnMarquee("Settings", Fonts.HeaderFont, Some<Player>() ? Fonts.HeaderSize : Fonts.TitleSize, Some<Player>() ? 2 : 3, 100f, height * 0.1f), new Pause());
 
         MarqueeSpawner.SpawnMarquee($"press {Input.GetButtonName(Actions.Cancel)} to go back", Fonts.BodyFont, Some<Player>() ? Fonts.InfoSize : Fonts.PromptSize, Some<Player>() ? 2 : 3, -100f, height * 0.2f);
 
@@ -295,7 +295,7 @@ public class SettingsMenuSpawner : Manipulator
         if (!Some<Player>())
             Set(rebindLabel, new UI());
 
-        Relate(songLabel, rebindLabel, new VerticalConnection());
+        Relate(paletteLabel, rebindLabel, new VerticalConnection());
 
     }
 

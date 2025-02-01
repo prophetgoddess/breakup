@@ -12,7 +12,7 @@ public class MarqueeSpawner : Manipulator
     {
     }
 
-    public Entity SpawnMarquee(string str, int fontID, int size, float copies, float speed, float y)
+    public Entity SpawnMarquee(string str, int fontID, int size, float copies, float speed, float y, float time = 0f)
     {
         var font = Stores.FontStorage.Get(fontID);
         var strID = Stores.TextStorage.GetID(str);
@@ -28,6 +28,12 @@ public class MarqueeSpawner : Manipulator
         for (int i = 0; i < copies; i++)
         {
             entity = CreateEntity();
+
+            if (time > 0f)
+            {
+                Set(entity, new Timer(time));
+            }
+
             Set(entity,
             new Position(new Vector2(i * (rect.W + totalWidth), y)));
             Set(entity,
@@ -38,7 +44,6 @@ public class MarqueeSpawner : Manipulator
                 HorizontalAlignment.Center,
                 VerticalAlignment.Middle));
             Set(entity, new KeepOpacityWhenPaused());
-            Set(entity, new Pause());
             Set(entity, new Depth(0.1f));
             Set(entity, new Marquee(speed));
             if (Some<Player>())
@@ -51,4 +56,5 @@ public class MarqueeSpawner : Manipulator
         }
         return entity;
     }
+
 }

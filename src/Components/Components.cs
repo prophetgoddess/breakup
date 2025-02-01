@@ -60,6 +60,7 @@ public readonly record struct Selector();
 public readonly record struct DestroyOnStateTransition();
 public readonly record struct DontDestroyOnNextTransition();
 public readonly record struct GivesUpgrade();
+public readonly record struct GivesUnlock();
 public readonly record struct UpgradeOption(Upgrades Upgrade);
 public readonly record struct DamageBlocksOnLostLife();
 public readonly record struct DoubleDamageOnOneLife();
