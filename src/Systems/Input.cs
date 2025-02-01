@@ -140,12 +140,17 @@ public class Input : MoonTools.ECS.System
                 if (Inputs.Keyboard.AnyPressed)
                 {
                     Keyboard[RebindState] = Inputs.Keyboard.AnyPressedButton;
+                    RebindState++;
                 }
                 if (Inputs.GetGamepad(0).AnyPressed)
                 {
-                    Gamepad[RebindState] = (GamepadButton)Inputs.GetGamepad(0).AnyPressedButton;
+                    if (Inputs.GetGamepad(0).AnyPressedButton.GetType() == typeof(GamepadButton))
+                    {
+                        Gamepad[RebindState] = (GamepadButton)Inputs.GetGamepad(0).AnyPressedButton;
+                        RebindState++;
+
+                    }
                 }
-                RebindState++;
             }
 
             if (RebindState > Actions.Dash)
