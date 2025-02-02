@@ -73,12 +73,12 @@ public static class ColorPalettes
             return -1;
         }
 
-        var index = Rando.Int(0, Palettes.Length);
+        var index = -1;
 
-        while (Palettes[index].Unlocked)
+        do
         {
             index = Rando.Int(0, Palettes.Length);
-        }
+        } while (Palettes[index].Unlocked);
 
         var palette = Palettes[index];
 

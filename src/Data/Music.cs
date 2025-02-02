@@ -39,12 +39,12 @@ public static class Music
             return -1;
         }
 
-        var index = Rando.Int(0, Songs.Length);
+        var index = -1;
 
-        while (Songs[index].unlocked)
+        do
         {
             index = Rando.Int(0, Songs.Length);
-        }
+        } while (Songs[index].unlocked);
 
         var song = Songs[index];
 
