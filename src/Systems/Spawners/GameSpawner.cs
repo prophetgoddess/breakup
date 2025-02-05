@@ -85,7 +85,7 @@ public class GameSpawner : Manipulator
 
         var leftBoundSprite = CreateEntity();
         Set(leftBoundSprite, new Position(new Vector2(-9, 0)));
-        Set(leftBoundSprite, new Model(Content.Models.Square.ID));
+        Set(leftBoundSprite, new SDFGraphic(Content.SDF.Square));
         Set(leftBoundSprite, new Scale(new Vector2(24f, 2000)));
         Set(leftBoundSprite, new DestroyOnStateTransition());
         Set(leftBoundSprite, new FollowsCamera(0));
@@ -101,7 +101,7 @@ public class GameSpawner : Manipulator
 
         var rightBoundSprite = CreateEntity();
         Set(rightBoundSprite, new Position(new Vector2(Dimensions.GameWidth + 9, 0)));
-        Set(rightBoundSprite, new Model(Content.Models.Square.ID));
+        Set(rightBoundSprite, new SDFGraphic(Content.SDF.Square));
         Set(rightBoundSprite, new Scale(new Vector2(24f, 2000)));
         Set(rightBoundSprite, new DestroyOnStateTransition());
         Set(rightBoundSprite, new FollowsCamera(0));
@@ -115,8 +115,8 @@ public class GameSpawner : Manipulator
         Set(bottomBound, new DestroysBall());
         Set(bottomBound, new FollowsCamera(Dimensions.GameHeight + 8));
         Set(bottomBound, new DestroyOnStateTransition());
-        Set(bottomBound, new Model(Content.Models.Square.ID));
-        Set(bottomBound, new Scale(new Vector2(Dimensions.GameWidth, 26.0f)));
+        Set(bottomBound, new SDFGraphic(Content.SDF.Square));
+        Set(bottomBound, new Scale(new Vector2(Dimensions.GameWidth * 2, 32.0f)));
         Set(bottomBound, new Highlight());
         Set(bottomBound, new Invisible());
 

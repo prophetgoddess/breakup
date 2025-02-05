@@ -19,14 +19,11 @@ public class Renderer : MoonTools.ECS.Renderer
     GraphicsDevice GraphicsDevice;
     Inputs Inputs;
     ComputePipeline ComputePipeline;
-    GraphicsPipeline ModelPipeline;
     GraphicsPipeline SDFPipeline;
 
-    MoonTools.ECS.Filter ModelFilter;
     MoonTools.ECS.Filter SDFFilter;
     MoonTools.ECS.Filter UISDFFilter;
 
-    MoonTools.ECS.Filter UIFilter;
     MoonTools.ECS.Filter TextFilter;
     MoonTools.ECS.Filter GameTextFilter;
     MoonTools.ECS.Filter ColliderFilter;
@@ -180,10 +177,8 @@ public class Renderer : MoonTools.ECS.Renderer
         DepthSampler = Sampler.Create(GraphicsDevice, new SamplerCreateInfo());
         DepthUniforms = new DepthUniforms(0.01f, 100f);
 
-        ModelFilter = FilterBuilder.Include<Model>().Include<Position>().Exclude<UI>().Exclude<Invisible>().Build();
         SDFFilter = FilterBuilder.Include<SDFGraphic>().Include<Position>().Exclude<UI>().Exclude<Invisible>().Build();
         UISDFFilter = FilterBuilder.Include<SDFGraphic>().Include<Position>().Include<UI>().Exclude<Invisible>().Build();
-        UIFilter = FilterBuilder.Include<Model>().Include<Position>().Include<UI>().Exclude<Invisible>().Build();
         TextFilter = FilterBuilder.Include<Text>().Include<Position>().Include<UI>().Exclude<Invisible>().Build();
         GameTextFilter = FilterBuilder.Include<Text>().Include<Position>().Exclude<UI>().Exclude<Invisible>().Build();
         ColliderFilter = FilterBuilder.Include<Position>().Include<BoundingBox>().Build();
@@ -226,36 +221,6 @@ public class Renderer : MoonTools.ECS.Renderer
             "main",
             ShaderCross.ShaderFormat.SPIRV
         );
-
-        var renderPipelineCreateInfo = new GraphicsPipelineCreateInfo
-        {
-            TargetInfo = new GraphicsPipelineTargetInfo
-            {
-                ColorTargetDescriptions = [
-                        new ColorTargetDescription
-                        {
-                            Format = Window.SwapchainFormat,
-                            BlendState = ColorTargetBlendState.NonPremultipliedAlphaBlend
-                        }
-                    ],
-                HasDepthStencilTarget = true,
-                DepthStencilFormat = TextureFormat.D16Unorm
-            },
-            DepthStencilState = new DepthStencilState
-            {
-                EnableDepthTest = true,
-                EnableDepthWrite = true,
-                CompareOp = CompareOp.LessOrEqual
-            },
-            MultisampleState = MultisampleState.None,
-            PrimitiveType = PrimitiveType.TriangleList,
-            RasterizerState = RasterizerState.CCW_CullNone,
-            VertexInputState = VertexInputState.CreateSingleBinding<PositionVertex>(),
-            VertexShader = modelVertShader,
-            FragmentShader = modelFragShader
-        };
-
-        ModelPipeline = GraphicsPipeline.Create(GraphicsDevice, renderPipelineCreateInfo);
 
         var sdfPipelineCreateInfo = new GraphicsPipelineCreateInfo
         {
