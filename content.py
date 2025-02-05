@@ -62,6 +62,9 @@ fonts_out = os.path.join(output, "Fonts")
 text_out = os.path.join(output, "Text")
 levels_out = os.path.join(output, "Levels")
 
+shutil.copy(
+    os.path.join(input, "attribution.txt"), os.path.join(output, "attribution.txt")
+)
 
 if not os.path.exists(project):
     print(f"ERROR: could not find {project}.")
