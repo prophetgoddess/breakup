@@ -26,7 +26,13 @@ public class Settings : MoonTools.ECS.System
     {
         var selector = CreateEntity();
         Set(selector, new Position(Vector2.Zero));
-        Set(selector, new Model(Content.Models.Triangle.ID));
+        Set(selector, new SDFGraphic(Content.SDF.Triangle));
+
+        if (Some<Player>())
+            Set(selector, new Scale(Vector2.One * 16f));
+        else
+            Set(selector, new Scale(Vector2.One * 64f));
+
         Set(selector, new Orientation(MathF.PI * -0.5f));
         Set(selector, new Depth(0.1f));
         Set(selector, new FollowsCamera(0f));
@@ -36,7 +42,7 @@ public class Settings : MoonTools.ECS.System
         if (!Some<Player>())
         {
             Set(selector, new UI());
-            Set(selector, new Scale(Vector2.One * 2.0f));
+            Set(selector, new Scale(Vector2.One * 16.0f));
         }
 
         return selector;

@@ -15,10 +15,10 @@ public class Animations : MoonTools.ECS.System
     {
         AnimationFilter = FilterBuilder.Include<AnimationTimer>().Build();
 
-        PulsateFilter = FilterBuilder.Include<Pulsate>().Include<Model>().Build();
-        ExpandingEchoesFilter = FilterBuilder.Include<ExpandingEchoes>().Include<Model>().Build();
-        GrowFilter = FilterBuilder.Include<GrowOverTime>().Include<Model>().Build();
-        FadeFilter = FilterBuilder.Include<FadeOut>().Include<Model>().Include<Timer>().Build();
+        PulsateFilter = FilterBuilder.Include<Pulsate>().Include<SDFGraphic>().Build();
+        ExpandingEchoesFilter = FilterBuilder.Include<ExpandingEchoes>().Include<SDFGraphic>().Build();
+        GrowFilter = FilterBuilder.Include<GrowOverTime>().Include<SDFGraphic>().Build();
+        FadeFilter = FilterBuilder.Include<FadeOut>().Include<SDFGraphic>().Include<Timer>().Build();
 
     }
 
@@ -63,7 +63,7 @@ public class Animations : MoonTools.ECS.System
                 Set(entity, new AnimationTimer(0f));
 
                 var echo = CreateEntity();
-                Set(echo, new Model(Get<Model>(entity).ID));
+                Set(echo, new SDFGraphic(Get<SDFGraphic>(entity).UV));
                 Set(echo, new Position(Get<Position>(entity).Value));
                 Set(echo, new Scale(Has<Scale>(entity) ? Get<Scale>(entity).Value : Vector2.One));
                 Set(echo, new GrowOverTime(echoes.GrowthRate));

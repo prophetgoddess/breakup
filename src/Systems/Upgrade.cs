@@ -23,7 +23,8 @@ public class Upgrade : MoonTools.ECS.System
     {
         var selector = CreateEntity();
         Set(selector, new Position(Vector2.Zero));
-        Set(selector, new Model(Content.Models.Triangle.ID));
+        Set(selector, new SDFGraphic(Content.SDF.Triangle));
+        Set(selector, new Scale(Vector2.One * 8f));
         Set(selector, new Depth(0.1f));
         Set(selector, new FollowsCamera(0f));
         Set(selector, new Selector());

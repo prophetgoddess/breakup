@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Uploaded to: SVG Repo, www.svgrepo.com, Generator: SVG Repo Mixer Tools -->
+
+<svg
+   width="800px"
+   height="800px"
+   viewBox="0 0 24 24"
+   fill="none"
+   version="1.1"
+   id="svg1"
+   sodipodi:docname="Heart.svg"
+   inkscape:version="1.4 (e7c3feb1, 2024-10-09)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs1" />
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#000000"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:zoom="1.26125"
+     inkscape:cx="400"
+     inkscape:cy="399.60357"
+     inkscape:window-width="2304"
+     inkscape:window-height="1387"
+     inkscape:window-x="1512"
+     inkscape:window-y="25"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="svg1" />
+  <path
+     style="clip-rule:evenodd;fill:#ffffff;fill-rule:evenodd;stroke-linecap:round;stroke-linejoin:round"
+     d="M 8.7421875,3.1132813 C 7.2207696,2.8996357 5.6276254,3.2756433 4.2910156,4.4140625 1.6528654,6.6610216 1.2625082,10.514203 3.3496094,13.191406 c 1.6543569,2.122031 6.0440326,5.997501 7.5136716,7.294922 0.163376,0.144267 0.326688,0.337279 0.716797,0.453125 0.274215,0.08151 0.552261,0.08132 0.826172,0 0.390292,-0.1159 0.555502,-0.309059 0.71875,-0.453125 1.469649,-1.29743 5.859295,-5.172923 7.513672,-7.294922 C 22.723184,10.517509 22.377032,6.6361934 19.685547,4.40625 17.265747,2.4014025 14.138315,2.8768912 12,4.7285156 11.050005,3.905446 9.9477969,3.2825793 8.7421875,3.1132813 Z M 8.5371094,5.0488281 C 9.5325915,5.2034126 10.486639,5.774104 11.240234,6.6523437 a 1.0001,1.0001 0 0 0 1.519532,0 c 1.51122,-1.7611757 3.765484,-2.2687099 5.65039,-0.7070312 1.895115,1.5701366 2.106879,4.1492755 0.650391,6.0175785 -1.255431,1.610287 -5.499573,5.447319 -7.066406,6.835937 C 10.42731,17.410215 6.1811584,13.573153 4.9257812,11.962891 3.4718624,10.097894 3.7169409,7.5310209 5.5878906,5.9375 6.5058209,5.1556792 7.5416273,4.8942437 8.5371094,5.0488281 Z"
+     id="path1" />
+</svg>

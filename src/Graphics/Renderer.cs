@@ -24,6 +24,7 @@ public class Renderer : MoonTools.ECS.Renderer
 
     MoonTools.ECS.Filter ModelFilter;
     MoonTools.ECS.Filter SDFFilter;
+    MoonTools.ECS.Filter UISDFFilter;
 
     MoonTools.ECS.Filter UIFilter;
     MoonTools.ECS.Filter TextFilter;
@@ -181,6 +182,7 @@ public class Renderer : MoonTools.ECS.Renderer
 
         ModelFilter = FilterBuilder.Include<Model>().Include<Position>().Exclude<UI>().Exclude<Invisible>().Build();
         SDFFilter = FilterBuilder.Include<SDFGraphic>().Include<Position>().Exclude<UI>().Exclude<Invisible>().Build();
+        UISDFFilter = FilterBuilder.Include<SDFGraphic>().Include<Position>().Include<UI>().Exclude<Invisible>().Build();
         UIFilter = FilterBuilder.Include<Model>().Include<Position>().Include<UI>().Exclude<Invisible>().Build();
         TextFilter = FilterBuilder.Include<Text>().Include<Position>().Include<UI>().Exclude<Invisible>().Build();
         GameTextFilter = FilterBuilder.Include<Text>().Include<Position>().Exclude<UI>().Exclude<Invisible>().Build();
@@ -391,6 +393,62 @@ public class Renderer : MoonTools.ECS.Renderer
         GraphicsDevice.Submit(cmdbuf);
     }
 
+    public void SDFLoad(MoonTools.ECS.Filter filter, CommandBuffer cmdbuf)
+    {
+        var data = SpriteComputeTransferBuffer.Map<ComputeSpriteData>(true);
+        int sdfIndex = 0;
+
+        var palette = GetSingleton<Palette>();
+
+        DrawPriority.Clear();
+
+        foreach (var entity in filter.Entities)
+        {
+            DrawPriority.Enqueue(entity, 1.0f - (Has<Depth>(entity) ? Get<Depth>(entity).Value : 0.5f));
+        }
+
+        while (DrawPriority.Count > 0)
+        {
+            var entity = DrawPriority.Dequeue();
+            var position = Get<Position>(entity).Value;
+            var rotation = Has<Orientation>(entity) ? Get<Orientation>(entity).Value : 0.0f;
+            var uv = Get<SDFGraphic>(entity).UV;
+            var scale = Has<Scale>(entity) ? Get<Scale>(entity).Value : Vector2.One;
+            var color = Has<Highlight>(entity) ? palette.Highlight : palette.Foreground;
+            color.A = Has<Alpha>(entity) ? Get<Alpha>(entity).A : color.A;
+            var depth = Has<Depth>(entity) ? Get<Depth>(entity).Value : 0.5f;
+
+            if (Some<Pause>() && !Has<KeepOpacityWhenPaused>(entity))
+                color.A = 200;
+
+            data[sdfIndex].Position = new Vector3(position.X, position.Y, depth);
+            data[sdfIndex].Rotation = rotation;
+            data[sdfIndex].Size = scale;
+            data[sdfIndex].Color = color.ToVector4();
+            data[sdfIndex].TextureRect = uv;
+            data[sdfIndex].Origin = Has<Origin>(entity) ? Get<Origin>(entity).Value : Vector2.One * 0.5f;
+            sdfIndex++;
+
+            if (sdfIndex >= data.Length)
+                break;
+        }
+        SpriteComputeTransferBuffer.Unmap();
+
+        var copyPass = cmdbuf.BeginCopyPass();
+        copyPass.UploadToBuffer(SpriteComputeTransferBuffer, SpriteComputeBuffer, true);
+        cmdbuf.EndCopyPass(copyPass);
+
+        var computePass = cmdbuf.BeginComputePass(
+            new StorageBufferReadWriteBinding(SpriteVertexBuffer, true)
+        );
+
+        computePass.BindComputePipeline(ComputePipeline);
+        computePass.BindStorageBuffers(SpriteComputeBuffer);
+        computePass.Dispatch(MAX_SPRITE_COUNT / 64, 1, 1);
+
+        cmdbuf.EndComputePass(computePass);
+    }
+
     public void Draw(CommandBuffer cmdbuf, Texture renderTexture)
     {
 
@@ -489,7 +547,6 @@ public class Renderer : MoonTools.ECS.Renderer
 
         GameTextBatch.UploadBufferData(cmdbuf);
 
-
         int count = 0;
         UITextBatch.Start();
         foreach (var textEntity in TextFilter.Entities)
@@ -516,90 +573,12 @@ public class Renderer : MoonTools.ECS.Renderer
         }
         UITextBatch.UploadBufferData(cmdbuf);
 
-        var data = SpriteComputeTransferBuffer.Map<ComputeSpriteData>(true);
-        int sdfIndex = 0;
-
-        DrawPriority.Clear();
-
-        foreach (var entity in SDFFilter.Entities)
-        {
-            DrawPriority.Enqueue(entity, 1.0f - (Has<Depth>(entity) ? Get<Depth>(entity).Value : 0.5f));
-        }
-
-        while (DrawPriority.Count > 0)
-        {
-            var entity = DrawPriority.Dequeue();
-            var position = Get<Position>(entity).Value;
-            var rotation = Has<Orientation>(entity) ? Get<Orientation>(entity).Value : 0.0f;
-            var uv = Get<SDFGraphic>(entity).UV;
-            var scale = Has<Scale>(entity) ? Get<Scale>(entity).Value : Vector2.One;
-            var color = Has<Highlight>(entity) ? palette.Highlight : palette.Foreground;
-            color.A = Has<Alpha>(entity) ? Get<Alpha>(entity).A : color.A;
-            var depth = Has<Depth>(entity) ? Get<Depth>(entity).Value : 0.5f;
-
-            if (Some<Pause>() && !Has<KeepOpacityWhenPaused>(entity))
-                color.A = 200;
-
-            data[sdfIndex].Position = new Vector3(position.X, position.Y, depth);
-            data[sdfIndex].Rotation = rotation;
-            data[sdfIndex].Size = scale;
-            data[sdfIndex].Color = color.ToVector4();
-            data[sdfIndex].TextureRect = uv;
-            data[sdfIndex].Origin = Has<Origin>(entity) ? Get<Origin>(entity).Value : Vector2.One * 0.5f;
-            sdfIndex++;
-
-            if (sdfIndex >= data.Length)
-                break;
-        }
-        SpriteComputeTransferBuffer.Unmap();
-
-        var copyPass = cmdbuf.BeginCopyPass();
-        copyPass.UploadToBuffer(SpriteComputeTransferBuffer, SpriteComputeBuffer, true);
-        cmdbuf.EndCopyPass(copyPass);
-
-        var computePass = cmdbuf.BeginComputePass(
-            new StorageBufferReadWriteBinding(SpriteVertexBuffer, true)
-        );
-
-        computePass.BindComputePipeline(ComputePipeline);
-        computePass.BindStorageBuffers(SpriteComputeBuffer);
-        computePass.Dispatch(MAX_SPRITE_COUNT / 64, 1, 1);
-
-        cmdbuf.EndComputePass(computePass);
+        SDFLoad(SDFFilter, cmdbuf);
 
         var gamePass = cmdbuf.BeginRenderPass(
             new DepthStencilTargetInfo(DepthTexture, 1f, false),
             new ColorTargetInfo(GameTexture, palette.Background)
         );
-
-        gamePass.BindGraphicsPipeline(ModelPipeline);
-
-        foreach (var entity in ModelFilter.Entities)
-        {
-            var position = Get<Position>(entity).Value;
-            var rotation = Has<Orientation>(entity) ? Get<Orientation>(entity).Value : 0.0f;
-            var mesh = Content.Models.IDToModel[Get<Model>(entity).ID];
-            var scale = Has<Scale>(entity) ? Get<Scale>(entity).Value : Vector2.One;
-            var color = Has<Highlight>(entity) ? palette.Highlight : palette.Foreground;
-            color.A = Has<Alpha>(entity) ? Get<Alpha>(entity).A : color.A;
-            var depth = Has<Depth>(entity) ? Get<Depth>(entity).Value : 0.5f;
-
-            if (Some<Pause>() && !Has<KeepOpacityWhenPaused>(entity))
-                color.A = 128;
-
-            Matrix4x4 model =
-                Matrix4x4.CreateScale(new Vector3(scale.X, scale.Y, 0f)) *
-                Matrix4x4.CreateFromAxisAngle(Vector3.UnitZ, rotation) *
-                Matrix4x4.CreateTranslation(new Vector3(position, depth)) * cameraMatrix;
-
-            var uniforms = new TransformVertexUniform(model, color);
-
-            gamePass.BindVertexBuffers(mesh.VertexBuffer);
-            gamePass.BindIndexBuffer(mesh.IndexBuffer, IndexElementSize.ThirtyTwo);
-            cmdbuf.PushVertexUniformData(uniforms);
-            gamePass.DrawIndexedPrimitives(mesh.TriangleCount * 3, 1, 0, 0, 0);
-
-        }
 
         if (SDFFilter.Count > 0)
         {
@@ -611,25 +590,6 @@ public class Renderer : MoonTools.ECS.Renderer
             gamePass.BindFragmentSamplers(new TextureSamplerBinding(Content.SDF.Atlas, SDFSampler));
             gamePass.DrawIndexedPrimitives((uint)SDFFilter.Count * 6, 1, 0, 0, 0);
         }
-
-        gamePass.BindGraphicsPipeline(ModelPipeline);
-
-
-        // foreach (var entity in ColliderFilter.Entities)
-        // {
-        //     var position = Get<Position>(entity).Value;
-        //     var box = Get<BoundingBox>(entity);
-
-        //     Matrix4x4 model =
-        //     Matrix4x4.CreateScale(new Vector3(box.Width, box.Height, 0))
-        //     * Matrix4x4.CreateTranslation(new Vector3(position + new Vector2(box.X, box.Y), 0f)) * cameraMatrix;
-        //     var uniforms = new TransformVertexUniform(model, Color.Red * 0.5f);
-
-        //     gamePass.BindVertexBuffers(RectVertexBuffer);
-        //     gamePass.BindIndexBuffer(RectIndexBuffer, IndexElementSize.ThirtyTwo);
-        //     cmdbuf.PushVertexUniformData(uniforms);
-        //     gamePass.DrawIndexedPrimitives(6, 1, 0, 0, 0);
-        // }
 
         gamePass.BindGraphicsPipeline(TextPipeline);
 
@@ -655,12 +615,12 @@ public class Renderer : MoonTools.ECS.Renderer
             Cycle = false
         });
 
+        SDFLoad(UISDFFilter, cmdbuf);
+
         var uiPass = cmdbuf.BeginRenderPass(
             new DepthStencilTargetInfo(UIDepthTexture, 1f, false),
             new ColorTargetInfo(UITexture, LoadOp.Load)
         );
-
-        gamePass.BindGraphicsPipeline(ModelPipeline);
 
         Matrix4x4 uiCameraMatrix =
         Matrix4x4.CreateOrthographicOffCenter(
@@ -672,23 +632,15 @@ public class Renderer : MoonTools.ECS.Renderer
             -1f
         );
 
-        uiPass.BindGraphicsPipeline(ModelPipeline);
-
-        foreach (var entity in UIFilter.Entities)
+        if (UISDFFilter.Count > 0)
         {
-            var position = Get<Position>(entity).Value;
-            var rotation = Has<Orientation>(entity) ? Get<Orientation>(entity).Value : 0.0f;
-            var mesh = Content.Models.IDToModel[Get<Model>(entity).ID];
-            var scale = Has<Scale>(entity) ? Get<Scale>(entity).Value : Vector2.One;
-            var color = Has<Highlight>(entity) ? palette.Highlight : palette.Foreground;
+            cmdbuf.PushVertexUniformData(uiCameraMatrix);
 
-            Matrix4x4 model = Matrix4x4.CreateScale(new Vector3(scale.X, scale.Y, 0f)) * Matrix4x4.CreateFromAxisAngle(Vector3.UnitZ, rotation) * Matrix4x4.CreateTranslation(new Vector3(position, 0)) * uiCameraMatrix;
-            var uniforms = new TransformVertexUniform(model, color);
-
-            uiPass.BindVertexBuffers(mesh.VertexBuffer);
-            uiPass.BindIndexBuffer(mesh.IndexBuffer, IndexElementSize.ThirtyTwo);
-            cmdbuf.PushVertexUniformData(uniforms);
-            uiPass.DrawIndexedPrimitives(mesh.TriangleCount * 3, 1, 0, 0, 0);
+            uiPass.BindGraphicsPipeline(SDFPipeline);
+            uiPass.BindVertexBuffers(SpriteVertexBuffer);
+            uiPass.BindIndexBuffer(SpriteIndexBuffer, IndexElementSize.ThirtyTwo);
+            uiPass.BindFragmentSamplers(new TextureSamplerBinding(Content.SDF.Atlas, SDFSampler));
+            uiPass.DrawIndexedPrimitives((uint)UISDFFilter.Count * 6, 1, 0, 0, 0);
         }
 
         uiPass.BindGraphicsPipeline(TextPipeline);

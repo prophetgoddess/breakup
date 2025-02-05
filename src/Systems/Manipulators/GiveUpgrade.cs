@@ -83,7 +83,7 @@ public class GiveUpgrade : Manipulator
         else if (type == Upgrades.Buddy)
         {
             var buddy = CreateEntity();
-            Set(buddy, new Model(Content.Models.Square.ID));
+            Set(buddy, new SDFGraphic(Content.SDF.Square));
             Set(buddy, new Position(new Vector2(
                     Dimensions.GameWidth * 0.5f,
                     Dimensions.GameHeight * 0.75f

@@ -91,7 +91,7 @@ public class GameStateManager : MoonTools.ECS.System
                 {
                     var quitMeter = CreateEntity();
                     Set(quitMeter, new QuitMeter());
-                    Set(quitMeter, new Model(Content.Models.Square.ID));
+                    Set(quitMeter, new SDFGraphic(Content.SDF.Square));
                     Set(quitMeter, new Position(new Vector2(
                             Dimensions.GameWidth * 0.5f,
                             Dimensions.GameHeight * 0.1f
@@ -102,6 +102,7 @@ public class GameStateManager : MoonTools.ECS.System
                     Set(quitMeter, new Highlight());
                     Set(quitMeter, new KeepOpacityWhenPaused());
                     Set(quitMeter, new Depth(0.01f));
+
                     if (Some<Player>())
                     {
                         Set(quitMeter, new FollowsCamera(Dimensions.GameHeight * 0.65f));

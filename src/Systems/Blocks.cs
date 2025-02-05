@@ -90,7 +90,7 @@ public class Blocks : MoonTools.ECS.System
                 Set(block, new GivesUpgrade());
                 Set(block, new Highlight());
                 Set(hpDisplay, new Highlight());
-                Set(block, new Pulsate(Vector2.One * 1.9f, 3.0f, 0.2f));
+                Set(block, new Pulsate(Vector2.One * 32, 3.0f, 0.2f));
                 hp *= 2;
                 Set(block, new HitPoints(hp, hp));
                 Set(hpDisplay, new Text(Fonts.BodyFont, Fonts.InfoSize, Stores.TextStorage.GetID($"{GameStateManager.GetFormattedNumber(hp, 2)}"), MoonWorks.Graphics.Font.HorizontalAlignment.Center, MoonWorks.Graphics.Font.VerticalAlignment.Middle));
@@ -102,7 +102,7 @@ public class Blocks : MoonTools.ECS.System
                 Set(block, new Block(0));
                 Set(hpDisplay, new Scale(Vector2.One * 20));
                 Set(block, new HitPoints(1, 1));
-                Set(block, new Pulsate(Vector2.One * 1.9f, 3.0f, 0.2f));
+                Set(block, new Pulsate(Vector2.One * 32, 3.0f, 0.2f));
                 Set(hpDisplay, new Highlight());
                 Set(hpDisplay, new SDFGraphic(Content.SDF.Unlock));
             }
@@ -303,9 +303,8 @@ public class Blocks : MoonTools.ECS.System
                     if (Rando.Value < 0.01f)
                     {
                         var extraLife = CreateEntity();
-                        Set(extraLife, new Model(Content.Models.ExtraLife.ID));
-                        Set(extraLife, new Orientation(-MathF.PI / 2f));
-                        Set(extraLife, new Scale(Vector2.One * 10.0f));
+                        Set(extraLife, new SDFGraphic(Content.SDF.Heart));
+                        Set(extraLife, new Scale(Vector2.One * 20.0f));
                         Set(extraLife, new Position(Get<Position>(block).Value));
                         Set(extraLife, new Velocity(new Vector2(Rando.Range(-50f, 50f), Rando.Range(-100f, -10f))));
                         Set(extraLife, new BoundingBox(0, 0, 18, 18));
