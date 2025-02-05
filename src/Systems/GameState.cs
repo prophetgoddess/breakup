@@ -96,10 +96,8 @@ public class GameStateManager : MoonTools.ECS.System
                             Dimensions.GameWidth * 0.5f,
                             Dimensions.GameHeight * 0.1f
                         )));
-                    Set(quitMeter, new Orientation(0f));
                     Set(quitMeter, new Velocity(Vector2.Zero));
                     Set(quitMeter, new Scale(new Vector2(0f, 4f)));
-                    Set(quitMeter, new Power(0f, 0.01f, 2f));
                     Set(quitMeter, new DestroyOnStateTransition());
                     Set(quitMeter, new Highlight());
                     Set(quitMeter, new KeepOpacityWhenPaused());
@@ -124,7 +122,9 @@ public class GameStateManager : MoonTools.ECS.System
                     if (Some<Player>())
                         Set(quitMeter, new Scale(new Vector2(t * Dimensions.GameWidth, 4f)));
                     else
+                    {
                         Set(quitMeter, new Scale(new Vector2(t * Dimensions.UIWidth, 4f)));
+                    }
                 }
             }
 
@@ -148,6 +148,12 @@ public class GameStateManager : MoonTools.ECS.System
         }
         else
         {
+            if (Some<QuitMeter>())
+            {
+                Console.WriteLine("destroy quit meter");
+
+                Destroy(GetSingletonEntity<QuitMeter>());
+            }
 
             holdActivationTimer = 0f;
             holdTimer = 0f;
