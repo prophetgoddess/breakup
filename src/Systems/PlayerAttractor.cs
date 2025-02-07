@@ -11,11 +11,13 @@ public class PlayerAttractor : MoonTools.ECS.System
 
     Filter PlayerAttractionFilter;
     XPAndLevel XPAndLevel;
+    Scorer Scorer;
 
     public PlayerAttractor(World world) : base(world)
     {
         PlayerAttractionFilter = FilterBuilder.Include<Position>().Include<MoveTowardsPlayer>().Build();
         XPAndLevel = new(world);
+        Scorer = new(world);
     }
 
     public override void Update(TimeSpan delta)
@@ -62,6 +64,9 @@ public class PlayerAttractor : MoonTools.ECS.System
                     var current = gems.Current;
                     current += Get<AddGems>(entity).Amount;
                     Set(gemsEntity, new Gems(current, total));
+
+                    Scorer.AddScore(1);
+
 
                     XPAndLevel.GiveXP(Get<GivesXP>(entity).Amount);
                     Set(CreateEntity(), new PlayOnce(Stores.SFXStorage.GetID(Content.SFX.gemcollect)));

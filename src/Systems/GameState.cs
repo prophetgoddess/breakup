@@ -197,44 +197,6 @@ public class GameStateManager : MoonTools.ECS.System
             MoonWorks.Graphics.Font.HorizontalAlignment.Left,
             MoonWorks.Graphics.Font.VerticalAlignment.Middle));
 
-        if (!Some<Score>())
-            return;
-
-        var newScore = (int)GetSingleton<CameraPosition>().Y + gems.Total;
-        var scoreEntity = GetSingletonEntity<Score>();
-        var score = Get<Score>(scoreEntity);
-        var highScoreEntity = GetSingletonEntity<HighScore>();
-        var highScore = Get<HighScore>(highScoreEntity).Value;
-
-        Set(scoreEntity, new Score(newScore));
-        Set(scoreEntity,
-        new Text(
-            Fonts.BodyFont,
-            Fonts.BodySize,
-            Stores.TextStorage.GetID(GetFormattedNumber(newScore)),
-            MoonWorks.Graphics.Font.HorizontalAlignment.Left,
-            MoonWorks.Graphics.Font.VerticalAlignment.Middle));
-
-        if (newScore > highScore)
-        {
-            highScore = newScore;
-            Set(highScoreEntity, new HighScore(newScore));
-            SaveGame.Save();
-            if (!Some<SetHighScoreThisRun>())
-            {
-                Set(CreateEntity(), new SetHighScoreThisRun());
-                Set(CreateEntity(), new PlayOnce(Stores.SFXStorage.GetID(Content.SFX.hiscore)));
-            }
-        }
-
-        Set(highScoreEntity,
-         new Text(
-            Fonts.BodyFont,
-            Fonts.BodySize,
-            Stores.TextStorage.GetID(GetFormattedNumber(highScore)),
-            MoonWorks.Graphics.Font.HorizontalAlignment.Left,
-            MoonWorks.Graphics.Font.VerticalAlignment.Middle));
-
         if (!Some<Lives>())
             return;
 

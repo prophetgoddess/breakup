@@ -11,14 +11,15 @@ public class Collision : MoonTools.ECS.System
     Filter BlocksFilter;
     Filter BallFilter;
 
-
     XPAndLevel XPAndLevel;
+    Scorer Scorer;
 
     public Collision(World world) : base(world)
     {
         BallFilter = FilterBuilder.Include<CanDealDamageToBlock>().Include<HasGravity>().Include<CanBeHit>().Build();
         CollidingFilter = FilterBuilder.Include<Position>().Include<BoundingBox>().Build();
         XPAndLevel = new XPAndLevel(world);
+        Scorer = new Scorer(world);
         BlocksFilter = FilterBuilder
         .Include<Block>()
         .Include<HitPoints>()
@@ -60,6 +61,7 @@ public class Collision : MoonTools.ECS.System
     {
         if (Has<FillMeter>(other) && Has<AddGems>(other) && Has<Player>(entity))
         {
+            System.Console.WriteLine("collect gems");
             var meterEntity = GetSingletonEntity<Power>();
             var meter = Get<Power>(meterEntity);
             var value = meter.Value;
@@ -76,6 +78,8 @@ public class Collision : MoonTools.ECS.System
             Set(gemsEntity, new Gems(current, total));
 
             XPAndLevel.GiveXP(Get<GivesXP>(other).Amount);
+            System.Console.WriteLine("add score");
+            Scorer.AddScore(1);
             Set(CreateEntity(), new PlayOnce(Stores.SFXStorage.GetID(Content.SFX.gemcollect)));
 
             Destroy(other);

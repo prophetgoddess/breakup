@@ -219,11 +219,13 @@ public class GameSpawner : Manipulator
         var highScoreEntity = CreateEntity();
         Set(highScoreEntity, new HighScore(saveData.HighScore));
         Set(highScoreEntity, new Position(new Vector2(UILayoutConstants.InfoX, UILayoutConstants.HighScoreY)));
-        Set(highScoreEntity,
-         new Text(
+        Set(highScoreEntity, new Text(
             Fonts.BodyFont,
             Fonts.BodySize,
-            Stores.TextStorage.GetID("")));
+            Stores.TextStorage.GetID(GameStateManager.GetFormattedNumber(saveData.HighScore)),
+            MoonWorks.Graphics.Font.HorizontalAlignment.Left,
+            MoonWorks.Graphics.Font.VerticalAlignment.Middle
+            ));
         Set(highScoreEntity, new UI());
         Set(highScoreEntity, new Highlight());
         Set(highScoreEntity, new HideOnMainMenu());
@@ -239,7 +241,13 @@ public class GameSpawner : Manipulator
         Set(gemsLabel, new DestroyOnStateTransition());
 
         var scoreEntity = Some<Score>() ? GetSingletonEntity<Score>() : CreateEntity();
-        Set(scoreEntity, new Text(Fonts.BodyFont, Fonts.BodySize, Stores.TextStorage.GetID("0")));
+        Set(scoreEntity, new Text(
+            Fonts.BodyFont,
+            Fonts.BodySize,
+            Stores.TextStorage.GetID(GameStateManager.GetFormattedNumber(0)),
+            MoonWorks.Graphics.Font.HorizontalAlignment.Left,
+            MoonWorks.Graphics.Font.VerticalAlignment.Middle
+            ));
         Set(scoreEntity, new Highlight());
         Set(scoreEntity, new Score(0));
         Set(scoreEntity, new Position(new Vector2(UILayoutConstants.InfoX, UILayoutConstants.ScoreY)));
@@ -247,7 +255,13 @@ public class GameSpawner : Manipulator
         Set(scoreEntity, new DestroyOnStateTransition());
 
         var gemsEntity = Some<Gems>() ? GetSingletonEntity<Gems>() : CreateEntity();
-        Set(gemsEntity, new Text(Fonts.BodyFont, Fonts.BodySize, Stores.TextStorage.GetID("0")));
+        Set(gemsEntity, new Text(
+                Fonts.BodyFont,
+                Fonts.BodySize,
+                Stores.TextStorage.GetID(GameStateManager.GetFormattedNumber(0)),
+                MoonWorks.Graphics.Font.HorizontalAlignment.Left,
+                MoonWorks.Graphics.Font.VerticalAlignment.Middle
+            ));
         Set(gemsEntity, new Highlight());
         Set(gemsEntity, new Gems(0, 0));
         Set(gemsEntity, new Position(new Vector2(UILayoutConstants.InfoX, UILayoutConstants.GemsY)));

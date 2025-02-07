@@ -9,11 +9,13 @@ public class FollowCamera : MoonTools.ECS.System
 {
     Filter FollowFilter;
     Filter FollowsFilter;
+    Scorer Scorer;
 
     public FollowCamera(World world) : base(world)
     {
         FollowFilter = FilterBuilder.Include<FollowsCamera>().Include<Position>().Build();
         FollowsFilter = FilterBuilder.Include<CameraFollows>().Include<Position>().Build();
+        Scorer = new Scorer(world);
     }
 
     public override void Update(TimeSpan delta)
@@ -38,6 +40,7 @@ public class FollowCamera : MoonTools.ECS.System
 
         if (highestY < -offset)
         {
+            Scorer.AddScore((int)Math.Abs(highestY) - (int)Math.Abs(offset));
             offset = -highestY;
         }
 
