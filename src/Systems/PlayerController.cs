@@ -56,7 +56,7 @@ public class PlayerController : MoonTools.ECS.System
             movementDelta = Vector2.Normalize(movementDelta);
         }
 
-        movementDelta *= 300f * (inputState.Dash.IsDown ? 2f : 1.0f);
+        movementDelta *= 350f * (inputState.Dash.IsDown ? 2f : 1.0f);
 
         Set(player, new Velocity(movementDelta));
 

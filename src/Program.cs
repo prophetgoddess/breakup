@@ -124,8 +124,8 @@ class Program : Game
         debugMode = true;
         var windowCreateInfo = new WindowCreateInfo(
             "break.up",
-            1920,
-            1080,
+            1280,
+            720,
             ScreenMode.Windowed
         );
 

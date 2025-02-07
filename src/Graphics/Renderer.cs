@@ -183,22 +183,6 @@ public class Renderer : MoonTools.ECS.Renderer
         GameTextFilter = FilterBuilder.Include<Text>().Include<Position>().Exclude<UI>().Exclude<Invisible>().Build();
         ColliderFilter = FilterBuilder.Include<Position>().Include<BoundingBox>().Build();
 
-        Shader modelVertShader = ShaderCross.Create(
-            GraphicsDevice,
-            Path.Join(System.AppContext.BaseDirectory, "Shaders", "Vertex.vert.spv"),
-            "main",
-            ShaderCross.ShaderFormat.SPIRV,
-            ShaderStage.Vertex
-        );
-
-        Shader modelFragShader = ShaderCross.Create(
-            GraphicsDevice,
-            Path.Join(System.AppContext.BaseDirectory, "Shaders", "Fragment.frag.spv"),
-            "main",
-            ShaderCross.ShaderFormat.SPIRV,
-            ShaderStage.Fragment
-        );
-
         Shader sdfVertShader = ShaderCross.Create(
             GraphicsDevice,
             Path.Join(System.AppContext.BaseDirectory, "Shaders", "TexturedQuadColorWithMatrix.vert.spv"),
