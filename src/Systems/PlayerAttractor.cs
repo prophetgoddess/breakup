@@ -67,7 +67,6 @@ public class PlayerAttractor : MoonTools.ECS.System
 
                     Scorer.AddScore(1);
 
-
                     XPAndLevel.GiveXP(Get<GivesXP>(entity).Amount);
                     Set(CreateEntity(), new PlayOnce(Stores.SFXStorage.GetID(Content.SFX.gemcollect)));
 

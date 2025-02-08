@@ -270,7 +270,7 @@ public static class Content
 
     for spritesheet in Path(texture_out).glob("*.json"):
         f.write(f"public static class {Path(spritesheet).stem}\n{{\n")
-        f.write(f"public static Texture? Atlas {{get; private set;}}")
+        f.write(f"public static Texture Atlas {{get; private set;}}")
 
         with open(spritesheet, "r+") as s:
             data = json.loads(s.read())

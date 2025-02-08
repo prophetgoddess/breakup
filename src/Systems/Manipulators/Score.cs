@@ -22,16 +22,16 @@ public class Scorer : Manipulator
         if (!Some<Score>())
             return;
 
+        var combo = GetSingleton<Combo>().Value;
+
+        Amount *= combo;
+
         var scoreEntity = GetSingletonEntity<Score>();
         var score = Get<Score>(scoreEntity);
 
         var highScoreEntity = GetSingletonEntity<HighScore>();
         var highScore = Get<HighScore>(highScoreEntity).Value;
         var newScore = score.Current + Amount;
-
-        var combo = GetSingleton<Combo>().Value;
-
-        Amount *= combo;
 
         Set(scoreEntity, new Score(newScore));
         Set(scoreEntity,
