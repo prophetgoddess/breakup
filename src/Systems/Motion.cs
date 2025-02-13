@@ -8,6 +8,7 @@ public class Motion : MoonTools.ECS.System
 {
     public Filter MotionFilter;
     public Filter ColliderFilter;
+    public Filter StaticFilter;
 
     const int CellSize = 16;
     const float CellReciprocal = 1.0f / CellSize;
@@ -82,6 +83,11 @@ public class Motion : MoonTools.ECS.System
     {
         MotionFilter = FilterBuilder.Include<Velocity>().Include<Position>().Build();
         ColliderFilter = FilterBuilder.Include<Position>().Include<BoundingBox>().Build();
+        StaticFilter = FilterBuilder
+        .Include<Position>()
+        .Include<BoundingBox>()
+        .Include<CheckForStaticCollisions>()
+        .Build();
     }
 
     public bool Overlaps(Vector2 posA, BoundingBox boxA, Vector2 posB, BoundingBox boxB)

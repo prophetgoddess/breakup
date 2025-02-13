@@ -2,6 +2,7 @@
 using System.Reflection.Metadata;
 using Microsoft.VisualBasic;
 using MoonTools.ECS;
+using MoonWorks.Input;
 
 namespace Ball;
 
@@ -11,8 +12,11 @@ public class FollowCamera : MoonTools.ECS.System
     Filter FollowsFilter;
     Scorer Scorer;
 
-    public FollowCamera(World world) : base(world)
+    Inputs Inputs;
+
+    public FollowCamera(World world, Inputs inputs) : base(world)
     {
+        Inputs = inputs;
         FollowFilter = FilterBuilder.Include<FollowsCamera>().Include<Position>().Build();
         FollowsFilter = FilterBuilder.Include<CameraFollows>().Include<Position>().Build();
         Scorer = new Scorer(world);
@@ -27,6 +31,13 @@ public class FollowCamera : MoonTools.ECS.System
         var pos = Get<CameraPosition>(camera);
         var offset = pos.Y;
 
+#if DEBUG
+        var inputState = GetSingleton<InputState>();
+        if (Inputs.Keyboard.IsHeld(KeyCode.W))
+        {
+            offset += (float)delta.TotalSeconds * 100.0f;
+        }
+#endif
         var highestY = 0.0f;
 
         foreach (var ball in FollowsFilter.Entities)
@@ -43,6 +54,8 @@ public class FollowCamera : MoonTools.ECS.System
             Scorer.AddScore((int)Math.Abs(highestY) - (int)Math.Abs(offset));
             offset = -highestY;
         }
+
+
 
         Set(camera, new CameraPosition(offset));
 

@@ -24,7 +24,8 @@ public class Scorer : Manipulator
 
         var combo = GetSingleton<Combo>().Value;
 
-        Amount *= combo;
+        if (combo > 0)
+            Amount *= combo;
 
         var scoreEntity = GetSingletonEntity<Score>();
         var score = Get<Score>(scoreEntity);

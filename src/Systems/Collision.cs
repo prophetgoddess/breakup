@@ -57,11 +57,27 @@ public class Collision : MoonTools.ECS.System
         }
     }
 
+    private void HandleIncoming(Entity entity, Entity other)
+    {
+        if (Has<IncomingIndicator>(entity) && Has<Block>(other))
+        {
+            System.Console.WriteLine("incoming");
+            Remove<Invisible>(entity);
+            if (Has<HitPoints>(other))
+            {
+                Set(entity, new SDFGraphic(Content.SDF.EmptyTriangle));
+            }
+            else
+            {
+                Set(entity, new SDFGraphic(Content.SDF.Triangle));
+            }
+        }
+    }
+
     void HandleGems(Entity entity, Entity other)
     {
         if (Has<FillMeter>(other) && Has<AddGems>(other) && Has<Player>(entity))
         {
-            System.Console.WriteLine("collect gems");
             var meterEntity = GetSingletonEntity<Power>();
             var meter = Get<Power>(meterEntity);
             var value = meter.Value;
@@ -173,6 +189,9 @@ public class Collision : MoonTools.ECS.System
 
     void HandleBounce(Entity entity, Entity other, Colliding collision, bool xCollision, bool yCollision)
     {
+        if (!Has<Velocity>(entity))
+            return;
+
         var velocity = Get<Velocity>(entity).Value;
         var position = Get<Position>(entity).Value;
 
@@ -244,6 +263,9 @@ public class Collision : MoonTools.ECS.System
 
     void HandleHitBall(Entity entity, Entity other)
     {
+        if (!Has<Velocity>(entity))
+            return;
+
         var position = Get<Position>(entity).Value;
         var velocity = Get<Velocity>(entity).Value;
 

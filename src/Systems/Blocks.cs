@@ -6,20 +6,25 @@ using MoonTools.ECS;
 using MoonWorks;
 using MoonWorks.Graphics.Font;
 using MoonWorks.Math;
+using Nito.Collections;
 
 namespace Ball;
+
+
 
 public class Blocks : MoonTools.ECS.System
 {
 
     Filter BlockFilter;
-    int CellSize = 32;
-    int GridWidth { get { return Dimensions.GameWidth / CellSize; } }
-    int GridHeight { get { return Dimensions.GameHeight / CellSize; } }
+    Filter IncomingFilter;
+    public static int CellSize = 32;
+    public static int GridWidth { get { return Dimensions.GameWidth / CellSize; } }
+    public static int GridHeight { get { return Dimensions.GameHeight / CellSize; } }
     UpgradeMenuSpawner UpgradeMenuSpawner;
     MarqueeSpawner MarqueeSpawner;
     SaveGame SaveGame;
 
+    Deque<Entity[]> BlockBuffer = new(GridHeight + 3);
 
     System.Random Random = new System.Random();
     float LastGridOffset = -1.0f;
@@ -37,9 +42,12 @@ public class Blocks : MoonTools.ECS.System
     {
         GemSpawner = new GemSpawner(world);
 
+
         BlockFilter = FilterBuilder
         .Include<Block>()
         .Build();
+
+        IncomingFilter = FilterBuilder.Include<IncomingIndicator>().Build();
 
         UpgradeMenuSpawner = new UpgradeMenuSpawner(world);
         BallSpawner = new BallSpawner(world);
@@ -48,7 +56,7 @@ public class Blocks : MoonTools.ECS.System
         SaveGame = new SaveGame(world);
     }
 
-    void SpawnBlock(int x, int y, bool unbreakable = false)
+    Entity SpawnBlock(int x, int y, bool unbreakable = false)
     {
         var cameraY = GetSingleton<CameraPosition>().Y;
 
@@ -115,36 +123,32 @@ public class Blocks : MoonTools.ECS.System
         {
             Set(block, new SDFGraphic(Content.SDF.RoundedSquare));
         }
+
+        return block;
     }
 
     void Initialize()
     {
         Destroy(GetSingletonEntity<Initialize>());
         LastGridOffset = 0.0f;
-        for (int x = 0; x < GridWidth; x++)
+
+        for (int y = -3; y < GridHeight * 0.4f; y++)
         {
-            for (int y = -3; y < GridHeight * 0.4f; y++)
+            var rowArray = new Entity[GridWidth];
+            for (int x = 0; x < GridWidth; x++)
             {
                 if (Random.NextDouble() < float.Lerp(MinBlockDensity, MaxBlockDensity, 0f))
                 {
+                    rowArray[x] =
                     SpawnBlock(
                         x,
                         y
                     );
                 }
             }
+
+            BlockBuffer.AddToBack(rowArray);
         }
-
-        // int maxY = -(int)(MathF.Floor(GameplaySettings.MaxCameraY + CellSize) / CellSize);
-
-        // for (int x = 0; x < GridWidth; x++)
-        // {
-        //     SpawnBlock(
-        //         x,
-        //         maxY,
-        //         true
-        //     );
-        // }
 
     }
 
@@ -162,19 +166,44 @@ public class Blocks : MoonTools.ECS.System
 
         var cam = GetSingleton<CameraPosition>();
 
+        var upcomingRow = BlockBuffer[2];
+
+        IncomingFilter.DestroyAllEntities();
+
+        for (int x = 0; x < GridWidth; x++)
+        {
+            if (Has<Block>(upcomingRow[x]))
+            {
+                var incomingEntity = CreateEntity();
+                Set(incomingEntity, new Position(new Vector2(CellSize * 0.5f + x * CellSize, -cam.Y + CellSize * 0.5f)));
+                Set(incomingEntity, new Scale(Vector2.One * 16));
+                Set(incomingEntity, new BoundingBox(0, -CellSize * 1.5f, CellSize, CellSize));
+                Set(incomingEntity, new CheckForStaticCollisions());
+                Set(incomingEntity, new DestroyOnStateTransition());
+                Set(incomingEntity, new SDFGraphic(Has<HitPoints>(upcomingRow[x]) ? Content.SDF.EmptyTriangle : Content.SDF.Triangle));
+                Set(incomingEntity, new Depth(0.01f));
+                Set(incomingEntity, new IncomingIndicator());
+            }
+        }
+
         if (cam.Y > LastGridOffset && cam.Y > LastGridOffset + CellSize && cam.Y < GameplaySettings.MaxCameraY)
         {
             LastGridOffset = cam.Y;
 
             int y = -(int)(MathF.Floor(cam.Y + CellSize) / CellSize) - 3;
 
+            var rowArray = BlockBuffer.RemoveFromBack();
+            Array.Clear(rowArray);
+
             for (int x = 0; x < GridWidth; x++)
             {
                 if (Random.NextDouble() < float.Lerp(MinBlockDensity, MaxBlockDensity, cam.Y / GameplaySettings.MaxCameraY))
                 {
-                    SpawnBlock(x, y);
+                    rowArray[x] = SpawnBlock(x, y);
                 }
             }
+
+            BlockBuffer.AddToFront(rowArray);
         }
 
         foreach (var block in BlockFilter.Entities)

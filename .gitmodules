@@ -7,3 +7,6 @@
 [submodule "lib/Steamworks.NET.Dissent"]
 	path = lib/Steamworks.NET.Dissent
 	url = https://github.com/MoonsideGames/Steamworks.NET.Dissent
+[submodule "lib/Deque"]
+	path = lib/Deque
+	url = https://github.com/StephenCleary/Deque

@@ -268,5 +268,7 @@ public class GameSpawner : Manipulator
         Set(gemsEntity, new UI());
         Set(gemsEntity, new DestroyOnStateTransition());
 
+
+
     }
 }

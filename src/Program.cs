@@ -43,7 +43,7 @@ class Program : Game
             new Rotation(World),
             new Motion(World),
             new Collision(World),
-            new FollowCamera(World),
+            new FollowCamera(World, Inputs),
             new Parent(World),
             new Blocks(World),
             new PowerMeter(World),
