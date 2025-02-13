@@ -172,7 +172,10 @@ public class Blocks : MoonTools.ECS.System
 
         for (int x = 0; x < GridWidth; x++)
         {
-            if (Has<Block>(upcomingRow[x]))
+            if (
+                Has<Block>(upcomingRow[x]) &&
+                Get<Position>(upcomingRow[x]).Value.Y < -cam.Y - CellSize * 0.4f
+            )
             {
                 var incomingEntity = CreateEntity();
                 Set(incomingEntity, new Position(new Vector2(CellSize * 0.5f + x * CellSize, -cam.Y + CellSize * 0.5f)));
@@ -182,6 +185,7 @@ public class Blocks : MoonTools.ECS.System
                 Set(incomingEntity, new DestroyOnStateTransition());
                 Set(incomingEntity, new SDFGraphic(Has<HitPoints>(upcomingRow[x]) ? Content.SDF.EmptyTriangle : Content.SDF.Triangle));
                 Set(incomingEntity, new Depth(0.01f));
+                Set(incomingEntity, new Highlight());
                 Set(incomingEntity, new IncomingIndicator());
             }
         }
