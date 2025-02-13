@@ -71,7 +71,7 @@ public class GameSpawner : Manipulator
         Set(power, new Orientation(0f));
         Set(power, new Velocity(Vector2.Zero));
         Set(power, new Scale(new Vector2(0f, 0f)));
-        Set(power, new Power(0f, 0.01f, 25f));
+        Set(power, new Power(0f, 0.01f, 20f));
         Set(power, new DestroyOnStateTransition());
         Set(power, new Highlight());
         Relate(power, player, new ChildOf(new Vector2(0f, 0f)));
@@ -267,7 +267,6 @@ public class GameSpawner : Manipulator
         Set(gemsEntity, new Position(new Vector2(UILayoutConstants.InfoX, UILayoutConstants.GemsY)));
         Set(gemsEntity, new UI());
         Set(gemsEntity, new DestroyOnStateTransition());
-
 
 
     }

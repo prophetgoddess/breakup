@@ -24,11 +24,11 @@
      inkscape:deskcolor="#d1d1d1"
      inkscape:document-units="mm"
      inkscape:zoom="10.16956"
-     inkscape:cx="14.307403"
-     inkscape:cy="28.123143"
-     inkscape:window-width="1920"
-     inkscape:window-height="1027"
-     inkscape:window-x="0"
+     inkscape:cx="14.258237"
+     inkscape:cy="28.123144"
+     inkscape:window-width="2304"
+     inkscape:window-height="1387"
+     inkscape:window-x="1512"
      inkscape:window-y="25"
      inkscape:window-maximized="0"
      inkscape:current-layer="layer1" />
@@ -40,8 +40,9 @@
      id="layer1">
     <path
        style="fill:#ffffff;paint-order:stroke fill markers"
-       d="M -2.3847656,-0.17382812 3.4609375,9.9492188 9.3046875,-0.17382812 Z M -1.03125,0.60742187 H 7.9511719 L 3.4609375,8.3847656 Z"
+       d="M -2.3847656,-0.17382812 3.4609375,9.9492188 9.3046875,-0.17382812 Z m 1.60515167,1.04097151 H 7.6995358 L 3.4608828,8.1250441 Z"
        id="path2"
-       transform="matrix(1.2407054,0,0,1.3022541,2.9828467,0.24028747)" />
+       transform="matrix(1.2407054,0,0,1.3022541,2.9828467,0.24028747)"
+       sodipodi:nodetypes="cccccccc" />
   </g>
 </svg>

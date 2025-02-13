@@ -36,6 +36,9 @@ public class Blocks : MoonTools.ECS.System
 
     float MaxHP = 99;
     float MinHP = 1;
+    int FlickerFrameCounter = 0;
+    int FlickerFrameCount = 6;
+    bool IndicatorsVisible = true;
 
 
     public Blocks(World world) : base(world)
@@ -54,6 +57,7 @@ public class Blocks : MoonTools.ECS.System
         MarqueeSpawner = new MarqueeSpawner(world);
 
         SaveGame = new SaveGame(world);
+        FlickerFrameCounter = 0;
     }
 
     Entity SpawnBlock(int x, int y, bool unbreakable = false)
@@ -155,6 +159,12 @@ public class Blocks : MoonTools.ECS.System
 
     public override void Update(TimeSpan delta)
     {
+        FlickerFrameCounter++;
+        FlickerFrameCounter = FlickerFrameCounter % (10 * FlickerFrameCount);
+
+        if (FlickerFrameCounter % FlickerFrameCount == 0)
+            IndicatorsVisible = !IndicatorsVisible;
+
         if (Some<Pause>())
             return;
 
@@ -179,14 +189,16 @@ public class Blocks : MoonTools.ECS.System
             {
                 var incomingEntity = CreateEntity();
                 Set(incomingEntity, new Position(new Vector2(CellSize * 0.5f + x * CellSize, -cam.Y + CellSize * 0.5f)));
-                Set(incomingEntity, new Scale(Vector2.One * 16));
-                Set(incomingEntity, new BoundingBox(0, -CellSize * 1.5f, CellSize, CellSize));
-                Set(incomingEntity, new CheckForStaticCollisions());
+                Set(incomingEntity, new Scale(Vector2.One * 20));
                 Set(incomingEntity, new DestroyOnStateTransition());
                 Set(incomingEntity, new SDFGraphic(Has<HitPoints>(upcomingRow[x]) ? Content.SDF.EmptyTriangle : Content.SDF.Triangle));
                 Set(incomingEntity, new Depth(0.01f));
-                Set(incomingEntity, new Highlight());
                 Set(incomingEntity, new IncomingIndicator());
+                if (!IndicatorsVisible)
+                {
+                    Set(incomingEntity, new Invisible());
+                }
+
             }
         }
 
@@ -236,7 +248,6 @@ public class Blocks : MoonTools.ECS.System
 
                             if (index >= 0)
                             {
-
                                 var name = Stores.TextStorage.Get(Music.Songs[index].NameID);
 
                                 var entity = CreateEntity();
