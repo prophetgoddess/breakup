@@ -10,8 +10,6 @@ using Nito.Collections;
 
 namespace Ball;
 
-
-
 public class Blocks : MoonTools.ECS.System
 {
 
@@ -23,7 +21,6 @@ public class Blocks : MoonTools.ECS.System
     UpgradeMenuSpawner UpgradeMenuSpawner;
     MarqueeSpawner MarqueeSpawner;
     SaveGame SaveGame;
-
     Deque<Entity[]> BlockBuffer = new(GridHeight + 3);
 
     System.Random Random = new System.Random();
@@ -183,8 +180,7 @@ public class Blocks : MoonTools.ECS.System
         for (int x = 0; x < GridWidth; x++)
         {
             if (
-                Has<Block>(upcomingRow[x]) &&
-                Get<Position>(upcomingRow[x]).Value.Y < -cam.Y - CellSize * 0.4f
+                Has<Block>(upcomingRow[x])
             )
             {
                 var incomingEntity = CreateEntity();
